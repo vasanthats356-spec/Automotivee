@@ -1,0 +1,2574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Automotive — Inventory</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+
+<style>
+/* ==========================================================
+   COLOR SYSTEM
+   ========================================================== */
+:root{
+  --carbon:      #0B0E13;
+  --graphite:    #141922;
+  --steel:       #232A36;
+  --red:         #E10600;
+  --red-bright:  #FF2A1F;
+  --red-deep:    #A80400;
+  --amber:       #FFB020;
+  --amber-d:     #E08A00;
+  --green:       #22C55E;
+  --silver:      #C9D1DC;
+  --text:        #EEF2F8;
+  --text-soft:   #A9B3C0;
+  --text-mute:   #8B96A6;
+  --line:        rgba(201,209,220,.12);
+  --line-2:      rgba(201,209,220,.22);
+  --input-bg:    rgba(11,14,19,.55);
+  --input-bd:    rgba(201,209,220,.18);
+  --card-bg:     linear-gradient(160deg, rgba(20,25,34,.96), rgba(11,14,19,.99));
+  --card-bd:     rgba(201,209,220,.14);
+  --ease:        cubic-bezier(.22,.61,.36,1);
+  --ease-bounce: cubic-bezier(.34,1.56,.64,1);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; font-family:'Inter','Segoe UI',Roboto,system-ui,sans-serif; }
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; width:100%; max-width:100%; overflow-x:hidden; }
+
+body{
+  background:
+    radial-gradient(1100px 600px at 78% -10%, rgba(225,6,0,.14), transparent 62%),
+    radial-gradient(900px 520px at 4% 6%, rgba(255,176,32,.06), transparent 60%),
+    var(--carbon);
+  color:var(--text);
+  min-height:100vh;
+  display:flex; flex-direction:column; align-items:center;
+  width:100%; max-width:100%; min-width:0;
+  overflow-x:hidden;
+  position:relative; z-index:0;
+}
+
+body::before,
+body::after{
+  content:''; position:fixed; border-radius:50%; filter:blur(90px);
+  z-index:-1; pointer-events:none;
+}
+body::before{
+  width:520px; height:520px; background:#E10600; opacity:.16;
+  top:-180px; left:-160px;
+  animation:blobDrift 16s ease-in-out infinite;
+}
+body::after{
+  width:460px; height:460px; background:#FFB020; opacity:.09;
+  bottom:-200px; right:-180px;
+  animation:blobDrift 20s ease-in-out infinite reverse;
+}
+@keyframes blobDrift{
+  0%,100%{ transform:translate(0,0) scale(1); }
+  50%{ transform:translate(40px,-30px) scale(1.1); }
+}
+
+#header-placeholder,
+#footer-placeholder{ width:100%; flex-shrink:0; }
+
+.wrap{ width:100%; max-width:1280px; margin:0 auto; padding:0 24px; }
+main{ width:100%; max-width:100%; overflow-x:clip; flex:1; }
+
+h1,h2,h3,h4{
+  font-family:'Outfit','Inter',sans-serif;
+  font-weight:800; letter-spacing:-.025em; line-height:1.1; color:#fff;
+}
+
+a{ text-decoration:none; color:inherit; }
+button{ font-family:inherit; cursor:pointer; border:none; background:none; }
+img{ display:block; max-width:100%; }
+
+::-webkit-scrollbar{ width:8px; height:8px; }
+::-webkit-scrollbar-track{ background:var(--carbon); }
+::-webkit-scrollbar-thumb{ background:var(--steel); border-radius:4px; border:2px solid var(--carbon); }
+::-webkit-scrollbar-thumb:hover{ background:var(--red); }
+::selection{ background:var(--red); color:#fff; }
+
+.sec{ padding:90px 0; position:relative; overflow-x:clip; }
+
+.mini-eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:.66rem; font-weight:800; letter-spacing:2px;
+  text-transform:uppercase; color:var(--amber); margin-bottom:16px;
+}
+.mini-eyebrow::before{
+  content:''; width:24px; height:2px;
+  background:linear-gradient(90deg, var(--red), var(--amber));
+  border-radius:2px;
+}
+.mini-eyebrow i{ color:var(--red-bright); font-size:.72rem; }
+
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:10px; padding:14px 28px; border-radius:60px;
+  font-size:.86rem; font-weight:800; letter-spacing:.4px;
+  white-space:nowrap; border:1.5px solid transparent;
+  transition:all .35s var(--ease); text-decoration:none; min-height:48px;
+}
+.btn i{ font-size:.92em; transition:transform .35s var(--ease); }
+.btn-red{
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  color:#fff; box-shadow:0 12px 30px rgba(225,6,0,.4);
+}
+.btn-red:hover{
+  background:linear-gradient(135deg, var(--red-bright), var(--red));
+  transform:translateY(-3px);
+  box-shadow:0 18px 40px rgba(225,6,0,.55);
+}
+.btn-ghost{
+  background:rgba(255,255,255,.03);
+  border-color:rgba(201,209,220,.32);
+  color:var(--silver);
+}
+.btn-ghost:hover{
+  background:rgba(201,209,220,.10);
+  border-color:var(--silver);
+  color:#fff; transform:translateY(-3px);
+}
+
+/* ==========================================================
+   SECTION 1 — HERO
+   ========================================================== */
+.hero-showroom{
+  position:relative;
+  padding:50px 0 80px;
+  overflow:hidden;
+}
+.hero-showroom::before{
+  content:''; position:absolute;
+  top:-180px; right:-100px;
+  width:700px; height:700px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(225,6,0,.20), transparent 62%);
+  filter:blur(60px); pointer-events:none;
+}
+
+.hero-grid{
+  position:relative; z-index:2;
+  display:grid;
+  grid-template-columns:auto 1fr 1fr;
+  gap:48px;
+  align-items:center;
+}
+
+.hero-index{
+  display:flex; flex-direction:column; gap:20px;
+  align-self:center;
+  border-right:1px solid var(--line-2);
+  padding-right:32px;
+}
+.hi-item{
+  display:flex; align-items:center; gap:12px;
+  opacity:.5;
+  transition:opacity .4s var(--ease);
+}
+.hi-item.active{ opacity:1; }
+.hi-num{
+  font-family:'Outfit',sans-serif;
+  font-size:1.1rem; font-weight:900;
+  color:var(--text-mute); letter-spacing:-.02em;
+  min-width:32px;
+  transition:color .4s ease;
+}
+.hi-item.active .hi-num{ color:var(--red-bright); font-size:1.4rem; }
+.hi-line{
+  flex:1; height:1px; background:var(--line-2);
+  min-width:24px; transition:background .4s ease;
+}
+.hi-item.active .hi-line{ background:linear-gradient(90deg, var(--red), var(--amber)); }
+.hi-label{
+  font-size:.6rem; font-weight:800;
+  letter-spacing:1.4px; text-transform:uppercase;
+  color:var(--text-mute); white-space:nowrap;
+}
+.hi-item.active .hi-label{ color:var(--amber); }
+
+.hero-copy h1{
+  font-size:clamp(2.2rem, 4.4vw, 3.8rem);
+  font-weight:900; line-height:1.02;
+  letter-spacing:-.04em; margin-bottom:22px;
+}
+.hero-copy h1 em{
+  font-style:normal; color:var(--red-bright);
+  position:relative; display:inline-block;
+}
+.hero-copy h1 em::after{
+  content:''; position:absolute;
+  left:0; right:0; bottom:4px; height:12px;
+  background:linear-gradient(90deg, rgba(225,6,0,.4), rgba(255,176,32,.2));
+  border-radius:6px; z-index:-1;
+}
+.hero-copy > p{
+  font-size:.98rem; color:var(--text-soft);
+  line-height:1.78; max-width:440px; margin-bottom:28px;
+}
+.hero-tags{
+  display:flex; gap:10px; flex-wrap:wrap; margin-bottom:32px;
+}
+.hero-tag{
+  display:inline-flex; align-items:center; gap:7px;
+  padding:8px 14px; border-radius:100px;
+  background:rgba(11,14,19,.65);
+  border:1px solid var(--line-2);
+  font-size:.72rem; font-weight:700;
+  color:var(--text-soft);
+}
+.hero-tag i{ color:var(--red-bright); font-size:.7rem; }
+.hero-actions{ display:flex; gap:12px; flex-wrap:wrap; }
+
+.hero-visual{
+  position:relative;
+  width:100%;
+  aspect-ratio:4/5;
+  max-width:480px;
+  margin-left:auto;
+}
+.hero-visual .hv-img{
+  position:absolute;
+  top:0; right:0;
+  width:100%; height:100%;
+  border-radius:24px;
+  overflow:hidden;
+  border:1px solid var(--line-2);
+  box-shadow:0 30px 70px rgba(0,0,0,.7);
+  background:var(--graphite);
+}
+.hero-visual .hv-img img{
+  width:100%; height:100%;
+  object-fit:cover;
+  transition:transform 1s var(--ease);
+}
+.hero-visual .hv-img:hover img{ transform:scale(1.05); }
+.hero-visual .hv-img::before{
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+  z-index:2; pointer-events:none;
+}
+.hero-visual .hv-img::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 55%, rgba(11,14,19,.75) 100%);
+  pointer-events:none;
+}
+
+.hero-spec-card{
+  position:absolute;
+  bottom:-40px; left:-40px;
+  z-index:3;
+  background:rgba(11,14,19,.96);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  border:1px solid var(--line-2);
+  border-radius:18px;
+  padding:22px 24px;
+  box-shadow:0 24px 56px rgba(0,0,0,.7);
+  width:min(340px, 85%);
+}
+.hero-spec-card .hsc-label{
+  font-size:.58rem; font-weight:900;
+  letter-spacing:2px; text-transform:uppercase;
+  color:var(--amber); margin-bottom:10px;
+  display:flex; align-items:center; gap:8px;
+}
+.hero-spec-card .hsc-label::before{
+  content:''; width:6px; height:6px;
+  border-radius:50%; background:var(--green);
+  box-shadow:0 0 0 0 rgba(34,197,94,.6);
+  animation:pingDot 1.8s infinite;
+}
+@keyframes pingDot{
+  0%{ box-shadow:0 0 0 0 rgba(34,197,94,.6); }
+  70%{ box-shadow:0 0 0 10px rgba(34,197,94,0); }
+  100%{ box-shadow:0 0 0 0 rgba(34,197,94,0); }
+}
+.hero-spec-card .hsc-brand{
+  font-size:.7rem; font-weight:800;
+  letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-soft); margin-bottom:4px;
+}
+.hero-spec-card .hsc-name{
+  font-family:'Outfit',sans-serif;
+  font-size:1.25rem; font-weight:800; color:#fff;
+  letter-spacing:-.02em; margin-bottom:16px;
+}
+.hero-spec-card .hsc-specs{
+  display:grid; grid-template-columns:repeat(3, 1fr);
+  gap:8px; padding:14px 0;
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  margin-bottom:16px;
+}
+.hero-spec-card .hsc-specs > div{ text-align:center; }
+.hero-spec-card .hsc-specs span{
+  display:block;
+  font-family:'Outfit',sans-serif;
+  font-size:.95rem; font-weight:900; color:#fff;
+  letter-spacing:-.01em; line-height:1; margin-bottom:4px;
+}
+.hero-spec-card .hsc-specs small{
+  display:block; font-size:.56rem; font-weight:800;
+  letter-spacing:.8px; text-transform:uppercase; color:var(--text-mute);
+}
+.hero-spec-card .btn{
+  width:100%; padding:11px 20px; min-height:44px;
+  font-size:.8rem; justify-content:center;
+}
+
+.hero-search{
+  position:relative; z-index:3;
+  margin-top:80px;
+  background:linear-gradient(160deg, rgba(20,25,34,.98), rgba(11,14,19,.99));
+  border:1px solid var(--line-2);
+  border-radius:20px;
+  padding:22px;
+  box-shadow:0 20px 50px rgba(0,0,0,.55);
+  overflow:hidden;
+}
+.hero-search::before{
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+  pointer-events:none;
+}
+.hero-search .hs-label{
+  display:flex; align-items:center; gap:10px;
+  font-size:.66rem; font-weight:800;
+  letter-spacing:1.6px; text-transform:uppercase;
+  color:var(--amber); margin-bottom:14px;
+}
+.hero-search .hs-label i{ color:var(--red-bright); font-size:.76rem; }
+.hs-form{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr auto;
+  gap:12px; align-items:end;
+}
+.hs-field{
+  display:flex; flex-direction:column; gap:7px; min-width:0;
+}
+.hs-field label{
+  font-size:.62rem; font-weight:800;
+  letter-spacing:.8px; text-transform:uppercase; color:var(--text-soft);
+}
+.hs-field select{
+  width:100%; padding:13px 36px 13px 14px;
+  border:1.5px solid var(--input-bd); border-radius:11px;
+  font-size:.86rem; background:var(--input-bg); color:#fff;
+  outline:none; font-family:inherit; cursor:pointer;
+  appearance:none; -webkit-appearance:none;
+  background-image:url("car4.webp");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:11px;
+  transition:all .25s ease; min-height:46px;
+}
+.hs-field select:focus{
+  border-color:var(--red);
+  box-shadow:0 0 0 3px rgba(225,6,0,.14);
+  background-color:rgba(11,14,19,.9);
+}
+.hs-field select option{ background:#141922; color:#fff; }
+.hs-field.error select{ border-color:var(--red-bright); }
+.hs-submit{
+  padding:13px 26px; border-radius:11px;
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  color:#fff; font-weight:800; font-size:.86rem;
+  display:inline-flex; align-items:center; gap:8px;
+  box-shadow:0 10px 26px rgba(225,6,0,.4);
+  transition:all .3s var(--ease);
+  min-height:46px; white-space:nowrap;
+  justify-content:center; width:100%;
+}
+.hs-submit:hover{ transform:translateY(-2px); box-shadow:0 14px 32px rgba(225,6,0,.55); }
+.hs-submit:disabled{ opacity:.7; cursor:wait; }
+.hs-error{
+  display:none; margin-top:12px;
+  padding:10px 14px; border-radius:10px;
+  background:rgba(225,6,0,.10);
+  border:1px solid rgba(225,6,0,.35);
+  color:#FF8A85; font-size:.76rem; font-weight:600;
+  align-items:center; gap:8px;
+}
+.hs-error.show{ display:flex; }
+.hs-error i{ font-size:.78rem; }
+
+/* ==========================================================
+   SECTION 2 — FILTER SHOWCASE
+   ========================================================== */
+.filters-section{ padding-top:20px; padding-bottom:90px; }
+
+.filters-head{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:24px; flex-wrap:wrap; margin-bottom:28px;
+}
+.filters-head h2{
+  font-size:clamp(1.75rem, 3.6vw, 2.6rem);
+  line-height:1.05;
+}
+.filters-head h2 em{ font-style:normal; color:var(--red-bright); }
+.filters-head .fh-meta{
+  font-size:.72rem; color:var(--text-mute);
+  font-weight:700; letter-spacing:.4px;
+}
+.filters-head .fh-meta strong{ color:var(--amber); }
+
+.filter-pills{
+  display:flex; gap:10px; flex-wrap:wrap;
+  margin-bottom:32px; padding-bottom:24px;
+  border-bottom:1px solid var(--line);
+}
+.filter-pill{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:11px 20px; border-radius:100px;
+  font-size:.8rem; font-weight:700;
+  color:var(--text-soft);
+  background:rgba(11,14,19,.55);
+  border:1px solid var(--line);
+  cursor:pointer; transition:all .3s var(--ease);
+  white-space:nowrap;
+}
+.filter-pill i{ font-size:.78rem; color:var(--red-bright); transition:color .3s ease; }
+.filter-pill:hover{
+  color:#fff; border-color:rgba(225,6,0,.35);
+  background:rgba(20,25,34,.9);
+}
+.filter-pill.active{
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  border-color:transparent; color:#fff;
+  box-shadow:0 10px 24px rgba(225,6,0,.4);
+}
+.filter-pill.active i{ color:#fff; }
+
+.showcase{
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:32px; align-items:stretch;
+  animation:showFade .5s var(--ease);
+}
+@keyframes showFade{
+  from{ opacity:0; transform:translateY(12px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+
+.showcase-image{
+  position:relative;
+  aspect-ratio:4/3;
+  border-radius:24px;
+  overflow:hidden;
+  border:1px solid var(--line-2);
+  box-shadow:0 24px 60px rgba(0,0,0,.65);
+  background:var(--graphite);
+}
+.showcase-image img{
+  width:100%; height:100%;
+  object-fit:cover;
+  transition:transform 1s var(--ease);
+}
+.showcase-image:hover img{ transform:scale(1.04); }
+.showcase-image::before{
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+  z-index:2; pointer-events:none;
+}
+.showcase-image::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 55%, rgba(11,14,19,.7) 100%);
+  pointer-events:none;
+}
+.showcase-image .si-tag{
+  position:absolute; top:20px; left:20px;
+  z-index:2; padding:7px 14px; border-radius:100px;
+  font-size:.6rem; font-weight:900;
+  letter-spacing:1.2px; text-transform:uppercase;
+  background:linear-gradient(135deg, var(--amber), var(--amber-d));
+  color:#1a1300;
+  box-shadow:0 8px 18px rgba(255,176,32,.4);
+}
+.showcase-image .si-price-tag{
+  position:absolute;
+  bottom:22px; left:22px; right:22px;
+  z-index:2;
+  background:rgba(11,14,19,.92);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  border:1px solid var(--line-2);
+  border-radius:14px;
+  padding:14px 18px;
+  display:flex; justify-content:space-between; align-items:center;
+  gap:12px;
+  box-shadow:0 12px 28px rgba(0,0,0,.55);
+}
+.showcase-image .si-price-tag .pt-label{
+  font-size:.62rem; font-weight:800;
+  letter-spacing:1px; text-transform:uppercase; color:var(--text-mute);
+}
+.showcase-image .si-price-tag .pt-value{
+  font-family:'Outfit',sans-serif;
+  font-size:1.3rem; font-weight:900; color:#fff;
+  letter-spacing:-.02em; line-height:1;
+}
+.showcase-image .si-price-tag .pt-value small{
+  display:block; font-size:.6rem; color:var(--text-mute);
+  text-decoration:line-through; font-weight:700; margin-top:3px;
+  letter-spacing:0; font-family:'Inter',sans-serif;
+}
+
+.showcase-body{
+  background:linear-gradient(160deg, rgba(20,25,34,.96), rgba(11,14,19,.99));
+  border:1px solid var(--card-bd);
+  border-radius:24px;
+  padding:32px 30px;
+  display:flex; flex-direction:column;
+  box-shadow:0 20px 46px rgba(0,0,0,.5);
+}
+.showcase-body .sb-brand{
+  font-size:.68rem; font-weight:900;
+  letter-spacing:1.6px; text-transform:uppercase;
+  color:var(--amber); margin-bottom:8px;
+}
+.showcase-body h3{
+  font-size:1.5rem; margin-bottom:8px;
+  letter-spacing:-.02em; line-height:1.2;
+}
+.showcase-body .sb-sub{
+  font-size:.82rem; color:var(--text-soft);
+  line-height:1.55; margin-bottom:20px;
+}
+.showcase-body .sb-rating{
+  display:flex; align-items:center; gap:8px;
+  font-size:.74rem; margin-bottom:20px;
+}
+.showcase-body .sb-rating .stars{
+  color:var(--amber); letter-spacing:2px; font-size:.82rem;
+}
+.showcase-body .sb-rating .count{ color:var(--text-mute); font-weight:600; }
+
+.showcase-specs{
+  display:flex; flex-direction:column;
+  gap:0; margin-bottom:24px;
+  border-top:1px solid var(--line);
+}
+.showcase-specs .sp-row{
+  display:flex; justify-content:space-between; align-items:center;
+  gap:12px; padding:11px 0;
+  border-bottom:1px solid var(--line);
+  font-size:.82rem;
+}
+.showcase-specs .sp-row .sp-label{
+  color:var(--text-mute); font-weight:600;
+  display:flex; align-items:center; gap:8px;
+}
+.showcase-specs .sp-row .sp-label i{
+  color:var(--red-bright); font-size:.72rem; width:14px;
+}
+.showcase-specs .sp-row .sp-value{
+  color:#fff; font-weight:800;
+}
+
+.showcase-actions{
+  margin-top:auto;
+  display:flex; gap:10px; flex-wrap:wrap;
+}
+.showcase-actions .btn{ flex:1 1 140px; min-width:0; justify-content:center; }
+
+/* ==========================================================
+   SECTION 3 — MASONRY
+   ========================================================== */
+.masonry-section{ padding-top:20px; padding-bottom:90px; }
+
+.masonry-head{
+  text-align:center; max-width:640px; margin:0 auto 48px;
+}
+.masonry-head h2{
+  font-size:clamp(1.75rem, 3.6vw, 2.6rem);
+  margin-bottom:14px;
+}
+.masonry-head h2 em{ font-style:normal; color:var(--red-bright); }
+.masonry-head p{
+  font-size:.96rem; color:var(--text-soft); line-height:1.75;
+}
+
+.masonry-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 460px;
+  gap: 20px;
+}
+.masonry-item{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: linear-gradient(160deg, rgba(20,25,34,.96), rgba(11,14,19,.99));
+  border: 1px solid var(--card-bd);
+  border-radius: 18px;
+  transition: border-color .4s var(--ease), box-shadow .4s var(--ease);
+}
+.masonry-item:hover{
+  border-color: rgba(225,6,0,.35);
+  box-shadow: 0 18px 40px rgba(0,0,0,.55);
+}
+@media (min-width: 1025px){
+  .masonry-item.feature{ grid-column: span 2; }
+}
+.masonry-img{
+  position: relative;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--graphite);
+}
+.masonry-img img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 1s var(--ease);
+}
+.masonry-item:hover .masonry-img img{ transform: scale(1.05); }
+.masonry-img::after{
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(11,14,19,.5) 100%);
+  pointer-events: none;
+}
+.masonry-badge{
+  position: absolute;
+  top: 14px; left: 14px;
+  z-index: 2;
+  padding: 5px 11px;
+  border-radius: 100px;
+  font-size: .56rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  box-shadow: 0 6px 16px rgba(225,6,0,.4);
+}
+.masonry-badge.new{ background: linear-gradient(135deg, var(--green), #15803D); box-shadow: 0 6px 16px rgba(34,197,94,.4); }
+.masonry-badge.used{ background: linear-gradient(135deg, var(--amber), var(--amber-d)); color: #1a1300; box-shadow: 0 6px 16px rgba(255,176,32,.4); }
+
+.masonry-body{
+  flex-shrink: 0;
+  height: 148px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.masonry-body .mb-brand{
+  font-size: .62rem;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 5px;
+}
+.masonry-body h4{
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -.01em;
+  line-height: 1.3;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.masonry-body .mb-meta{
+  font-size: .72rem;
+  color: var(--text-mute);
+  font-weight: 600;
+  margin-bottom: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.masonry-body .mb-foot{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 10px;
+  margin-top: auto;
+  border-top: 1px dashed var(--line);
+  gap: 12px;
+}
+.masonry-body .mb-price{
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--red-bright);
+  letter-spacing: -.02em;
+  line-height: 1;
+}
+.masonry-body .mb-link{
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  color: var(--amber);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: gap .3s ease, color .3s ease;
+  white-space: nowrap;
+}
+.masonry-body .mb-link:hover{ gap: 11px; color: #fff; }
+
+.masonry-cta{
+  display:flex; justify-content:center; margin-top:32px;
+}
+
+/* ==========================================================
+   SECTION 4 — COMPARE VS
+   ========================================================== */
+.compare-section{ padding-top:20px; padding-bottom:90px; }
+
+.compare-head{
+  text-align:center; max-width:680px; margin:0 auto 48px;
+}
+.compare-head h2{
+  font-size:clamp(1.75rem, 3.6vw, 2.6rem);
+  margin-bottom:14px;
+}
+.compare-head h2 em{ font-style:normal; color:var(--red-bright); }
+.compare-head p{
+  font-size:.96rem; color:var(--text-soft); line-height:1.75;
+}
+
+.compare-container{
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.compare-card{
+  background: linear-gradient(160deg, rgba(20,25,34,.96), rgba(11,14,19,.99));
+  border: 1px solid var(--card-bd);
+  border-radius: 24px;
+  overflow: hidden;
+  transition: border-color .4s var(--ease), box-shadow .4s var(--ease);
+}
+.compare-card:hover{
+  border-color: rgba(225,6,0,.35);
+  box-shadow: 0 20px 50px rgba(0,0,0,.6);
+}
+.compare-card.featured{
+  border-color: rgba(225,6,0,.4);
+  box-shadow: 0 20px 50px rgba(225,6,0,.15);
+}
+.compare-card .cc-image{
+  position: relative;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+  background: var(--graphite);
+}
+.compare-card .cc-image img{
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform 1s var(--ease);
+}
+.compare-card:hover .cc-image img{ transform: scale(1.04); }
+.compare-card .cc-image::after{
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, transparent 45%, rgba(11,14,19,.85) 100%);
+  pointer-events: none;
+}
+.compare-card .cc-image::before{
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--red), var(--amber), transparent);
+  z-index: 2; pointer-events: none;
+}
+.compare-card.featured .cc-image::before{
+  background: linear-gradient(90deg, var(--red-bright), var(--amber), var(--red));
+}
+.compare-card .cc-tag{
+  position: absolute;
+  top: 16px; left: 16px;
+  z-index: 2;
+  padding: 6px 12px;
+  border-radius: 100px;
+  font-size: .58rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  box-shadow: 0 6px 16px rgba(225,6,0,.4);
+}
+.compare-card .cc-body{
+  padding: 24px 24px 28px;
+}
+.compare-card .cc-brand{
+  font-size: .64rem;
+  font-weight: 900;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 6px;
+}
+.compare-card h3{
+  font-size: 1.28rem;
+  letter-spacing: -.02em;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+.compare-card .cc-price{
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--red-bright);
+  letter-spacing: -.02em;
+  margin-bottom: 20px;
+}
+.compare-card .cc-specs{
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 22px;
+  border-top: 1px solid var(--line);
+}
+.compare-card .cc-specs .cs-row{
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: .82rem;
+  align-items: center;
+}
+.compare-card .cc-specs .cs-label{
+  color: var(--text-mute);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.compare-card .cc-specs .cs-label i{
+  color: var(--red-bright);
+  font-size: .72rem;
+  width: 14px;
+}
+.compare-card .cc-specs .cs-value{
+  color: #fff;
+  font-weight: 800;
+  text-align: right;
+}
+.compare-card .cc-specs .cs-value.better{
+  color: #4ade80;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.compare-card .cc-specs .cs-value.better::after{
+  content: '●';
+  font-size: .5rem;
+  color: var(--green);
+}
+.compare-card .cc-btn{
+  width: 100%;
+  justify-content: center;
+}
+
+.vs-badge{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  border: 4px solid var(--carbon);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Outfit', sans-serif;
+  font-size: .9rem;
+  font-weight: 900;
+  letter-spacing: .5px;
+  box-shadow: 0 12px 30px rgba(225,6,0,.5);
+}
+
+.compare-cta{
+  text-align:center; margin-top:40px;
+}
+
+/* ==========================================================
+   SECTION 5 — ARRIVALS
+   ========================================================== */
+.arrivals-section{
+  padding-top:20px; padding-bottom:90px;
+  overflow-x:clip;
+}
+.arrivals-head{
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:24px; flex-wrap:wrap; margin-bottom:36px;
+  max-width:1280px; margin-left:auto; margin-right:auto;
+  padding:0 24px;
+}
+.arrivals-head h2{
+  font-size:clamp(1.75rem, 3.6vw, 2.6rem);
+  line-height:1.05;
+}
+.arrivals-head h2 em{ font-style:normal; color:var(--red-bright); }
+.arrivals-nav{ display:flex; gap:10px; }
+.arr-nav-btn{
+  width:48px; height:48px;
+  border-radius:50%;
+  background:rgba(11,14,19,.7);
+  border:1.5px solid var(--line-2);
+  color:var(--silver);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.9rem;
+  transition:all .3s var(--ease);
+  cursor:pointer;
+}
+.arr-nav-btn:hover{
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  border-color:transparent; color:#fff;
+  transform:translateY(-3px);
+  box-shadow:0 12px 26px rgba(225,6,0,.4);
+}
+.arr-nav-btn:disabled{ opacity:.4; cursor:not-allowed; transform:none; }
+
+.arrivals-track{
+  display:flex; gap:20px;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  padding:8px 24px 24px;
+  max-width:100%;
+}
+.arrivals-track::-webkit-scrollbar{ display:none; }
+
+.arrival-slide{
+  flex:0 0 min(680px, 80vw);
+  scroll-snap-align:start;
+  position:relative;
+  aspect-ratio:16/9;
+  border-radius:24px;
+  overflow:hidden;
+  border:1px solid var(--line-2);
+  box-shadow:0 24px 60px rgba(0,0,0,.65);
+  background:var(--graphite);
+  isolation:isolate;
+}
+.arrival-slide img{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  z-index:-2;
+  transition:transform 1s var(--ease);
+}
+.arrival-slide:hover img{ transform:scale(1.04); }
+.arrival-slide::after{
+  content:''; position:absolute; inset:0; z-index:-1;
+  background:
+    linear-gradient(90deg, rgba(11,14,19,.9) 0%, rgba(11,14,19,.35) 55%, rgba(11,14,19,.7) 100%),
+    linear-gradient(180deg, transparent 40%, rgba(11,14,19,.5) 100%);
+}
+.arrival-slide::before{
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+  z-index:2; pointer-events:none;
+}
+
+.arrival-slide .as-content{
+  position:absolute;
+  top:0; left:0; bottom:0;
+  max-width:60%;
+  padding:36px 40px;
+  display:flex; flex-direction:column; justify-content:center;
+  z-index:2;
+}
+.as-content .as-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 12px; border-radius:100px;
+  font-size:.56rem; font-weight:900;
+  letter-spacing:1.2px; text-transform:uppercase;
+  color:#fff;
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  width:fit-content; margin-bottom:14px;
+  box-shadow:0 6px 16px rgba(225,6,0,.4);
+}
+.as-content .as-brand{
+  font-size:.68rem; font-weight:900;
+  letter-spacing:1.4px; text-transform:uppercase;
+  color:var(--amber); margin-bottom:6px;
+}
+.as-content h3{
+  font-size:clamp(1.3rem, 2.2vw, 1.85rem);
+  margin-bottom:8px; line-height:1.15;
+  letter-spacing:-.025em; color:#fff;
+}
+.as-content .as-meta{
+  font-size:.78rem; color:var(--text-soft);
+  line-height:1.55; margin-bottom:20px; max-width:340px;
+  display:-webkit-box; -webkit-line-clamp:3;
+  -webkit-box-orient:vertical; overflow:hidden;
+}
+.as-content .as-price{
+  font-family:'Outfit',sans-serif;
+  font-size:1.5rem; font-weight:900; color:#fff;
+  letter-spacing:-.02em; margin-bottom:18px; line-height:1;
+}
+.as-content .as-actions{
+  display:flex; gap:10px; flex-wrap:wrap;
+}
+.as-content .as-actions .btn{
+  padding:11px 22px; font-size:.78rem; min-height:42px;
+}
+
+.arrival-slide .as-spec{
+  position:absolute;
+  right:20px; bottom:20px;
+  z-index:2;
+  background:rgba(11,14,19,.9);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  border:1px solid var(--line-2);
+  border-radius:14px;
+  padding:12px 16px;
+  display:flex; gap:16px;
+  box-shadow:0 12px 26px rgba(0,0,0,.55);
+}
+.as-spec > div{ text-align:center; }
+.as-spec span{
+  display:block;
+  font-family:'Outfit',sans-serif;
+  font-size:.86rem; font-weight:900; color:#fff;
+  letter-spacing:-.01em; line-height:1; margin-bottom:3px;
+}
+.as-spec small{
+  display:block; font-size:.5rem; font-weight:800;
+  letter-spacing:.6px; text-transform:uppercase; color:var(--text-mute);
+}
+
+/* ==========================================================
+   SECTION 6 — FINANCE
+   ========================================================== */
+.finance-section{ padding-top:20px; padding-bottom:90px; }
+
+.finance-head{
+  text-align:center; max-width:680px; margin:0 auto 44px;
+}
+.finance-head h2{
+  font-size:clamp(1.75rem, 3.6vw, 2.6rem);
+  margin-bottom:14px;
+}
+.finance-head h2 em{ font-style:normal; color:var(--red-bright); }
+.finance-head p{
+  font-size:.96rem; color:var(--text-soft); line-height:1.75;
+}
+
+.finance-band{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:16px;
+  max-width:1100px;
+  margin:0 auto;
+}
+.finance-tile{
+  position:relative;
+  background:linear-gradient(160deg, rgba(20,25,34,.96), rgba(11,14,19,.99));
+  border:1px solid var(--card-bd);
+  border-radius:20px;
+  padding:24px 22px;
+  display:flex; align-items:center; gap:16px;
+  transition:border-color .35s var(--ease), box-shadow .35s var(--ease), transform .35s var(--ease);
+  overflow:hidden;
+}
+.finance-tile::before{
+  content:''; position:absolute;
+  top:-40px; right:-40px;
+  width:140px; height:140px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(225,6,0,.12), transparent 70%);
+  pointer-events:none;
+}
+.finance-tile:hover{
+  border-color:rgba(225,6,0,.35);
+  transform:translateY(-3px);
+  box-shadow:0 14px 34px rgba(0,0,0,.55);
+}
+.finance-tile.featured{
+  border-color:rgba(255,176,32,.4);
+  background:linear-gradient(160deg, #1f1205 0%, #0B0E13 100%);
+}
+.finance-tile .ft-badge{
+  position:absolute;
+  top:12px; right:12px;
+  padding:4px 10px; border-radius:100px;
+  font-size:.52rem; font-weight:900;
+  letter-spacing:1px; text-transform:uppercase;
+  color:#1a1300;
+  background:linear-gradient(135deg, var(--amber), var(--amber-d));
+  box-shadow:0 4px 12px rgba(255,176,32,.4);
+}
+.finance-tile .ft-term{
+  display:flex; flex-direction:column; align-items:center;
+  padding-right:16px;
+  border-right:1px solid var(--line);
+  flex-shrink:0; min-width:80px;
+}
+.finance-tile .ft-term span{
+  font-family:'Outfit',sans-serif;
+  font-size:2rem; font-weight:900; color:#fff;
+  letter-spacing:-.04em; line-height:1;
+}
+.finance-tile .ft-term small{
+  font-size:.6rem; font-weight:800;
+  letter-spacing:1.4px; text-transform:uppercase;
+  color:var(--text-mute); margin-top:6px;
+}
+.finance-tile.featured .ft-term span{ color:var(--amber); }
+.finance-tile .ft-info{
+  flex:1; min-width:0;
+  display:flex; flex-direction:column; gap:4px;
+  position:relative; z-index:1;
+}
+.finance-tile .ft-monthly{
+  font-family:'Outfit',sans-serif;
+  font-size:1.15rem; font-weight:900;
+  color:var(--red-bright);
+  letter-spacing:-.02em; line-height:1;
+}
+.finance-tile .ft-monthly small{
+  font-size:.66rem; font-weight:700;
+  color:var(--text-mute); letter-spacing:0;
+  font-family:'Inter',sans-serif; margin-left:2px;
+}
+.finance-tile .ft-desc{
+  font-size:.7rem; color:var(--text-soft);
+  font-weight:600; line-height:1.5;
+}
+.finance-tile .ft-link{
+  font-size:.66rem; font-weight:800;
+  letter-spacing:.5px; text-transform:uppercase;
+  color:var(--amber);
+  display:inline-flex; align-items:center; gap:5px;
+  margin-top:6px;
+  transition:gap .3s ease, color .3s ease;
+}
+.finance-tile .ft-link:hover{ gap:10px; color:#fff; }
+
+.finance-note{
+  text-align:center; margin-top:28px;
+  font-size:.72rem; color:var(--text-mute); line-height:1.6;
+}
+.finance-note strong{ color:var(--text-soft); }
+
+/* ==========================================================
+   SECTION 7 — TRADE-IN
+   ========================================================== */
+.tradein-section{
+  padding-top:20px; padding-bottom:90px;
+}
+.tradein-strip{
+  position:relative;
+  background:linear-gradient(135deg, #0B0E13 0%, #1a0505 55%, #0B0E13 100%);
+  border:1px solid rgba(225,6,0,.28);
+  border-radius:24px;
+  padding:36px 40px;
+  box-shadow:0 24px 60px rgba(0,0,0,.7);
+  overflow:hidden;
+  isolation:isolate;
+}
+.tradein-strip::before{
+  content:''; position:absolute;
+  top:-120px; right:-100px;
+  width:340px; height:340px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(225,6,0,.3), transparent 62%);
+  pointer-events:none; z-index:-1;
+}
+.tradein-strip::after{
+  content:''; position:absolute;
+  bottom:-120px; left:-100px;
+  width:340px; height:340px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,176,32,.12), transparent 62%);
+  pointer-events:none; z-index:-1;
+}
+.tradein-strip .ti-head{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:20px; margin-bottom:24px; flex-wrap:wrap;
+}
+.tradein-strip .ti-head h3{
+  font-size:clamp(1.15rem, 2.2vw, 1.5rem);
+  display:flex; align-items:center; gap:12px;
+  letter-spacing:-.02em;
+}
+.tradein-strip .ti-head h3 i{ color:var(--amber); font-size:1.1rem; }
+.tradein-strip .ti-head p{
+  font-size:.82rem; color:var(--text-soft); line-height:1.6;
+}
+.tradein-form{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr 1fr auto;
+  gap:12px; align-items:end;
+}
+.tradein-form .tf-field{
+  display:flex; flex-direction:column; gap:6px; min-width:0;
+}
+.tradein-form .tf-field label{
+  font-size:.6rem; font-weight:800;
+  letter-spacing:.8px; text-transform:uppercase; color:var(--text-soft);
+}
+.tradein-form .tf-field select,
+.tradein-form .tf-field input{
+  width:100%; padding:12px 14px;
+  border:1.5px solid var(--input-bd); border-radius:10px;
+  font-size:.86rem; background:var(--input-bg); color:#fff;
+  outline:none; font-family:inherit;
+  transition:all .25s ease; min-height:46px;
+}
+.tradein-form .tf-field input::placeholder{ color:#7a8593; }
+.tradein-form .tf-field select{
+  appearance:none; -webkit-appearance:none;
+  padding-right:32px; cursor:pointer;
+  background-image:url("cp10.webp");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:10px;
+}
+.tradein-form .tf-field select option{ background:#141922; color:#fff; }
+.tradein-form .tf-field select:focus,
+.tradein-form .tf-field input:focus{
+  border-color:var(--red);
+  box-shadow:0 0 0 3px rgba(225,6,0,.14);
+  background:rgba(11,14,19,.9);
+}
+.tradein-form .tf-field.error select,
+.tradein-form .tf-field.error input{
+  border-color:var(--red-bright);
+}
+.tradein-form .tf-submit{
+  padding:12px 24px; border-radius:10px;
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  color:#fff; font-weight:800; font-size:.84rem;
+  display:inline-flex; align-items:center; gap:8px;
+  box-shadow:0 10px 26px rgba(225,6,0,.4);
+  transition:all .3s var(--ease);
+  min-height:46px; white-space:nowrap;
+  justify-content:center; cursor:pointer; width:100%;
+}
+.tradein-form .tf-submit:hover{
+  transform:translateY(-2px);
+  box-shadow:0 14px 32px rgba(225,6,0,.55);
+}
+.tradein-form .tf-submit:disabled{ opacity:.7; cursor:wait; }
+.tradein-error{
+  display:none; margin-top:14px;
+  padding:10px 14px; border-radius:10px;
+  background:rgba(225,6,0,.10);
+  border:1px solid rgba(225,6,0,.35);
+  color:#FF8A85; font-size:.76rem; font-weight:600;
+  align-items:center; gap:8px;
+}
+.tradein-error.show{ display:flex; }
+
+/* ==========================================================
+   SECTION 8 — SHOWROOM
+   ========================================================== */
+.showroom-section{ padding-top:20px; padding-bottom:100px; }
+.showroom-split{
+  position:relative;
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  border-radius:28px;
+  overflow:hidden;
+  min-height:520px;
+  box-shadow:0 24px 60px rgba(0,0,0,.7);
+  border:1px solid rgba(225,6,0,.28);
+  background:linear-gradient(135deg, #0B0E13 0%, #1a0505 100%);
+}
+.showroom-split .sr-image{
+  position:relative;
+  overflow:hidden;
+  min-height:320px;
+}
+.showroom-split .sr-image img{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+}
+.showroom-split .sr-image::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(11,14,19,.15) 0%, rgba(11,14,19,.75) 100%);
+  pointer-events:none;
+}
+.showroom-split .sr-image::before{
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+  z-index:2; pointer-events:none;
+}
+.showroom-split .sr-address-card{
+  position:absolute;
+  bottom:24px; left:24px; right:24px;
+  z-index:3;
+  background:rgba(11,14,19,.94);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  border:1px solid var(--line-2);
+  border-radius:16px;
+  padding:18px 20px;
+  box-shadow:0 16px 36px rgba(0,0,0,.55);
+  max-width:420px;
+}
+.showroom-split .sr-address-card .ac-label{
+  font-size:.58rem; font-weight:900;
+  letter-spacing:1.4px; text-transform:uppercase;
+  color:var(--amber); margin-bottom:8px;
+  display:flex; align-items:center; gap:6px;
+}
+.showroom-split .sr-address-card .ac-line1{
+  font-family:'Outfit',sans-serif;
+  font-size:1rem; font-weight:800; color:#fff;
+  margin-bottom:3px; letter-spacing:-.01em;
+}
+.showroom-split .sr-address-card .ac-line2{
+  font-size:.78rem; color:var(--text-soft); font-weight:600;
+}
+.showroom-split .sr-content{
+  padding:56px 48px;
+  display:flex; flex-direction:column; justify-content:center;
+  position:relative; z-index:2;
+  background-image:radial-gradient(circle, rgba(201,209,220,.08) 1px, transparent 1px);
+  background-size:22px 22px;
+}
+.showroom-split .sr-content h2{
+  font-size:clamp(1.8rem, 3.8vw, 2.6rem);
+  margin-bottom:16px; line-height:1.1;
+}
+.showroom-split .sr-content h2 em{
+  font-style:normal; color:var(--red-bright);
+}
+.showroom-split .sr-content > p{
+  font-size:.96rem; color:var(--text-soft);
+  line-height:1.78; margin-bottom:32px; max-width:440px;
+}
+.showroom-info{
+  display:flex; flex-direction:column; gap:16px; margin-bottom:32px;
+}
+.showroom-info .si-row{
+  display:flex; gap:14px; align-items:flex-start;
+}
+.showroom-info .si-icon{
+  width:42px; height:42px;
+  border-radius:11px;
+  background:linear-gradient(135deg, rgba(225,6,0,.15), rgba(255,176,32,.1));
+  border:1px solid rgba(225,6,0,.25);
+  color:var(--red-bright);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.94rem; flex-shrink:0;
+}
+.showroom-info .si-text strong{
+  display:block; font-size:.86rem; font-weight:800; color:#fff;
+  margin-bottom:3px;
+}
+.showroom-info .si-text small{
+  font-size:.74rem; color:var(--text-soft); line-height:1.55;
+}
+.showroom-actions{
+  display:flex; gap:12px; flex-wrap:wrap;
+}
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+@media (max-width:1100px){
+  .hero-grid{
+    grid-template-columns:auto 1fr;
+    grid-template-rows:auto auto;
+    gap:40px;
+  }
+  .hero-visual{
+    grid-column:1 / -1;
+    max-width:none;
+    aspect-ratio:16/10;
+    margin:0;
+  }
+  .hero-spec-card{
+    bottom:16px;
+    left:16px;
+    width:min(320px, 60%);
+  }
+}
+
+@media (max-width:1024px){
+  .sec{ padding:72px 0; }
+  .hero-showroom{ padding:30px 0 60px; }
+  .hero-index{ display:none; }
+  .hero-grid{ grid-template-columns:1fr; gap:36px; }
+  .hero-search{ margin-top:40px; }
+  .hs-form{ grid-template-columns:1fr 1fr; }
+
+  .showcase{ grid-template-columns:1fr; gap:22px; }
+
+  .masonry-grid{
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 420px;
+    gap: 16px;
+  }
+  .masonry-item.feature{ grid-column: span 1; }
+  .masonry-item.feature:first-child{ grid-column: span 2; }
+  .masonry-body{ height: 138px; padding: 16px 18px; }
+  .masonry-body h4{ font-size: .94rem; }
+
+  .compare-container{ grid-template-columns:1fr; gap:20px; }
+  .vs-badge{
+    position: relative; top:auto; left:auto;
+    transform: none; margin: 0 auto;
+    width: 60px; height: 60px;
+    font-size: .85rem;
+    justify-self: center; align-self: center;
+  }
+
+  .arrivals-head{ align-items:flex-start; }
+  .arrival-slide{ flex:0 0 min(560px, 88vw); }
+  .arrival-slide .as-content{ padding:28px 28px; }
+  .arrival-slide .as-spec{ display:none; }
+
+  .finance-band{ grid-template-columns:1fr; gap:12px; max-width:520px; }
+
+  .tradein-form{ grid-template-columns:1fr 1fr; gap:10px; }
+  .tradein-form .tf-submit{ grid-column:1 / -1; }
+
+  .showroom-split{ grid-template-columns:1fr; min-height:auto; }
+  .showroom-split .sr-image{ min-height:320px; aspect-ratio:16/10; }
+  .showroom-split .sr-content{ padding:44px 32px; }
+}
+
+@media (max-width:768px){
+  .sec{ padding:60px 0; }
+  .wrap{ padding:0 18px; }
+
+  .hero-showroom{ padding:24px 0 50px; }
+  .hero-copy h1{ font-size:2rem; }
+  .hero-copy > p{ font-size:.92rem; margin-bottom:24px; }
+  .hero-tags{ margin-bottom:26px; }
+  .hero-visual{ aspect-ratio:4/3; border-radius:20px; }
+  .hero-spec-card{
+    padding:18px 18px; bottom:12px; left:12px;
+    width:calc(100% - 24px);
+  }
+  .hero-spec-card .hsc-name{ font-size:1.08rem; margin-bottom:12px; }
+  .hero-spec-card .hsc-specs{ padding:12px 0; margin-bottom:14px; }
+  .hero-spec-card .hsc-specs span{ font-size:.85rem; }
+  .hero-spec-card .hsc-specs small{ font-size:.5rem; }
+  .hero-spec-card .btn{ font-size:.76rem; padding:10px 16px; min-height:40px; }
+
+  .hero-search{ padding:18px; margin-top:32px; }
+  .hs-form{ grid-template-columns:1fr; gap:10px; }
+  .hs-submit{ padding:14px 20px; }
+
+  .filter-pills{
+    gap:8px; overflow-x:auto; flex-wrap:nowrap;
+    padding-bottom:20px;
+    scrollbar-width:none; -webkit-overflow-scrolling:touch;
+  }
+  .filter-pills::-webkit-scrollbar{ display:none; }
+  .filter-pill{ padding:10px 16px; font-size:.76rem; }
+
+  .showcase-body{ padding:26px 22px; }
+  .showcase-body h3{ font-size:1.25rem; }
+
+  .masonry-grid{
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+    gap: 16px;
+  }
+  .masonry-item,
+  .masonry-item.feature,
+  .masonry-item.feature:first-child{
+    grid-column: span 1;
+    height: auto;
+  }
+  .masonry-img{
+    flex: 0 0 auto;
+    aspect-ratio: 16/10;
+  }
+  .masonry-body{
+    height: auto;
+    min-height: 130px;
+    padding: 16px 18px;
+  }
+  .masonry-body h4{ font-size: .98rem; }
+
+  .compare-card .cc-body{ padding:20px 20px 24px; }
+  .compare-card h3{ font-size:1.15rem; }
+
+  .arrivals-head{ padding:0 18px; }
+  .arrivals-track{ padding:8px 18px 24px; gap:14px; }
+  .arrival-slide{ flex:0 0 86vw; aspect-ratio:4/5; }
+  .arrival-slide .as-content{
+    max-width:100%; padding:24px 22px 28px;
+    justify-content:flex-end;
+  }
+  .arrival-slide::after{
+    background:
+      linear-gradient(180deg, rgba(11,14,19,.35) 0%, rgba(11,14,19,.75) 55%, rgba(11,14,19,.95) 100%);
+  }
+  .as-content h3{ font-size:1.25rem; }
+
+  .finance-tile{ padding:18px 18px; }
+  .finance-tile .ft-term span{ font-size:1.7rem; }
+
+  .tradein-strip{ padding:28px 22px; border-radius:20px; }
+  .tradein-strip .ti-head h3{ font-size:1.1rem; }
+  .tradein-form{ grid-template-columns:1fr 1fr; }
+
+  .showroom-split .sr-image{ min-height:auto; aspect-ratio:16/10; }
+  .showroom-split .sr-content{ padding:36px 24px; }
+  .showroom-split .sr-address-card{
+    padding:14px 16px;
+    bottom:16px; left:16px; right:16px;
+  }
+  .showroom-split .sr-address-card .ac-line1{ font-size:.9rem; }
+  .showroom-split .sr-address-card .ac-line2{ font-size:.7rem; }
+}
+
+/* ==========================================================
+   MOBILE (≤480px) — with button-size fixes
+   ========================================================== */
+@media (max-width:480px){
+  .sec{ padding:48px 0; }
+  .wrap{ padding:0 16px; }
+
+  /* ---- GLOBAL BUTTON TIGHTENING ---- */
+  .btn {
+    padding: 11px 18px;
+    font-size: .8rem;
+    min-height: 42px;
+    gap: 8px;
+  }
+  .btn i { font-size: .86em; }
+
+  /* ---- HERO PRIMARY CTAs ---- */
+  .hero-actions { flex-direction: column; }
+  .hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 18px;
+    font-size: .82rem;
+    min-height: 44px;
+  }
+
+  /* ---- CARD SECONDARY ACTIONS — side by side ---- */
+  .showcase-actions,
+  .as-content .as-actions,
+  .showroom-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .showcase-actions .btn,
+  .as-content .as-actions .btn,
+  .showroom-actions .btn {
+    flex: 1 1 0;
+    min-width: 0;
+    width: auto;
+    justify-content: center;
+    padding: 9px 12px;
+    font-size: .74rem;
+    min-height: 38px;
+    gap: 5px;
+  }
+  .showcase-actions .btn i,
+  .as-content .as-actions .btn i,
+  .showroom-actions .btn i { font-size: .82em; }
+
+  /* ---- FORM SUBMIT BUTTONS ---- */
+  .hs-submit {
+    width: 100%;
+    padding: 12px 18px;
+    font-size: .82rem;
+    min-height: 44px;
+  }
+  .tf-submit {
+    width: 100%;
+    padding: 11px 16px;
+    font-size: .8rem;
+    min-height: 42px;
+  }
+  .tradein-form .tf-submit { grid-column: 1 / -1; }
+
+  /* ---- CENTERED CTAs ---- */
+  .masonry-cta .btn,
+  .compare-cta .btn {
+    width: auto;
+    padding: 11px 20px;
+    font-size: .8rem;
+    min-height: 42px;
+  }
+
+  /* ---- NAV ARROWS ---- */
+  .arr-nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: .78rem;
+  }
+
+  /* ---- FILTER PILLS ---- */
+  .filter-pill {
+    padding: 8px 14px;
+    font-size: .72rem;
+  }
+  .filter-pill i { font-size: .7rem; }
+
+  /* ---- HERO SPEC CARD BUTTON ---- */
+  .hero-spec-card .btn {
+    padding: 10px 16px;
+    min-height: 40px;
+    font-size: .78rem;
+  }
+
+  /* ---- INLINE TEST DRIVE (Showcase image) ---- */
+  .si-price-tag .btn {
+    padding: 9px 14px !important;
+    min-height: 36px !important;
+    font-size: .72rem !important;
+  }
+
+  /* ---- Rest of hero layout ---- */
+  .hero-showroom{ padding:20px 0 40px; }
+  .hero-copy h1{ font-size:1.7rem; }
+  .hero-copy > p{ font-size:.86rem; }
+  .hero-visual{ aspect-ratio:1/1; border-radius:16px; }
+  .hero-spec-card{ padding:16px 14px; }
+  .hero-spec-card .hsc-label{ font-size:.54rem; margin-bottom:8px; }
+  .hero-spec-card .hsc-name{ font-size:.98rem; }
+  .hero-search{ padding:14px; border-radius:14px; margin-top:28px; }
+  .hs-field select{ font-size:16px; padding:11px 32px 11px 12px; }
+
+  .filters-head h2{ font-size:1.45rem; }
+  .filters-head .fh-meta{ font-size:.68rem; }
+
+  .showcase-image{ aspect-ratio:1/1; border-radius:18px; }
+  .showcase-body{ border-radius:18px; padding:22px 18px; }
+  .showcase-body h3{ font-size:1.15rem; }
+  .showcase-body .sb-sub{ font-size:.78rem; }
+
+  .masonry-head h2{ font-size:1.45rem; }
+  .masonry-grid{ gap:14px; }
+  .masonry-body{ padding:14px 16px; min-height:120px; }
+  .masonry-body h4{ font-size:.94rem; }
+  .masonry-body .mb-price{ font-size:1rem; }
+
+  .compare-head h2{ font-size:1.45rem; }
+  .compare-card .cc-body{ padding:18px 16px 22px; }
+  .compare-card h3{ font-size:1.05rem; }
+  .compare-card .cc-price{ font-size:1.2rem; margin-bottom:16px; }
+  .compare-card .cc-specs .cs-row{ padding:9px 0; font-size:.76rem; }
+  .vs-badge{ width:52px; height:52px; font-size:.78rem; border-width:3px; }
+
+  .arrivals-head h2{ font-size:1.45rem; }
+  .arrivals-head{ padding:0 16px; }
+  .arrivals-track{ padding:8px 16px 20px; }
+  .arrival-slide{ flex:0 0 90vw; aspect-ratio:3/4; border-radius:18px; }
+  .arrival-slide .as-content{ padding:20px 18px 22px; }
+  .as-content h3{ font-size:1.1rem; }
+  .as-content .as-meta{ font-size:.72rem; margin-bottom:14px; -webkit-line-clamp:2; }
+  .as-content .as-price{ font-size:1.2rem; margin-bottom:14px; }
+
+  .finance-head h2{ font-size:1.45rem; }
+  .finance-tile{
+    flex-direction:column; align-items:flex-start;
+    gap:12px; padding:18px;
+  }
+  .finance-tile .ft-term{
+    padding-right:0; padding-bottom:12px;
+    border-right:none; border-bottom:1px solid var(--line);
+    width:100%; flex-direction:row;
+    align-items:baseline; justify-content:flex-start;
+    gap:10px; min-width:0;
+  }
+  .finance-tile .ft-term span{ font-size:1.7rem; }
+  .finance-tile .ft-term small{ margin-top:0; }
+  .finance-tile .ft-monthly{ font-size:1.05rem; }
+
+  .tradein-strip{ padding:22px 16px; border-radius:18px; }
+  .tradein-strip .ti-head{
+    flex-direction:column; align-items:flex-start;
+    gap:10px; margin-bottom:18px;
+  }
+  .tradein-strip .ti-head h3{ font-size:1rem; }
+  .tradein-form{ grid-template-columns:1fr; gap:10px; }
+  .tradein-form .tf-field select,
+  .tradein-form .tf-field input{ font-size:16px; }
+
+  .showroom-split{ border-radius:20px; }
+  .showroom-split .sr-image{ min-height:auto; aspect-ratio:4/3; }
+  .showroom-split .sr-content{ padding:28px 18px; }
+  .showroom-split .sr-content h2{ font-size:1.4rem; }
+  .showroom-split .sr-content > p{ font-size:.86rem; margin-bottom:26px; }
+  .showroom-split .sr-address-card{
+    padding:12px 14px;
+    bottom:12px; left:12px; right:12px;
+    border-radius:12px;
+  }
+  .showroom-split .sr-address-card .ac-label{ font-size:.54rem; margin-bottom:5px; }
+  .showroom-split .sr-address-card .ac-line1{ font-size:.82rem; }
+  .showroom-split .sr-address-card .ac-line2{ font-size:.66rem; }
+}
+
+@media (max-width:380px){
+  .wrap{ padding:0 14px; }
+  .hero-copy h1{ font-size:1.55rem; }
+  .filters-head h2,
+  .masonry-head h2,
+  .compare-head h2,
+  .arrivals-head h2,
+  .finance-head h2{ font-size:1.3rem; }
+  .hero-spec-card .hsc-name{ font-size:.9rem; }
+  .hero-spec-card .hsc-specs span{ font-size:.78rem; }
+
+  /* Tighter buttons on very small phones */
+  .btn {
+    padding: 10px 16px;
+    font-size: .78rem;
+    min-height: 40px;
+  }
+  .showcase-actions .btn,
+  .as-content .as-actions .btn,
+  .showroom-actions .btn {
+    padding: 8px 10px;
+    font-size: .7rem;
+    min-height: 36px;
+  }
+  .arr-nav-btn { width: 36px; height: 36px; font-size: .72rem; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+  html{ scroll-behavior:auto; }
+}
+</style>
+</head>
+<body>
+
+<div id="header-placeholder"></div>
+
+<main>
+
+  <!-- SECTION 1 — HERO -->
+  <section class="hero-showroom">
+    <div class="wrap">
+      <div class="hero-grid">
+        <div class="hero-index" aria-hidden="true">
+          <div class="hi-item active"><span class="hi-num">01</span><span class="hi-line"></span><span class="hi-label">Featured</span></div>
+          <div class="hi-item"><span class="hi-num">02</span><span class="hi-line"></span><span class="hi-label">Performance</span></div>
+          <div class="hi-item"><span class="hi-num">03</span><span class="hi-line"></span><span class="hi-label">Luxury</span></div>
+          <div class="hi-item"><span class="hi-num">04</span><span class="hi-line"></span><span class="hi-label">Electric</span></div>
+        </div>
+
+        <div class="hero-copy">
+          <span class="mini-eyebrow" data-aos="fade-down"><i class="fas fa-car-side"></i> 2024 Inventory</span>
+          <h1 data-aos="fade-up" data-aos-delay="100">Curated rides.<br><em>Ready to drive.</em></h1>
+          <p data-aos="fade-up" data-aos-delay="180">184 certified vehicles in stock — every one inspected, priced transparently, and backed by our 12-month guarantee. Test drive today.</p>
+          <div class="hero-tags" data-aos="fade-up" data-aos-delay="240">
+            <span class="hero-tag"><i class="fas fa-certificate"></i> 180-Point Check</span>
+            <span class="hero-tag"><i class="fas fa-shield-halved"></i> 12-Mo Warranty</span>
+            <span class="hero-tag"><i class="fas fa-tag"></i> No Hidden Fees</span>
+          </div>
+          <div class="hero-actions" data-aos="fade-up" data-aos-delay="300">
+            <a href="404.html" class="btn btn-red"><i class="fas fa-th-large"></i> Browse All Stock</a>
+            <a href="404.html" class="btn btn-ghost"><i class="fas fa-calendar-check"></i> Book Test Drive</a>
+          </div>
+        </div>
+
+        <div class="hero-visual" data-aos="zoom-in" data-aos-delay="150">
+          <div class="hv-img">
+            <img src="car10.webp"
+                 alt="Featured vehicle" loading="eager"
+                 onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #1a0000, #0B0E13)';">
+          </div>
+          <div class="hero-spec-card">
+            <div class="hsc-label">In Stock Now</div>
+            <div class="hsc-brand">Porsche</div>
+            <div class="hsc-name">911 Carrera S</div>
+            <div class="hsc-specs">
+              <div><span>2024</span><small>Year</small></div>
+              <div><span>3,240</span><small>Miles</small></div>
+              <div><span>443<span style="font-size:.7em;">hp</span></span><small>Power</small></div>
+            </div>
+            <a href="404.html" class="btn btn-red"><i class="fas fa-circle-info"></i> View Details</a>
+          </div>
+        </div>
+      </div>
+
+      <form class="hero-search" id="invSearch" data-aos="fade-up">
+        <div class="hs-label"><i class="fas fa-search"></i> Find your perfect ride</div>
+        <div class="hs-form">
+          <div class="hs-field" id="sMakeWrap">
+            <label for="sMake">Make</label>
+            <select id="sMake">
+              <option value="">Any Make</option>
+              <option>BMW</option><option>Mercedes-Benz</option><option>Audi</option>
+              <option>Porsche</option><option>Tesla</option><option>Ford</option>
+              <option>Toyota</option><option>Honda</option><option>Jeep</option>
+            </select>
+          </div>
+          <div class="hs-field" id="sModelWrap">
+            <label for="sModel">Body Style</label>
+            <select id="sModel">
+              <option value="">Any Style</option>
+              <option>Sedan</option><option>SUV</option><option>Coupe</option>
+              <option>Truck</option><option>Convertible</option><option>Wagon</option>
+            </select>
+          </div>
+          <div class="hs-field" id="sPriceWrap">
+            <label for="sPrice">Price Range</label>
+            <select id="sPrice">
+              <option value="">Any Price</option>
+              <option>Under $30k</option><option>$30k – $60k</option>
+              <option>$60k – $100k</option><option>$100k – $150k</option>
+              <option>Over $150k</option>
+            </select>
+          </div>
+          <button type="submit" class="hs-submit" id="invSearchBtn">
+            <i class="fas fa-search"></i> Search
+          </button>
+        </div>
+        <div class="hs-error" id="invSearchErr">
+          <i class="fas fa-exclamation-circle"></i>
+          <span id="invSearchErrText">Please select at least one filter.</span>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- SECTION 2 — FILTER SHOWCASE -->
+  <section class="sec filters-section">
+    <div class="wrap">
+      <div class="filters-head" data-aos="fade-up">
+        <div>
+          <span class="mini-eyebrow"><i class="fas fa-sliders"></i> Filter by Category</span>
+          <h2>Browse by <em>body style</em></h2>
+        </div>
+        <div class="fh-meta"><strong>184</strong> vehicles in stock</div>
+      </div>
+
+      <div class="filter-pills" data-aos="fade-up" data-aos-delay="80">
+        <button type="button" class="filter-pill active" data-cat="all"><i class="fas fa-th"></i> All Vehicles</button>
+        <button type="button" class="filter-pill" data-cat="sports"><i class="fas fa-car-side"></i> Sports</button>
+        <button type="button" class="filter-pill" data-cat="suv"><i class="fas fa-truck-monster"></i> SUV</button>
+        <button type="button" class="filter-pill" data-cat="sedan"><i class="fas fa-car"></i> Sedan</button>
+        <button type="button" class="filter-pill" data-cat="ev"><i class="fas fa-bolt"></i> Electric</button>
+        <button type="button" class="filter-pill" data-cat="truck"><i class="fas fa-truck-pickup"></i> Truck</button>
+      </div>
+
+      <div class="showcase" id="showcase" data-aos="fade-up" data-aos-delay="120">
+        <div class="showcase-image">
+          <span class="si-tag" id="scTag">Best Seller</span>
+          <img id="scImg"
+               src="car1.webp"
+               alt="Featured car" loading="lazy"
+               onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          <div class="si-price-tag">
+            <div>
+              <span class="pt-label">Price</span>
+              <span class="pt-value" id="scPrice">$142,500</span>
+            </div>
+            <a href="404.html" class="btn btn-red" style="padding:10px 18px; min-height:40px; font-size:.76rem;">
+              <i class="fas fa-calendar-check"></i> Test Drive
+            </a>
+          </div>
+        </div>
+
+        <div class="showcase-body">
+          <div class="sb-brand" id="scBrand">Porsche</div>
+          <h3 id="scName">911 Carrera S</h3>
+          <p class="sb-sub" id="scDesc">The definitive sports car — precision engineering, timeless design, and a driving experience that never gets old.</p>
+          <div class="sb-rating">
+            <span class="stars">★★★★★</span>
+            <span class="count" id="scRating">(142 reviews)</span>
+          </div>
+          <div class="showcase-specs" id="scSpecs">
+            <div class="sp-row"><span class="sp-label"><i class="fas fa-calendar"></i> Year</span><span class="sp-value">2024</span></div>
+            <div class="sp-row"><span class="sp-label"><i class="fas fa-gauge-high"></i> Mileage</span><span class="sp-value">3,240 mi</span></div>
+            <div class="sp-row"><span class="sp-label"><i class="fas fa-bolt"></i> Power</span><span class="sp-value">443 hp</span></div>
+            <div class="sp-row"><span class="sp-label"><i class="fas fa-gear"></i> Transmission</span><span class="sp-value">8-Speed PDK</span></div>
+            <div class="sp-row"><span class="sp-label"><i class="fas fa-gas-pump"></i> Fuel</span><span class="sp-value">Petrol</span></div>
+          </div>
+          <div class="showcase-actions">
+            <a href="404.html" class="btn btn-red"><i class="fas fa-circle-info"></i> Full Details</a>
+            <a href="404.html" class="btn btn-ghost"><i class="fas fa-images"></i> Photos</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3 — MASONRY -->
+  <section class="sec masonry-section">
+    <div class="wrap">
+      <div class="masonry-head" data-aos="fade-up">
+        <span class="mini-eyebrow"><i class="fas fa-th-large"></i> Fresh Arrivals</span>
+        <h2>New in <em>this week</em></h2>
+        <p>Seven new vehicles added to the showroom — every one ready for inspection.</p>
+      </div>
+
+      <div class="masonry-grid">
+        <article class="masonry-item feature" data-aos="fade-up">
+          <div class="masonry-img">
+            <span class="masonry-badge new">New Arrival</span>
+            <img src="car8.webp" alt="BMW M4" loading="lazy" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          </div>
+          <div class="masonry-body">
+            <div class="mb-brand">BMW</div>
+            <h4>M4 Competition</h4>
+            <div class="mb-meta">2024 · 8,420 mi · Petrol · 503 hp</div>
+            <div class="mb-foot"><span class="mb-price">$78,900</span><a href="404.html" class="mb-link">View <i class="fas fa-arrow-right"></i></a></div>
+          </div>
+        </article>
+
+        <article class="masonry-item" data-aos="fade-up" data-aos-delay="60">
+          <div class="masonry-img">
+            <span class="masonry-badge">Featured</span>
+            <img src="car7.webp" alt="Audi RS7" loading="lazy" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          </div>
+          <div class="masonry-body">
+            <div class="mb-brand">Audi</div>
+            <h4>RS7 Sportback</h4>
+            <div class="mb-meta">2023 · 12,100 mi · Petrol</div>
+            <div class="mb-foot"><span class="mb-price">$118,700</span><a href="404.html" class="mb-link">View <i class="fas fa-arrow-right"></i></a></div>
+          </div>
+        </article>
+
+        <article class="masonry-item" data-aos="fade-up" data-aos-delay="120">
+          <div class="masonry-img">
+            <span class="masonry-badge used">Certified</span>
+            <img src="car6.webp" alt="Tesla Model S" loading="lazy" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          </div>
+          <div class="masonry-body">
+            <div class="mb-brand">Tesla</div>
+            <h4>Model S Plaid</h4>
+            <div class="mb-meta">2023 · 14,200 mi · Electric</div>
+            <div class="mb-foot"><span class="mb-price">$89,990</span><a href="404.html" class="mb-link">View <i class="fas fa-arrow-right"></i></a></div>
+          </div>
+        </article>
+
+        <article class="masonry-item" data-aos="fade-up" data-aos-delay="180">
+          <div class="masonry-img">
+            <span class="masonry-badge new">New</span>
+            <img src="car5.webp" alt="Mercedes AMG" loading="lazy" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          </div>
+          <div class="masonry-body">
+            <div class="mb-brand">Mercedes-Benz</div>
+            <h4>AMG GT 63 S</h4>
+            <div class="mb-meta">2022 · 8,400 mi · Petrol</div>
+            <div class="mb-foot"><span class="mb-price">$142,000</span><a href="404.html" class="mb-link">View <i class="fas fa-arrow-right"></i></a></div>
+          </div>
+        </article>
+
+        <article class="masonry-item" data-aos="fade-up" data-aos-delay="240">
+          <div class="masonry-img">
+            <span class="masonry-badge used">Pre-Owned</span>
+            <img src="car4.webp" alt="Jeep Wrangler" loading="lazy" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          </div>
+          <div class="masonry-body">
+            <div class="mb-brand">Jeep</div>
+            <h4>Wrangler Rubicon</h4>
+            <div class="mb-meta">2023 · 18,900 mi · Petrol</div>
+            <div class="mb-foot"><span class="mb-price">$62,500</span><a href="404.html" class="mb-link">View <i class="fas fa-arrow-right"></i></a></div>
+          </div>
+        </article>
+
+        <article class="masonry-item" data-aos="fade-up" data-aos-delay="300">
+          <div class="masonry-img">
+            <span class="masonry-badge new">New</span>
+            <img src="car3.webp" alt="Ford Mustang" loading="lazy" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          </div>
+          <div class="masonry-body">
+            <div class="mb-brand">Ford</div>
+            <h4>Mustang GT</h4>
+            <div class="mb-meta">2024 · 3,100 mi · Petrol</div>
+            <div class="mb-foot"><span class="mb-price">$54,900</span><a href="404.html" class="mb-link">View <i class="fas fa-arrow-right"></i></a></div>
+          </div>
+        </article>
+
+        <article class="masonry-item feature" data-aos="fade-up" data-aos-delay="360">
+          <div class="masonry-img">
+            <span class="masonry-badge used">Certified</span>
+            <img src="car2.webp" alt="Toyota Supra" loading="lazy" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          </div>
+          <div class="masonry-body">
+            <div class="mb-brand">Toyota</div>
+            <h4>GR Supra</h4>
+            <div class="mb-meta">2023 · 9,800 mi · Petrol · 382 hp</div>
+            <div class="mb-foot"><span class="mb-price">$58,400</span><a href="404.html" class="mb-link">View <i class="fas fa-arrow-right"></i></a></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="masonry-cta" data-aos="fade-up">
+        <a href="404.html" class="btn btn-ghost"><i class="fas fa-th-list"></i> Load More Vehicles</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4 — COMPARE -->
+  <section class="sec compare-section">
+    <div class="wrap">
+      <div class="compare-head" data-aos="fade-up">
+        <span class="mini-eyebrow"><i class="fas fa-scale-balanced"></i> Compare</span>
+        <h2>Head to head: <em>the final two</em></h2>
+        <p>Two stunning machines, side by side. See what makes each one unique.</p>
+      </div>
+
+      <div class="compare-container" data-aos="fade-up">
+        <div class="compare-card">
+          <div class="cc-image">
+            <span class="cc-tag">Choice #1</span>
+            <img src="car1.webp" alt="Porsche 911" loading="lazy" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          </div>
+          <div class="cc-body">
+            <div class="cc-brand">Porsche</div>
+            <h3>911 Carrera S</h3>
+            <div class="cc-price">$142,500</div>
+            <div class="cc-specs">
+              <div class="cs-row"><span class="cs-label"><i class="fas fa-bolt"></i> Power</span><span class="cs-value">443 hp</span></div>
+              <div class="cs-row"><span class="cs-label"><i class="fas fa-tachometer-alt"></i> 0–60 mph</span><span class="cs-value better">3.5s</span></div>
+              <div class="cs-row"><span class="cs-label"><i class="fas fa-gauge-high"></i> Top Speed</span><span class="cs-value">191 mph</span></div>
+              <div class="cs-row"><span class="cs-label"><i class="fas fa-gear"></i> Drivetrain</span><span class="cs-value">RWD</span></div>
+              <div class="cs-row"><span class="cs-label"><i class="fas fa-gas-pump"></i> Engine</span><span class="cs-value">3.0L Twin-Turbo</span></div>
+            </div>
+            <a href="404.html" class="btn btn-red cc-btn"><i class="fas fa-check"></i> Choose This One</a>
+          </div>
+        </div>
+
+        <span class="vs-badge" aria-hidden="true">VS</span>
+
+        <div class="compare-card featured">
+          <div class="cc-image">
+            <span class="cc-tag">Choice #2</span>
+            <img src="car10.webp" alt="Tesla Model S" loading="lazy" onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          </div>
+          <div class="cc-body">
+            <div class="cc-brand">Tesla</div>
+            <h3>Model S Plaid</h3>
+            <div class="cc-price">$89,990</div>
+            <div class="cc-specs">
+              <div class="cs-row"><span class="cs-label"><i class="fas fa-bolt"></i> Power</span><span class="cs-value better">1,020 hp</span></div>
+              <div class="cs-row"><span class="cs-label"><i class="fas fa-tachometer-alt"></i> 0–60 mph</span><span class="cs-value">1.99s</span></div>
+              <div class="cs-row"><span class="cs-label"><i class="fas fa-gauge-high"></i> Top Speed</span><span class="cs-value">200 mph</span></div>
+              <div class="cs-row"><span class="cs-label"><i class="fas fa-gear"></i> Drivetrain</span><span class="cs-value">AWD</span></div>
+              <div class="cs-row"><span class="cs-label"><i class="fas fa-gas-pump"></i> Engine</span><span class="cs-value">Tri-Motor EV</span></div>
+            </div>
+            <a href="404.html" class="btn btn-red cc-btn"><i class="fas fa-check"></i> Choose This One</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-cta" data-aos="fade-up">
+        <a href="404.html" class="btn btn-ghost"><i class="fas fa-table-columns"></i> See Full Comparison</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5 — ARRIVALS -->
+  <section class="sec arrivals-section">
+    <div class="wrap" style="padding:0;">
+      <div class="arrivals-head" data-aos="fade-up">
+        <div>
+          <span class="mini-eyebrow"><i class="fas fa-star"></i> Just Landed</span>
+          <h2>Fresh <em>off the truck</em></h2>
+        </div>
+        <div class="arrivals-nav">
+          <button type="button" class="arr-nav-btn" id="arrPrev" aria-label="Previous slide"><i class="fas fa-arrow-left"></i></button>
+          <button type="button" class="arr-nav-btn" id="arrNext" aria-label="Next slide"><i class="fas fa-arrow-right"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrivals-track" id="arrivalsTrack" data-aos="fade-up">
+      <div class="arrival-slide">
+        <img src="cp1.webp" alt="BMW M4" loading="lazy" onerror="this.style.display='none';">
+        <div class="as-content">
+          <span class="as-badge"><i class="fas fa-star"></i> Just Arrived</span>
+          <div class="as-brand">BMW</div>
+          <h3>M4 Competition</h3>
+          <p class="as-meta">The M4 Competition delivers razor-sharp handling with a twin-turbo straight-six that revs to 7,200 rpm.</p>
+          <div class="as-price">$78,900</div>
+          <div class="as-actions">
+            <a href="404.html" class="btn btn-red"><i class="fas fa-circle-info"></i> View Details</a>
+            <a href="404.html" class="btn btn-ghost"><i class="fas fa-calendar"></i> Test Drive</a>
+          </div>
+        </div>
+        <div class="as-spec">
+          <div><span>503hp</span><small>Power</small></div>
+          <div><span>3.8s</span><small>0-60</small></div>
+          <div><span>180</span><small>Top mph</small></div>
+        </div>
+      </div>
+
+      <div class="arrival-slide">
+        <img src="cp2.webp" alt="Ford Mustang GT" loading="lazy" onerror="this.style.display='none';">
+        <div class="as-content">
+          <span class="as-badge"><i class="fas fa-star"></i> Just Arrived</span>
+          <div class="as-brand">Ford</div>
+          <h3>Mustang GT</h3>
+          <p class="as-meta">America's iconic muscle car returns with the Coyote V8 and track-ready suspension.</p>
+          <div class="as-price">$54,900</div>
+          <div class="as-actions">
+            <a href="404.html" class="btn btn-red"><i class="fas fa-circle-info"></i> View Details</a>
+            <a href="404.html" class="btn btn-ghost"><i class="fas fa-calendar"></i> Test Drive</a>
+          </div>
+        </div>
+        <div class="as-spec">
+          <div><span>480hp</span><small>Power</small></div>
+          <div><span>4.2s</span><small>0-60</small></div>
+          <div><span>166</span><small>Top mph</small></div>
+        </div>
+      </div>
+
+      <div class="arrival-slide">
+        <img src="cp3.webp" alt="Jeep Wrangler" loading="lazy" onerror="this.style.display='none';">
+        <div class="as-content">
+          <span class="as-badge"><i class="fas fa-star"></i> Just Arrived</span>
+          <div class="as-brand">Jeep</div>
+          <h3>Wrangler Rubicon</h3>
+          <p class="as-meta">Trail-rated and ready for the wildest adventures — with front and rear lockers standard.</p>
+          <div class="as-price">$62,500</div>
+          <div class="as-actions">
+            <a href="404.html" class="btn btn-red"><i class="fas fa-circle-info"></i> View Details</a>
+            <a href="404.html" class="btn btn-ghost"><i class="fas fa-calendar"></i> Test Drive</a>
+          </div>
+        </div>
+        <div class="as-spec">
+          <div><span>285hp</span><small>Power</small></div>
+          <div><span>6.8s</span><small>0-60</small></div>
+          <div><span>99</span><small>Top mph</small></div>
+        </div>
+      </div>
+
+      <div class="arrival-slide">
+        <img src="cp4.webp" alt="Toyota Supra" loading="lazy" onerror="this.style.display='none';">
+        <div class="as-content">
+          <span class="as-badge"><i class="fas fa-star"></i> Just Arrived</span>
+          <div class="as-brand">Toyota</div>
+          <h3>GR Supra</h3>
+          <p class="as-meta">The legend returns — a pure driver's car with a turbocharged inline-six and rear-wheel drive.</p>
+          <div class="as-price">$58,400</div>
+          <div class="as-actions">
+            <a href="404.html" class="btn btn-red"><i class="fas fa-circle-info"></i> View Details</a>
+            <a href="404.html" class="btn btn-ghost"><i class="fas fa-calendar"></i> Test Drive</a>
+          </div>
+        </div>
+        <div class="as-spec">
+          <div><span>382hp</span><small>Power</small></div>
+          <div><span>3.9s</span><small>0-60</small></div>
+          <div><span>155</span><small>Top mph</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 6 — FINANCE -->
+  <section class="sec finance-section">
+    <div class="wrap">
+      <div class="finance-head" data-aos="fade-up">
+        <span class="mini-eyebrow"><i class="fas fa-dollar-sign"></i> Financing Made Simple</span>
+        <h2>Choose your <em>payment plan</em></h2>
+        <p>Three term options on a $30,000 vehicle. Instant approval, no credit impact.</p>
+      </div>
+
+      <div class="finance-band" data-aos="fade-up">
+        <div class="finance-tile">
+          <div class="ft-term"><span>36</span><small>Months</small></div>
+          <div class="ft-info">
+            <div class="ft-monthly">$875<small>/mo</small></div>
+            <div class="ft-desc">4.9% APR · Pay off faster</div>
+            <a href="404.html" class="ft-link">Apply Now <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </div>
+
+        <div class="finance-tile featured">
+          <span class="ft-badge">Best Value</span>
+          <div class="ft-term"><span>48</span><small>Months</small></div>
+          <div class="ft-info">
+            <div class="ft-monthly">$690<small>/mo</small></div>
+            <div class="ft-desc">3.9% APR · Most popular choice</div>
+            <a href="404.html" class="ft-link">Apply Now <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </div>
+
+        <div class="finance-tile">
+          <div class="ft-term"><span>60</span><small>Months</small></div>
+          <div class="ft-info">
+            <div class="ft-monthly">$580<small>/mo</small></div>
+            <div class="ft-desc">3.7% APR · Lowest monthly</div>
+            <a href="404.html" class="ft-link">Apply Now <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <p class="finance-note" data-aos="fade-up">
+        <strong>Representative example:</strong> $30,000 borrowed over 48 months at 3.9% APR. Total payable $33,120. Subject to status.
+      </p>
+    </div>
+  </section>
+
+  <!-- SECTION 7 — TRADE-IN -->
+  <section class="sec tradein-section">
+    <div class="wrap">
+      <div class="tradein-strip" data-aos="fade-up">
+        <div class="ti-head">
+          <h3><i class="fas fa-exchange-alt"></i> Trade in your current car</h3>
+          <p>Instant estimate in under 60 seconds. No obligation.</p>
+        </div>
+
+        <form class="tradein-form" id="tradeinForm" novalidate>
+          <div class="tf-field" id="tiMakeWrap">
+            <label for="tiMake">Make</label>
+            <select id="tiMake">
+              <option value="">Select make…</option>
+              <option>BMW</option><option>Mercedes-Benz</option><option>Audi</option>
+              <option>Porsche</option><option>Tesla</option><option>Ford</option>
+              <option>Toyota</option><option>Honda</option><option>Jeep</option><option>Other</option>
+            </select>
+          </div>
+          <div class="tf-field" id="tiYearWrap">
+            <label for="tiYear">Year</label>
+            <select id="tiYear">
+              <option value="">Select year…</option>
+              <option>2024</option><option>2023</option><option>2022</option>
+              <option>2021</option><option>2020</option><option>2019</option>
+              <option>2018</option><option>2017</option><option>2016</option>
+              <option>2015</option><option>Older</option>
+            </select>
+          </div>
+          <div class="tf-field" id="tiMileageWrap">
+            <label for="tiMileage">Mileage</label>
+            <input type="text" id="tiMileage" placeholder="e.g. 45,000" inputmode="numeric" maxlength="8" />
+          </div>
+          <div class="tf-field" id="tiConditionWrap">
+            <label for="tiCondition">Condition</label>
+            <select id="tiCondition">
+              <option value="">Select…</option>
+              <option>Excellent</option><option>Good</option>
+              <option>Fair</option><option>Poor</option>
+            </select>
+          </div>
+          <button type="submit" class="tf-submit" id="tiSubmitBtn"><i class="fas fa-calculator"></i> Get Offer</button>
+        </form>
+
+        <div class="tradein-error" id="tradeinErr">
+          <i class="fas fa-exclamation-circle"></i>
+          <span id="tradeinErrText">Please complete all fields.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 8 — SHOWROOM -->
+  <section class="sec showroom-section">
+    <div class="wrap">
+      <div class="showroom-split" data-aos="zoom-in">
+        <div class="sr-image">
+          <img src="cp5.webp"
+               alt="Our showroom" loading="lazy"
+               onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #1a0000, #0B0E13)';">
+          <div class="sr-address-card">
+            <div class="ac-label"><i class="fas fa-location-dot"></i> Showroom Address</div>
+            <div class="ac-line1">1420 Motorway Blvd</div>
+            <div class="ac-line2">Detroit, MI 48226 · Open Mon–Sat</div>
+          </div>
+        </div>
+
+        <div class="sr-content">
+          <span class="mini-eyebrow"><i class="fas fa-warehouse"></i> Visit Our Showroom</span>
+          <h2>See them <em>in person</em></h2>
+          <p>Nothing beats seeing the car up close and taking it for a spin. Drop by our Detroit showroom — no appointment required, though booking guarantees your preferred slot.</p>
+
+          <div class="showroom-info">
+            <div class="si-row">
+              <div class="si-icon"><i class="fas fa-clock"></i></div>
+              <div class="si-text">
+                <strong>Mon – Sat · 9 AM – 7 PM</strong>
+                <small>Closed Sundays &amp; public holidays</small>
+              </div>
+            </div>
+            <div class="si-row">
+              <div class="si-icon"><i class="fas fa-phone"></i></div>
+              <div class="si-text">
+                <strong>+1 (800) 555-0199</strong>
+                <small>Call ahead for a private viewing</small>
+              </div>
+            </div>
+            <div class="si-row">
+              <div class="si-icon"><i class="fas fa-map-location-dot"></i></div>
+              <div class="si-text">
+                <strong>1420 Motorway Blvd, Detroit</strong>
+                <small>Free parking · Complimentary coffee</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="showroom-actions">
+            <a href="404.html" class="btn btn-red"><i class="fas fa-calendar-check"></i> Book a Visit</a>
+            <a href="404.html" class="btn btn-ghost"><i class="fas fa-directions"></i> Get Directions</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="footer-placeholder"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+AOS.init({
+  duration: 850, easing: 'ease-out-cubic', once: true, offset: 60,
+  mirror: false, disable: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  fetch('header.html').then(r => r.ok ? r.text() : Promise.reject('Header not found'))
+    .then(d => { document.getElementById('header-placeholder').innerHTML = d; initHeader(); })
+    .catch(err => console.warn('Header not loaded:', err));
+  fetch('footer.html').then(r => r.ok ? r.text() : Promise.reject('Footer not found'))
+    .then(d => { document.getElementById('footer-placeholder').innerHTML = d; initFooter(); })
+    .catch(err => console.warn('Footer not loaded:', err));
+});
+
+function initHeader(){
+  const hamburger = document.getElementById('hamburgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (!hamburger || !mobileMenu) return;
+  function toggleMenu(){
+    const isOpen = !mobileMenu.classList.contains('active');
+    hamburger.classList.toggle('active', isOpen);
+    mobileMenu.classList.toggle('active', isOpen);
+    document.documentElement.classList.toggle('menu-open', isOpen);
+    document.body.classList.toggle('menu-open', isOpen);
+    document.documentElement.style.overflow = isOpen ? 'hidden' : '';
+    document.body.style.overflow            = isOpen ? 'hidden' : '';
+    hamburger.setAttribute('aria-expanded', isOpen);
+  }
+  function closeMenu(){
+    if (!mobileMenu.classList.contains('active')) return;
+    hamburger.classList.remove('active');
+    mobileMenu.classList.remove('active');
+    document.documentElement.classList.remove('menu-open');
+    document.body.classList.remove('menu-open');
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    hamburger.setAttribute('aria-expanded', 'false');
+  }
+  hamburger.addEventListener('click', toggleMenu);
+  document.addEventListener('click', e => {
+    if (mobileMenu.classList.contains('active') &&
+        !hamburger.contains(e.target) && !mobileMenu.contains(e.target)) closeMenu();
+  });
+  window.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
+  document.querySelectorAll('.mobile-nav-link, .mobile-action-link').forEach(l => l.addEventListener('click', closeMenu));
+}
+
+function initFooter(){
+  function validEmail(email){ return /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(email); }
+  [['footerSubscribeBtn','footerEmail','footerEmailError'],['mobileFooterSubscribeBtn','mobileFooterEmail','mobileFooterEmailError']].forEach(ids => {
+    var btn = document.getElementById(ids[0]);
+    var input = document.getElementById(ids[1]);
+    var err = document.getElementById(ids[2]);
+    if (!btn || !input || !err) return;
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var email = input.value.trim();
+      if (!email){ err.textContent = 'Please enter your email address'; err.classList.add('show'); input.classList.add('error'); }
+      else if (!validEmail(email)){ err.textContent = 'Please enter a valid email address'; err.classList.add('show'); input.classList.add('error'); }
+      else { err.classList.remove('show'); input.classList.remove('error'); window.location.href = '404.html'; }
+    });
+    input.addEventListener('input', function(){ if (this.value.trim()){ err.classList.remove('show'); this.classList.remove('error'); } });
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') btn.click(); });
+  });
+}
+
+(function initSearch(){
+  const form = document.getElementById('invSearch');
+  if (!form) return;
+  const make  = document.getElementById('sMake');
+  const model = document.getElementById('sModel');
+  const price = document.getElementById('sPrice');
+  const btn   = document.getElementById('invSearchBtn');
+  const err   = document.getElementById('invSearchErr');
+  const errTx = document.getElementById('invSearchErrText');
+  function clearErr(){
+    err.classList.remove('show');
+    document.getElementById('sMakeWrap').classList.remove('error');
+    document.getElementById('sModelWrap').classList.remove('error');
+    document.getElementById('sPriceWrap').classList.remove('error');
+  }
+  function showErr(msg){ errTx.textContent = msg; err.classList.add('show'); }
+  [make, model, price].forEach(sel => sel.addEventListener('change', clearErr));
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    clearErr();
+    if (!make.value && !model.value && !price.value){
+      showErr('Please select at least one filter to search.');
+      return;
+    }
+    if (make.value === 'BMW' && model.value === 'Truck'){
+      showErr('BMW does not currently have truck models in stock. Please adjust.');
+      document.getElementById('sModelWrap').classList.add('error');
+      return;
+    }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching…';
+    setTimeout(() => { window.location.href = '404.html'; }, 700);
+  });
+})();
+
+(function initFilters(){
+  const pills = document.querySelectorAll('.filter-pill');
+  const showcase = document.getElementById('showcase');
+  if (!pills.length || !showcase) return;
+  const data = {
+    all: { brand:'Porsche', name:'911 Carrera S', desc:'The definitive sports car — precision engineering, timeless design, and a driving experience that never gets old.', price:'$142,500', tag:'Best Seller', rating:'(142 reviews)', img:'car10.webp', specs:[{icon:'fa-calendar',label:'Year',value:'2024'},{icon:'fa-gauge-high',label:'Mileage',value:'3,240 mi'},{icon:'fa-bolt',label:'Power',value:'443 hp'},{icon:'fa-gear',label:'Transmission',value:'8-Speed PDK'},{icon:'fa-gas-pump',label:'Fuel',value:'Petrol'}] },
+    sports: { brand:'BMW', name:'M4 Competition', desc:"Razor-sharp handling meets a twin-turbo straight-six that revs to 7,200 rpm. The M4 is a proper driver's car.", price:'$78,900', tag:'Sports', rating:'(89 reviews)', img:'car9.webp', specs:[{icon:'fa-calendar',label:'Year',value:'2024'},{icon:'fa-gauge-high',label:'Mileage',value:'8,420 mi'},{icon:'fa-bolt',label:'Power',value:'503 hp'},{icon:'fa-gear',label:'Transmission',value:'8-Speed Auto'},{icon:'fa-gas-pump',label:'Fuel',value:'Petrol'}] },
+    suv: { brand:'Jeep', name:'Wrangler Rubicon', desc:'Trail-rated and ready for the wildest adventures — with front and rear lockers standard.', price:'$62,500', tag:'SUV', rating:'(156 reviews)', img:'car8.webp', specs:[{icon:'fa-calendar',label:'Year',value:'2023'},{icon:'fa-gauge-high',label:'Mileage',value:'18,900 mi'},{icon:'fa-bolt',label:'Power',value:'285 hp'},{icon:'fa-gear',label:'Transmission',value:'8-Speed Auto'},{icon:'fa-gas-pump',label:'Fuel',value:'Petrol'}] },
+    sedan: { brand:'Mercedes-Benz', name:'C-Class 300', desc:'The benchmark luxury sedan — refined, quiet, and beautifully engineered.', price:'$54,200', tag:'Sedan', rating:'(203 reviews)', img:'car7.webp', specs:[{icon:'fa-calendar',label:'Year',value:'2024'},{icon:'fa-gauge-high',label:'Mileage',value:'4,100 mi'},{icon:'fa-bolt',label:'Power',value:'255 hp'},{icon:'fa-gear',label:'Transmission',value:'9-Speed Auto'},{icon:'fa-gas-pump',label:'Fuel',value:'Mild Hybrid'}] },
+    ev: { brand:'Tesla', name:'Model S Plaid', desc:'The fastest production sedan ever made — 0 to 60 mph in under 2 seconds.', price:'$89,990', tag:'Electric', rating:'(312 reviews)', img:'car6.webp', specs:[{icon:'fa-calendar',label:'Year',value:'2023'},{icon:'fa-gauge-high',label:'Mileage',value:'14,200 mi'},{icon:'fa-bolt',label:'Power',value:'1,020 hp'},{icon:'fa-gear',label:'Drivetrain',value:'AWD Tri-Motor'},{icon:'fa-battery-full',label:'Range',value:'396 mi'}] },
+    truck: { brand:'Ford', name:'F-150 Raptor', desc:'A desert-racing truck with a 450-hp twin-turbo V6 and FOX live-valve shocks.', price:'$82,400', tag:'Truck', rating:'(178 reviews)', img:'car5.webp', specs:[{icon:'fa-calendar',label:'Year',value:'2023'},{icon:'fa-gauge-high',label:'Mileage',value:'22,500 mi'},{icon:'fa-bolt',label:'Power',value:'450 hp'},{icon:'fa-gear',label:'Transmission',value:'10-Speed Auto'},{icon:'fa-gas-pump',label:'Fuel',value:'Petrol'}] }
+  };
+  const scImg = document.getElementById('scImg');
+  const scBrand = document.getElementById('scBrand');
+  const scName = document.getElementById('scName');
+  const scDesc = document.getElementById('scDesc');
+  const scPrice = document.getElementById('scPrice');
+  const scTag = document.getElementById('scTag');
+  const scRating = document.getElementById('scRating');
+  const scSpecs = document.getElementById('scSpecs');
+  function render(cat){
+    const d = data[cat] || data.all;
+    showcase.style.animation = 'none';
+    void showcase.offsetWidth;
+    showcase.style.animation = 'showFade .5s var(--ease)';
+    scImg.src = d.img;
+    scImg.style.display = 'block';
+    scBrand.textContent = d.brand;
+    scName.textContent = d.name;
+    scDesc.textContent = d.desc;
+    scPrice.textContent = d.price;
+    scTag.textContent = d.tag;
+    scRating.textContent = d.rating;
+    scSpecs.innerHTML = d.specs.map(s =>
+      '<div class="sp-row"><span class="sp-label"><i class="fas ' + s.icon + '"></i> ' + s.label +
+      '</span><span class="sp-value">' + s.value + '</span></div>'
+    ).join('');
+  }
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      pills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      render(pill.dataset.cat);
+    });
+  });
+})();
+
+(function initArrivals(){
+  const track = document.getElementById('arrivalsTrack');
+  const prev = document.getElementById('arrPrev');
+  const next = document.getElementById('arrNext');
+  if (!track || !prev || !next) return;
+  const step = () => {
+    const slide = track.querySelector('.arrival-slide');
+    if (!slide) return 400;
+    return slide.offsetWidth + 20;
+  };
+  prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+  next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+  function updateNav(){
+    const max = track.scrollWidth - track.clientWidth;
+    prev.disabled = track.scrollLeft <= 4;
+    next.disabled = track.scrollLeft >= max - 4;
+  }
+  track.addEventListener('scroll', updateNav, { passive: true });
+  window.addEventListener('resize', updateNav);
+  updateNav();
+})();
+
+(function initTradein(){
+  const form = document.getElementById('tradeinForm');
+  if (!form) return;
+  const makeEl = document.getElementById('tiMake');
+  const yearEl = document.getElementById('tiYear');
+  const mileEl = document.getElementById('tiMileage');
+  const condEl = document.getElementById('tiCondition');
+  const btn    = document.getElementById('tiSubmitBtn');
+  const err    = document.getElementById('tradeinErr');
+  const errTx  = document.getElementById('tradeinErrText');
+  const wrapMake = document.getElementById('tiMakeWrap');
+  const wrapYear = document.getElementById('tiYearWrap');
+  const wrapMile = document.getElementById('tiMileageWrap');
+  const wrapCond = document.getElementById('tiConditionWrap');
+  function clearErr(){
+    err.classList.remove('show');
+    [wrapMake, wrapYear, wrapMile, wrapCond].forEach(w => w.classList.remove('error'));
+  }
+  function showErr(msg, wrap){
+    errTx.textContent = msg; err.classList.add('show');
+    if (wrap) wrap.classList.add('error');
+  }
+  mileEl.addEventListener('input', function(){
+    const raw = this.value;
+    const digits = raw.replace(/\D/g, '').slice(0, 8);
+    this.value = digits ? parseInt(digits, 10).toLocaleString('en-US') : '';
+    if (this.value) wrapMile.classList.remove('error');
+    clearErr();
+  });
+  makeEl.addEventListener('change', () => { if (makeEl.value) wrapMake.classList.remove('error'); clearErr(); });
+  yearEl.addEventListener('change', () => { if (yearEl.value) wrapYear.classList.remove('error'); clearErr(); });
+  condEl.addEventListener('change', () => { if (condEl.value) wrapCond.classList.remove('error'); clearErr(); });
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    clearErr();
+    if (!makeEl.value){ showErr('Please select your vehicle make.', wrapMake); return; }
+    if (!yearEl.value){ showErr('Please select your vehicle year.', wrapYear); return; }
+    const mileage = mileEl.value.replace(/\D/g, '');
+    if (!mileage || mileage.length < 3 || parseInt(mileage, 10) < 100){
+      showErr('Please enter a valid mileage (min 100 miles).', wrapMile);
+      return;
+    }
+    if (!condEl.value){ showErr('Please select your vehicle condition.', wrapCond); return; }
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating…';
+    setTimeout(() => { window.location.href = '404.html'; }, 800);
+  });
+})();
+
+console.log('%c🚗 Inventory page ready', 'color:#E10600;font-size:14px;font-weight:bold;');
+</script>
+
+</body>
+</html>

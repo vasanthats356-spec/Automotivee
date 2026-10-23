@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Automotive — Footer</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+/* ==========================================================
+   AUTOMOTIVE COLOR SYSTEM — matches navbar exactly
+   ========================================================== */
+:root{
+  --carbon:      #0B0E13;
+  --graphite:    #141922;
+
+  --red:         #E10600;
+  --red-bright:  #FF2A1F;
+  --red-deep:    #A80400;
+
+  --amber:       #FFB020;
+  --amber-d:     #E08A00;
+
+  --silver:      #C9D1DC;
+  --text:        #EEF2F8;
+  --text-soft:   #98A3B3;
+  --text-mute:   #6B7686;
+
+  --line:        rgba(201,209,220,.10);
+  --line-2:      rgba(201,209,220,.18);
+
+  --ease:        cubic-bezier(.22,.61,.36,1);
+}
+
+*{
+  margin:0; padding:0; box-sizing:border-box;
+  font-family:'Inter','Segoe UI',Roboto,system-ui,sans-serif;
+}
+
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; overflow-x:hidden; }
+
+body{
+  background:var(--carbon);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  overflow-x:hidden;
+}
+
+/* ==========================================================
+   FOOTER
+   ========================================================== */
+footer{
+  margin-top:auto;
+  background:linear-gradient(180deg, rgba(11,14,19,0) 0%, rgba(20,25,34,.65) 40%, rgba(11,14,19,.95) 100%);
+  padding:70px 0 0;
+  border-top:1px solid var(--line-2);
+  position:relative;
+  overflow-x:clip;
+}
+
+footer::before{
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:3px;
+  background:linear-gradient(90deg, var(--red) 0%, var(--amber) 50%, transparent 100%);
+  pointer-events:none;
+}
+
+.footer-container{
+  max-width:1280px;
+  width:92%;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ---------------- MAIN GRID ---------------- */
+.footer-grid{
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr 1.2fr;
+  gap:44px;
+  padding-bottom:48px;
+  border-bottom:1px solid var(--line);
+}
+
+/* Column 1: Brand */
+.footer-brand-col{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.footer-brand-col .footer-logo{
+  display:inline-block;
+  line-height:0;
+  max-width:fit-content;
+  transition:opacity .25s ease, transform .25s ease;
+}
+.footer-brand-col .footer-logo:hover{ opacity:.9; transform:scale(1.02); }
+
+.footer-brand-col .footer-logo .logo-img{
+  height:64px;
+  width:auto;
+  max-width:180px;
+  object-fit:contain;
+  display:block;
+  filter:drop-shadow(0 0 16px rgba(255,255,255,.08));
+}
+
+.footer-brand-col .brand-description{
+  font-size:14px;
+  color:var(--text-soft);
+  line-height:1.75;
+  max-width:360px;
+}
+.footer-brand-col .brand-description strong{
+  color:#fff;
+  font-weight:800;
+  font-family:'Outfit',sans-serif;
+}
+
+.footer-brand-col .brand-tagline{
+  font-size:13px;
+  color:var(--text-mute);
+  font-weight:600;
+  letter-spacing:.4px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.footer-brand-col .brand-tagline i{ color:var(--red-bright); }
+
+.footer-brand-col .highlight-text{
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  color:#fff;
+  padding:10px 18px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:700;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  max-width:fit-content;
+  box-shadow:0 8px 22px rgba(225,6,0,.35);
+}
+.footer-brand-col .highlight-text i{ color:var(--amber); }
+
+/* Column headings */
+.footer-col h4{
+  font-family:'Outfit',sans-serif;
+  font-size:1.02rem;
+  font-weight:800;
+  color:#fff;
+  margin-bottom:20px;
+  padding-bottom:10px;
+  border-bottom:2px solid var(--red);
+  display:inline-block;
+}
+
+.footer-col ul{
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.footer-col ul li a{
+  font-size:14px;
+  font-weight:500;
+  color:var(--text-soft);
+  text-decoration:none;
+  transition:all .3s ease;
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+}
+.footer-col ul li a i{
+  color:var(--red);
+  font-size:14px;
+  width:18px;
+  text-align:center;
+  transition:all .3s ease;
+}
+.footer-col ul li a:hover{ color:#fff; padding-left:6px; }
+.footer-col ul li a:hover i{ color:var(--amber); transform:scale(1.15); }
+
+/* Contact list */
+.footer-contact-list{
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.footer-contact-list li{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  font-size:14px;
+  color:var(--text-soft);
+  line-height:1.65;
+}
+.footer-contact-list li i{
+  color:var(--red-bright);
+  font-size:16px;
+  width:20px;
+  margin-top:3px;
+  flex-shrink:0;
+}
+.footer-contact-list li a{
+  color:var(--text-soft);
+  text-decoration:none;
+  transition:color .3s ease;
+}
+.footer-contact-list li a:hover{ color:var(--amber); }
+
+/* Service hours */
+.footer-hours{
+  list-style:none;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.footer-hours li{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  font-size:13.5px;
+  color:var(--text-soft);
+  padding:9px 0;
+  border-bottom:1px dashed var(--line);
+}
+.footer-hours li:last-child{ border-bottom:none; }
+.footer-hours li .time{
+  color:#fff;
+  font-weight:700;
+  font-family:'Outfit',sans-serif;
+}
+
+/* Service badge */
+.footer-col .service-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:linear-gradient(135deg, var(--amber), var(--amber-d));
+  color:#1a1300;
+  padding:11px 20px;
+  border-radius:60px;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.4px;
+  margin-top:16px;
+  transition:all .3s var(--ease);
+  box-shadow:0 8px 22px rgba(255,176,32,.32);
+  text-decoration:none;
+}
+.footer-col .service-badge:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 30px rgba(255,176,32,.45);
+}
+.footer-col .service-badge i{ color:#1a1300; }
+
+/* ---------------- NEWSLETTER ---------------- */
+.footer-newsletter{
+  background:linear-gradient(135deg, rgba(20,25,34,.9), rgba(11,14,19,.9));
+  border:1px solid var(--line-2);
+  border-radius:20px;
+  padding:28px 32px;
+  margin:36px 0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  flex-wrap:wrap;
+  position:relative;
+  overflow:hidden;
+}
+.footer-newsletter::before{
+  content:'';
+  position:absolute;
+  top:-80px; right:-80px;
+  width:240px; height:240px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(225,6,0,.18), transparent 68%);
+  pointer-events:none;
+}
+.footer-newsletter .newsletter-text{
+  position:relative;
+  z-index:2;
+  min-width:0;
+}
+.footer-newsletter .newsletter-text h3{
+  font-family:'Outfit',sans-serif;
+  font-size:1.2rem;
+  font-weight:800;
+  color:#fff;
+  margin-bottom:6px;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+}
+.footer-newsletter .newsletter-text h3 i{ color:var(--amber); }
+.footer-newsletter .newsletter-text p{
+  font-size:.86rem;
+  color:var(--text-soft);
+  line-height:1.6;
+}
+
+.footer-newsletter .newsletter-form{
+  position:relative;
+  z-index:2;
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+
+.footer-newsletter .input-wrapper{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  min-width:0;
+}
+
+.footer-newsletter .newsletter-form input{
+  padding:13px 20px;
+  border:1.5px solid var(--line-2);
+  border-radius:12px;
+  font-size:.9rem;
+  font-family:inherit;
+  background:rgba(11,14,19,.6);
+  color:#fff;
+  outline:none;
+  transition:all .3s ease;
+  min-width:280px;
+}
+.footer-newsletter .newsletter-form input::placeholder{ color:var(--text-mute); }
+.footer-newsletter .newsletter-form input:focus{
+  border-color:var(--red);
+  box-shadow:0 0 0 4px rgba(225,6,0,.14);
+}
+.footer-newsletter .newsletter-form input.error{ border-color:var(--red-bright); }
+
+.footer-newsletter .newsletter-form button{
+  padding:13px 26px;
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  font-size:.9rem;
+  font-weight:800;
+  cursor:pointer;
+  transition:all .3s var(--ease);
+  font-family:inherit;
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  box-shadow:0 10px 26px rgba(225,6,0,.4);
+  white-space:nowrap;
+}
+.footer-newsletter .newsletter-form button:hover{
+  background:linear-gradient(135deg, var(--red-bright), var(--red));
+  transform:translateY(-3px);
+  box-shadow:0 16px 36px rgba(225,6,0,.55);
+}
+
+.footer-newsletter .newsletter-error{
+  color:var(--red-bright);
+  font-size:.75rem;
+  font-weight:600;
+  display:none;
+  padding-left:4px;
+  line-height:1.3;
+}
+.footer-newsletter .newsletter-error.show{
+  display:block;
+  animation:shake .4s ease;
+}
+
+@keyframes shake{
+  0%,100%{ transform:translateX(0); }
+  25%{ transform:translateX(-4px); }
+  75%{ transform:translateX(4px); }
+}
+
+/* ---------------- BOTTOM ROW ---------------- */
+.footer-bottom-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:26px 0;
+  flex-wrap:wrap;
+  gap:20px;
+}
+
+.footer-copyright{
+  font-size:13px;
+  color:var(--text-mute);
+}
+.footer-copyright span{
+  color:#fff;
+  font-weight:700;
+  font-family:'Outfit',sans-serif;
+}
+
+.footer-social{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.footer-social a{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  background:rgba(20,25,34,.85);
+  border:1px solid var(--line-2);
+  color:var(--silver);
+  text-decoration:none;
+  transition:all .3s var(--ease);
+  font-size:15px;
+}
+.footer-social a:hover{
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  border-color:transparent;
+  color:#fff;
+  transform:translateY(-3px);
+  box-shadow:0 12px 28px rgba(225,6,0,.42);
+}
+
+.footer-payments{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.footer-payments span{
+  font-size:13px;
+  color:var(--text-mute);
+  font-weight:600;
+}
+.footer-payments i{
+  font-size:26px;
+  color:var(--text-mute);
+  transition:all .3s ease;
+}
+.footer-payments i:hover{ color:var(--amber); transform:scale(1.08); }
+
+/* ==========================================================
+   MOBILE VIEW
+   ========================================================== */
+.mobile-view{ display:none; }
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+@media (max-width:1024px){
+  .footer-grid{ grid-template-columns:1.5fr 1fr 1fr; gap:34px; }
+  .footer-brand-col .footer-logo .logo-img{ height:58px; max-width:160px; }
+}
+
+@media (max-width:900px){
+  .footer-grid,
+  .footer-bottom-row,
+  .footer-newsletter{ display:none; }
+
+  footer{ padding:46px 0 0; }
+
+  .mobile-view{
+    display:flex;
+    flex-direction:column;
+    gap:26px;
+    padding:8px 0 22px;
+  }
+
+  .mobile-view .mobile-logo{
+    display:inline-block;
+    line-height:0;
+    max-width:fit-content;
+  }
+  .mobile-view .mobile-logo .logo-img{
+    height:66px;
+    width:auto;
+    max-width:230px;
+    object-fit:contain;
+    display:block;
+    filter:drop-shadow(0 0 14px rgba(255,255,255,.08));
+  }
+
+  .mobile-view .mobile-brand{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .mobile-view .brand-description{
+    font-size:14px;
+    color:var(--text-soft);
+    line-height:1.75;
+  }
+  .mobile-view .brand-description strong{
+    color:#fff;
+    font-weight:800;
+    font-family:'Outfit',sans-serif;
+  }
+  .mobile-view .brand-tagline{
+    font-size:13px;
+    color:var(--text-mute);
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .mobile-view .brand-tagline i{ color:var(--red-bright); }
+  .mobile-view .highlight-text{
+    background:linear-gradient(135deg, var(--red), var(--red-deep));
+    color:#fff;
+    padding:10px 18px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:700;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    max-width:fit-content;
+    box-shadow:0 8px 22px rgba(225,6,0,.35);
+  }
+  .mobile-view .highlight-text i{ color:var(--amber); }
+
+  .mobile-view .mobile-section{
+    padding-top:22px;
+    border-top:1px solid var(--line);
+  }
+  .mobile-view .mobile-section h4{
+    font-family:'Outfit',sans-serif;
+    font-size:1rem;
+    font-weight:800;
+    color:#fff;
+    margin-bottom:16px;
+    padding-bottom:9px;
+    border-bottom:2px solid var(--red);
+    display:inline-block;
+  }
+  .mobile-view .mobile-section ul{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .mobile-view .mobile-section ul li a{
+    font-size:14px;
+    font-weight:500;
+    color:var(--text-soft);
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:12px;
+    transition:all .3s ease;
+  }
+  .mobile-view .mobile-section ul li a i{
+    color:var(--red);
+    font-size:14px;
+    width:18px;
+    text-align:center;
+    transition:all .3s ease;
+  }
+  .mobile-view .mobile-section ul li a:hover{ color:#fff; padding-left:6px; }
+  .mobile-view .mobile-section ul li a:hover i{ color:var(--amber); }
+
+  .mobile-view .mobile-contact-list{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .mobile-view .mobile-contact-list li{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    font-size:14px;
+    color:var(--text-soft);
+    line-height:1.65;
+  }
+  .mobile-view .mobile-contact-list li i{
+    color:var(--red-bright);
+    font-size:15px;
+    width:20px;
+    margin-top:3px;
+    flex-shrink:0;
+  }
+  .mobile-view .mobile-contact-list li a{
+    color:var(--text-soft);
+    text-decoration:none;
+  }
+  .mobile-view .mobile-contact-list li a:hover{ color:var(--amber); }
+
+  .mobile-view .mobile-hours{
+    list-style:none;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .mobile-view .mobile-hours li{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    font-size:13.5px;
+    color:var(--text-soft);
+    padding:9px 0;
+    border-bottom:1px dashed var(--line);
+  }
+  .mobile-view .mobile-hours li:last-child{ border-bottom:none; }
+  .mobile-view .mobile-hours li .time{
+    color:#fff;
+    font-weight:700;
+    font-family:'Outfit',sans-serif;
+  }
+
+  .mobile-view .service-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:linear-gradient(135deg, var(--amber), var(--amber-d));
+    color:#1a1300;
+    padding:11px 20px;
+    border-radius:60px;
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.4px;
+    margin-top:16px;
+    transition:all .3s var(--ease);
+    box-shadow:0 8px 22px rgba(255,176,32,.32);
+    text-decoration:none;
+  }
+  .mobile-view .service-badge:hover{ transform:translateY(-3px); }
+  .mobile-view .service-badge i{ color:#1a1300; }
+
+  .mobile-view .mobile-newsletter{
+    background:linear-gradient(135deg, rgba(20,25,34,.9), rgba(11,14,19,.9));
+    border:1px solid var(--line-2);
+    border-radius:18px;
+    padding:22px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    position:relative;
+    overflow:hidden;
+  }
+  .mobile-view .mobile-newsletter::before{
+    content:'';
+    position:absolute;
+    top:-70px; right:-70px;
+    width:200px; height:200px;
+    border-radius:50%;
+    background:radial-gradient(circle, rgba(225,6,0,.18), transparent 68%);
+    pointer-events:none;
+  }
+  .mobile-view .mobile-newsletter h3{
+    font-family:'Outfit',sans-serif;
+    font-size:1.02rem;
+    font-weight:800;
+    color:#fff;
+    margin-bottom:6px;
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+  }
+  .mobile-view .mobile-newsletter h3 i{ color:var(--amber); }
+  .mobile-view .mobile-newsletter p{
+    font-size:.83rem;
+    color:var(--text-soft);
+    line-height:1.6;
+  }
+
+  .mobile-view .mobile-newsletter .newsletter-form{
+    position:relative;
+    z-index:2;
+    display:flex;
+    gap:9px;
+    align-items:flex-start;
+  }
+  .mobile-view .mobile-newsletter .input-wrapper{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    min-width:0;
+  }
+  .mobile-view .mobile-newsletter input{
+    width:100%;
+    padding:12px 16px;
+    border:1.5px solid var(--line-2);
+    border-radius:11px;
+    font-size:.88rem;
+    font-family:inherit;
+    background:rgba(11,14,19,.6);
+    color:#fff;
+    outline:none;
+    transition:all .3s ease;
+  }
+  .mobile-view .mobile-newsletter input::placeholder{ color:var(--text-mute); }
+  .mobile-view .mobile-newsletter input:focus{
+    border-color:var(--red);
+    box-shadow:0 0 0 4px rgba(225,6,0,.14);
+  }
+  .mobile-view .mobile-newsletter input.error{ border-color:var(--red-bright); }
+  .mobile-view .mobile-newsletter button{
+    padding:12px 20px;
+    background:linear-gradient(135deg, var(--red), var(--red-deep));
+    color:#fff;
+    border:none;
+    border-radius:11px;
+    font-size:.86rem;
+    font-weight:800;
+    cursor:pointer;
+    font-family:inherit;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    box-shadow:0 10px 24px rgba(225,6,0,.4);
+    white-space:nowrap;
+    transition:all .3s var(--ease);
+  }
+  .mobile-view .mobile-newsletter button:hover{
+    background:linear-gradient(135deg, var(--red-bright), var(--red));
+    transform:translateY(-2px);
+  }
+  .mobile-view .mobile-newsletter .newsletter-error{
+    color:var(--red-bright);
+    font-size:.72rem;
+    font-weight:600;
+    display:none;
+    padding-left:4px;
+    line-height:1.3;
+  }
+  .mobile-view .mobile-newsletter .newsletter-error.show{
+    display:block;
+    animation:shake .4s ease;
+  }
+
+  .mobile-view .mobile-bottom{
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    padding-top:22px;
+    border-top:1px solid var(--line);
+  }
+
+  .mobile-view .mobile-social{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .mobile-view .mobile-social-label{
+    font-size:13px;
+    color:var(--text-mute);
+    font-weight:600;
+    margin-right:4px;
+  }
+  .mobile-view .mobile-social a{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    background:rgba(20,25,34,.85);
+    border:1px solid var(--line-2);
+    color:var(--silver);
+    text-decoration:none;
+    font-size:15px;
+    transition:all .3s var(--ease);
+  }
+  .mobile-view .mobile-social a:hover{
+    background:linear-gradient(135deg, var(--red), var(--red-deep));
+    border-color:transparent;
+    color:#fff;
+    transform:translateY(-3px);
+    box-shadow:0 12px 28px rgba(225,6,0,.42);
+  }
+
+  .mobile-view .mobile-payments{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+  }
+  .mobile-view .mobile-payments span{
+    font-size:13px;
+    color:var(--text-mute);
+    font-weight:600;
+  }
+  .mobile-view .mobile-payments i{
+    font-size:26px;
+    color:var(--text-mute);
+    transition:color .3s ease;
+  }
+  .mobile-view .mobile-payments i:hover{ color:var(--amber); }
+
+  .mobile-view .mobile-copyright{
+    font-size:12px;
+    color:var(--text-mute);
+    text-align:center;
+    padding-top:16px;
+    border-top:1px solid var(--line);
+  }
+  .mobile-view .mobile-copyright span{
+    color:#fff;
+    font-weight:700;
+    font-family:'Outfit',sans-serif;
+  }
+}
+
+@media (max-width:480px){
+  footer{ padding:38px 0 0; }
+  .footer-container{ width:94%; }
+
+  .mobile-view{ gap:22px; }
+  .mobile-view .mobile-logo .logo-img{ height:56px; max-width:200px; }
+  .mobile-view .brand-description{ font-size:13.5px; }
+  .mobile-view .brand-tagline{ font-size:12.5px; }
+  .mobile-view .highlight-text{ font-size:12px; padding:9px 15px; }
+  .mobile-view .mobile-section h4{ font-size:.96rem; }
+  .mobile-view .mobile-section ul li a{ font-size:13.5px; }
+  .mobile-view .mobile-contact-list li{ font-size:13.5px; }
+  .mobile-view .mobile-hours li{ font-size:13px; }
+  .mobile-view .mobile-newsletter{ padding:20px 16px; }
+  .mobile-view .mobile-newsletter h3{ font-size:.96rem; }
+  .mobile-view .mobile-newsletter p{ font-size:.8rem; }
+  .mobile-view .mobile-newsletter input{ font-size:.85rem; padding:11px 14px; }
+  .mobile-view .mobile-newsletter button{ font-size:.82rem; padding:11px 16px; }
+  .mobile-view .mobile-social a{ width:38px; height:38px; font-size:14px; }
+  .mobile-view .mobile-payments i{ font-size:24px; }
+  .mobile-view .mobile-copyright{ font-size:11px; }
+}
+
+@media (max-width:380px){
+  .footer-container{ width:96%; }
+  .mobile-view .mobile-logo .logo-img{ height:50px; max-width:180px; }
+  .mobile-view .brand-description{ font-size:12.5px; }
+  .mobile-view .mobile-newsletter{ padding:16px 13px; }
+  .mobile-view .mobile-newsletter h3{ font-size:.9rem; }
+  .mobile-view .mobile-newsletter p{ font-size:.76rem; }
+  .mobile-view .mobile-newsletter button{ font-size:.78rem; padding:10px 14px; }
+  .mobile-view .mobile-contact-list li{ font-size:12.5px; }
+  .mobile-view .mobile-hours li{ font-size:12.5px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:.001ms !important;
+    transition-duration:.001ms !important;
+  }
+  html{ scroll-behavior:auto; }
+}
+</style>
+</head>
+
+<body>
+
+<footer>
+  <div class="footer-container">
+
+    <!-- ============ DESKTOP VIEW ============ -->
+    <div class="footer-grid">
+
+      <!-- Column 1: Brand -->
+      <div class="footer-brand-col">
+        <a href="index.html" class="footer-logo">
+          <img src="logoo3.webp" alt="Automotive Logo" class="logo-img">
+        </a>
+        <p class="brand-description">
+          <strong>Automotive</strong> — certified vehicle sales, expert servicing, genuine parts, and performance upgrades. Over 15 years of precision engineering for every drive.
+        </p>
+        <p class="brand-tagline">
+          <i class="fas fa-bolt"></i> Certified · Precision · Performance
+        </p>
+        <div class="highlight-text">
+          <i class="fas fa-star"></i> Trusted by 50,000+ Drivers Since 2010
+        </div>
+      </div>
+
+      <!-- Column 2: Quick Links -->
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html"><i class="fas fa-house"></i> Home</a></li>
+          <li><a href="inventory.html"><i class="fas fa-car-side"></i> Inventory</a></li>
+          <li><a href="services.html"><i class="fas fa-screwdriver-wrench"></i> Services</a></li>
+          <li><a href="parts.html"><i class="fas fa-gears"></i> Parts</a></li>
+          <li><a href="contact.html"><i class="fas fa-headset"></i> Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Column 3: Contact -->
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <ul class="footer-contact-list">
+          <li>
+            <i class="fas fa-location-dot"></i>
+            <span>1420 Motorway Blvd,<br>Detroit, MI 48226</span>
+          </li>
+          <li>
+            <i class="fas fa-phone"></i>
+            <a href="404.html">+1 (800) 555-0199</a>
+          </li>
+          <li>
+            <i class="fas fa-envelope"></i>
+            <a href="404.html">hello@automotive.com</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Column 4: Service Hours -->
+      <div class="footer-col">
+        <h4>Service Hours</h4>
+        <ul class="footer-hours">
+          <li><span class="day">Mon - Fri</span><span class="time">8:00 AM - 7:00 PM</span></li>
+          <li><span class="day">Saturday</span><span class="time">9:00 AM - 6:00 PM</span></li>
+          <li><span class="day">Sunday</span><span class="time">10:00 AM - 4:00 PM</span></li>
+          <li><span class="day">Emergency</span><span class="time">24 / 7 Roadside</span></li>
+        </ul>
+        <a href="404.html" class="service-badge">
+          <i class="fas fa-calendar-check"></i> Book a Free Inspection
+        </a>
+      </div>
+
+    </div>
+
+    <!-- ============ NEWSLETTER ============ -->
+    <div class="footer-newsletter">
+      <div class="newsletter-text">
+        <h3><i class="fas fa-envelope-open-text"></i> Get Exclusive Auto Deals</h3>
+        <p>Subscribe for new inventory alerts, service offers, and performance tips.</p>
+      </div>
+      <div class="newsletter-form">
+        <div class="input-wrapper">
+          <input type="email" id="footerEmail" placeholder="Enter your email address">
+          <div class="newsletter-error" id="footerEmailError">Please enter a valid email address</div>
+        </div>
+        <button type="button" id="footerSubscribeBtn">
+          <i class="fas fa-paper-plane"></i> Subscribe
+        </button>
+      </div>
+    </div>
+
+    <!-- ============ BOTTOM ROW ============ -->
+    <div class="footer-bottom-row">
+      <div class="footer-copyright">
+        &copy; 2026 <span>Automotive</span>. All rights reserved.
+      </div>
+
+      <div class="footer-social">
+        <a href="404.html" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="404.html" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="404.html" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        <a href="404.html" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+        <a href="404.html" aria-label="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
+      </div>
+
+      <div class="footer-payments">
+        <span>We Accept:</span>
+        <i class="fab fa-cc-visa"></i>
+        <i class="fab fa-cc-mastercard"></i>
+        <i class="fab fa-cc-amex"></i>
+        <i class="fab fa-cc-paypal"></i>
+      </div>
+    </div>
+
+    <!-- ============ MOBILE VIEW ============ -->
+    <div class="mobile-view">
+
+      <a href="index.html" class="mobile-logo">
+        <img src="logoo3.webp" alt="Automotive Logo" class="logo-img">
+      </a>
+
+      <div class="mobile-brand">
+        <p class="brand-description">
+          <strong>Automotive</strong> — certified vehicle sales, expert servicing, genuine parts, and performance upgrades. Over 15 years of precision engineering for every drive.
+        </p>
+        <p class="brand-tagline">
+          <i class="fas fa-bolt"></i> Certified · Precision · Performance
+        </p>
+        <div class="highlight-text">
+          <i class="fas fa-star"></i> Trusted by 50,000+ Drivers Since 2010
+        </div>
+      </div>
+
+      <div class="mobile-section">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html"><i class="fas fa-house"></i> Home</a></li>
+          <li><a href="inventory.html"><i class="fas fa-car-side"></i> Inventory</a></li>
+          <li><a href="services.html"><i class="fas fa-screwdriver-wrench"></i> Services</a></li>
+          <li><a href="parts.html"><i class="fas fa-gears"></i> Parts</a></li>
+          <li><a href="contact.html"><i class="fas fa-headset"></i> Contact</a></li>
+        </ul>
+      </div>
+
+      <div class="mobile-section">
+        <h4>Contact Us</h4>
+        <ul class="mobile-contact-list">
+          <li>
+            <i class="fas fa-location-dot"></i>
+            <span>1420 Motorway Blvd, Detroit, MI 48226</span>
+          </li>
+          <li>
+            <i class="fas fa-phone"></i>
+            <a href="404.html">+1 (800) 555-0199</a>
+          </li>
+          <li>
+            <i class="fas fa-envelope"></i>
+            <a href="404.html">hello@automotive.com</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="mobile-section">
+        <h4>Service Hours</h4>
+        <ul class="mobile-hours">
+          <li><span>Mon - Fri</span><span class="time">8:00 AM - 7:00 PM</span></li>
+          <li><span>Saturday</span><span class="time">9:00 AM - 6:00 PM</span></li>
+          <li><span>Sunday</span><span class="time">10:00 AM - 4:00 PM</span></li>
+          <li><span>Emergency</span><span class="time">24 / 7 Roadside</span></li>
+        </ul>
+        <a href="404.html" class="service-badge">
+          <i class="fas fa-calendar-check"></i> Book a Free Inspection
+        </a>
+      </div>
+
+      <div class="mobile-newsletter">
+        <div>
+          <h3><i class="fas fa-envelope-open-text"></i> Get Exclusive Auto Deals</h3>
+          <p>Subscribe for new inventory alerts, service offers, and performance tips.</p>
+        </div>
+        <div class="newsletter-form">
+          <div class="input-wrapper">
+            <input type="email" id="mobileFooterEmail" placeholder="Enter your email address">
+            <div class="newsletter-error" id="mobileFooterEmailError">Please enter a valid email address</div>
+          </div>
+          <button type="button" id="mobileFooterSubscribeBtn">
+            <i class="fas fa-paper-plane"></i> Subscribe
+          </button>
+        </div>
+      </div>
+
+      <div class="mobile-bottom">
+        <div class="mobile-social">
+          <span class="mobile-social-label">Follow us:</span>
+          <a href="404.html" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="404.html" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="404.html" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+          <a href="404.html" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+          <a href="404.html" aria-label="X (Twitter)"><i class="fab fa-x-twitter"></i></a>
+        </div>
+
+        <div class="mobile-payments">
+          <span>We Accept:</span>
+          <i class="fab fa-cc-visa"></i>
+          <i class="fab fa-cc-mastercard"></i>
+          <i class="fab fa-cc-amex"></i>
+          <i class="fab fa-cc-paypal"></i>
+        </div>
+
+        <div class="mobile-copyright">
+          &copy; 2026 <span>Automotive</span>. All rights reserved.
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</footer>
+
+<script>
+  function validateEmail(email){
+    return /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(email);
+  }
+
+  /* Desktop newsletter */
+  (function(){
+    var btn = document.getElementById('footerSubscribeBtn');
+    var input = document.getElementById('footerEmail');
+    var err = document.getElementById('footerEmailError');
+    if (!btn || !input || !err) return;
+
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var email = input.value.trim();
+      if (!email){
+        err.textContent = 'Please enter your email address';
+        err.classList.add('show');
+        input.classList.add('error');
+      } else if (!validateEmail(email)){
+        err.textContent = 'Please enter a valid email address';
+        err.classList.add('show');
+        input.classList.add('error');
+      } else {
+        err.classList.remove('show');
+        input.classList.remove('error');
+        window.location.href = '404.html';
+      }
+    });
+
+    input.addEventListener('input', function(){
+      if (this.value.trim()){ err.classList.remove('show'); this.classList.remove('error'); }
+    });
+
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){ e.preventDefault(); btn.click(); }
+    });
+  })();
+
+  /* Mobile newsletter */
+  (function(){
+    var btn = document.getElementById('mobileFooterSubscribeBtn');
+    var input = document.getElementById('mobileFooterEmail');
+    var err = document.getElementById('mobileFooterEmailError');
+    if (!btn || !input || !err) return;
+
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var email = input.value.trim();
+      if (!email){
+        err.textContent = 'Please enter your email address';
+        err.classList.add('show');
+        input.classList.add('error');
+      } else if (!validateEmail(email)){
+        err.textContent = 'Please enter a valid email address';
+        err.classList.add('show');
+        input.classList.add('error');
+      } else {
+        err.classList.remove('show');
+        input.classList.remove('error');
+        window.location.href = '404.html';
+      }
+    });
+
+    input.addEventListener('input', function(){
+      if (this.value.trim()){ err.classList.remove('show'); this.classList.remove('error'); }
+    });
+
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter'){ e.preventDefault(); btn.click(); }
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,2094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Automotive — Customer Dashboard</title>
+
+<!-- ============================================================
+     AUTH GUARD — customer only
+     ============================================================ -->
+<script>
+(function guardCustomerDashboard() {
+  console.log('%c[AUTH] Customer guard running...', 'color:#FF2A1F;font-weight:bold');
+
+  let session = null;
+  try {
+    const raw = sessionStorage.getItem('automotive_session') || localStorage.getItem('automotive_session');
+    session = raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    console.warn('[AUTH] Storage blocked:', e);
+  }
+
+  const isValid = session &&
+                  session.authenticated === true &&
+                  typeof session.expiresAt === 'number' &&
+                  session.expiresAt > Date.now() &&
+                  session.role === 'customer';
+
+  if (!isValid) {
+    console.log('%c[AUTH] ❌ Invalid — redirecting to login.html', 'color:#dc2626;font-weight:bold');
+    try {
+      sessionStorage.removeItem('automotive_session');
+      localStorage.removeItem('automotive_session');
+    } catch (_) {}
+    window.location.replace('login.html');
+    return;
+  }
+
+  console.log('%c[AUTH] ✅ Valid — showing customer dashboard', 'color:#16a34a;font-weight:bold');
+  window.__AUTOMOTIVE_CUSTOMER__ = session;
+})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* ==========================================================
+   AUTOMOTIVE COLOR SYSTEM
+   ========================================================== */
+:root{
+  --carbon:      #0B0E13;
+  --graphite:    #141922;
+  --steel:       #232A36;
+
+  --red:         #E10600;
+  --red-bright:  #FF2A1F;
+  --red-deep:    #A80400;
+
+  --amber:       #FFB020;
+  --amber-d:     #E08A00;
+
+  --green:       #22C55E;
+
+  --silver:      #C9D1DC;
+  --text:        #EEF2F8;
+  --text-soft:   #A9B3C0;
+  --text-mute:   #8B96A6;
+
+  --line:        rgba(201,209,220,.12);
+  --line-2:      rgba(201,209,220,.22);
+
+  --card-bg:     linear-gradient(160deg, rgba(20,25,34,.96), rgba(11,14,19,.99));
+  --card-bd:     rgba(201,209,220,.14);
+
+  --ease:        cubic-bezier(.22,.61,.36,1);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; }
+html, body { max-width: 100vw; overflow-x: hidden !important; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background:
+    radial-gradient(1200px 700px at 78% -10%, rgba(225,6,0,.14), transparent 62%),
+    radial-gradient(900px 500px at 4% 6%, rgba(255,176,32,.06), transparent 60%),
+    var(--carbon);
+  height: 100vh;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 14px;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--carbon); }
+::-webkit-scrollbar-thumb { background: var(--steel); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--red); }
+
+/* ===== APP SHELL ===== */
+.app { display:flex; height:100vh; width:100%; overflow:hidden; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #1a0000 0%, #141922 40%, #0B0E13 100%);
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid var(--red-deep);
+  box-shadow: 4px 0 28px rgba(0,0,0,.6);
+  overflow: hidden;
+  z-index: 20;
+  position: relative;
+}
+.sidebar::after{
+  content:'';
+  position:absolute;
+  left:0; right:0; top:0;
+  height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+  pointer-events:none;
+}
+
+.sidebar-logo {
+  height: 84px;
+  display: flex; align-items: center;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.sidebar-logo img {
+  height: 56px; width: auto;
+  object-fit: contain; display: block;
+  filter: drop-shadow(0 0 14px rgba(255,255,255,.08));
+}
+.sidebar-logo .fallback-brand{
+  display:none; align-items:center; gap:10px;
+  color:var(--red-bright);
+  font-family:'Outfit',sans-serif;
+  font-weight:900; font-size:1.05rem;
+  letter-spacing:-.02em;
+}
+.sidebar-logo .fallback-brand i{
+  width:38px; height:38px;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--red),var(--red-deep));
+  color:#fff;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:1rem;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sidebar-nav::-webkit-scrollbar { width: 3px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: var(--red); border-radius: 10px; }
+
+.nav-link {
+  display: flex; align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  color: var(--text-soft);
+  text-decoration: none;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border-left: 3px solid transparent;
+  white-space: nowrap;
+}
+.nav-link i {
+  width: 18px; font-size: 0.88rem;
+  color: var(--red-bright);
+  text-align: center;
+  transition: 0.25s;
+}
+.nav-link:hover {
+  background: rgba(225,6,0,.12);
+  color: #fff;
+  border-left-color: rgba(255,176,32,.6);
+}
+.nav-link:hover i { color: var(--amber); }
+.nav-link.active {
+  background: linear-gradient(135deg, rgba(225,6,0,.22), rgba(255,176,32,.10));
+  color: #fff;
+  border-left-color: var(--red-bright);
+  box-shadow: inset 0 0 0 1px rgba(225,6,0,.25);
+}
+.nav-link.active i { color: var(--amber); }
+
+.nav-divider { height: 1px; background: var(--line); margin: 10px 4px; }
+
+.nav-link.logout { color: #FF8A85; }
+.nav-link.logout i { color: #FF8A85; }
+.nav-link.logout:hover { background: rgba(225,6,0,.18); color: #FFD9D7; }
+
+.sidebar-footer {
+  padding: 16px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--line);
+}
+.user-badge {
+  background: rgba(20,25,34,.9);
+  border: 1px solid rgba(225,6,0,.28);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.user-badge::before{
+  content:'';
+  position:absolute;
+  top:-30px; right:-30px;
+  width:80px; height:80px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(225,6,0,.3), transparent 70%);
+  pointer-events:none;
+}
+.user-badge .icon-circle {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg,var(--red),var(--red-deep));
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 0.88rem;
+  margin-bottom: 8px;
+  box-shadow: 0 6px 16px rgba(225,6,0,.4);
+}
+.user-badge .role {
+  font-size: 0.68rem; font-weight: 800;
+  color: #fff; letter-spacing: .4px;
+  text-transform: uppercase;
+}
+.user-badge .name {
+  font-size: 0.65rem; color: var(--text-soft);
+  margin: 3px 0 9px; word-break: break-word;
+  font-weight: 600;
+}
+.user-badge .status {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(34,197,94,.15);
+  border: 1px solid rgba(34,197,94,.35);
+  border-radius: 20px;
+  padding: 4px 11px;
+  font-size: 0.58rem; font-weight: 800;
+  color: #4ade80; letter-spacing: .3px;
+}
+.user-badge .status::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: #4ade80;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(74,222,128,.7);
+  animation:ping 1.6s infinite;
+}
+@keyframes ping{
+  0%{ box-shadow:0 0 0 0 rgba(74,222,128,.6); }
+  70%{ box-shadow:0 0 0 8px rgba(74,222,128,0); }
+  100%{ box-shadow:0 0 0 0 rgba(74,222,128,0); }
+}
+.sidebar-copy {
+  text-align: center;
+  font-size: 0.58rem;
+  color: var(--text-mute);
+  margin-top: 10px;
+}
+
+/* ===== MAIN ===== */
+.main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+.main-header {
+  background: rgba(20,25,34,.85);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+  border-bottom: 1px solid var(--line);
+  padding: 0 24px;
+  height: 76px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px;
+  flex-shrink: 0;
+  z-index: 10;
+  position: relative;
+}
+.main-header::after{
+  content:'';
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:2px;
+  background:linear-gradient(90deg, var(--red), var(--amber) 30%, transparent 80%);
+  pointer-events:none;
+}
+
+.header-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.mobile-logo { display: none; }
+.mobile-logo img { height: 48px; width: auto; }
+
+.header-title h1 {
+  font-family:'Outfit',sans-serif;
+  font-size: 1.2rem; font-weight: 800;
+  color: #fff; letter-spacing: -0.3px;
+  line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.header-title p {
+  font-size: 0.72rem; color: var(--text-soft);
+  margin-top: 2px; font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.header-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+
+.date-pill {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(11,14,19,.65);
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 0.72rem; font-weight: 600;
+  color: var(--text); cursor: pointer;
+  transition: 0.2s;
+}
+.date-pill:hover { background: rgba(11,14,19,.9); border-color: rgba(225,6,0,.35); }
+.date-pill i { color: var(--red-bright); }
+
+.bell-btn {
+  position: relative;
+  cursor: pointer;
+  color: var(--silver);
+  font-size: 1.1rem;
+  transition: 0.2s;
+  background: transparent; border: none; padding: 6px;
+}
+.bell-btn:hover { color: var(--amber); }
+.bell-badge {
+  position: absolute;
+  top: 0; right: -2px;
+  background: linear-gradient(135deg,var(--red),var(--red-deep));
+  color: #fff;
+  font-size: 0.55rem; font-weight: 800;
+  width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--graphite);
+  box-shadow: 0 4px 10px rgba(225,6,0,.5);
+}
+
+.user-block {
+  display: flex; align-items: center; gap: 12px;
+  padding-left: 16px;
+  border-left: 1px solid var(--line);
+}
+.user-text { text-align: right; }
+.user-text .name { font-size: 0.78rem; font-weight: 800; color: #fff; }
+.user-text .role {
+  font-size: 0.58rem; color: var(--amber);
+  font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.6px; margin-top: 3px;
+}
+.user-avatar {
+  position: relative;
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 800; font-size: 0.78rem;
+  cursor: pointer;
+  transition: 0.25s;
+  box-shadow: 0 8px 22px rgba(225,6,0,.4);
+  border: 2px solid rgba(255,255,255,.08);
+}
+.user-avatar:hover { transform: scale(1.05); }
+
+.profile-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px); right: 0;
+  background: linear-gradient(160deg, rgba(20,25,34,.98), rgba(11,14,19,.99));
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.7);
+  width: 200px; padding: 6px 0;
+  z-index: 9999;
+}
+.profile-menu.show { display: block; }
+.profile-menu a {
+  display: block; padding: 10px 16px;
+  font-size: 0.78rem; color: var(--text-soft);
+  text-decoration: none; transition: 0.2s; font-weight: 500;
+}
+.profile-menu a i { color: var(--red-bright); margin-right: 10px; width: 14px; }
+.profile-menu a:hover { background: rgba(225,6,0,.1); color: #fff; }
+.profile-menu hr { border: none; border-top: 1px solid var(--line); margin: 4px 0; }
+.profile-menu a.danger { color: #FF8A85; }
+.profile-menu a.danger i { color: #FF8A85; }
+.profile-menu a.danger:hover { background: rgba(225,6,0,.15); }
+
+.notif-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 12px); right: 0;
+  background: linear-gradient(160deg, rgba(20,25,34,.98), rgba(11,14,19,.99));
+  border-radius: 14px;
+  border: 1px solid var(--line-2);
+  border-top: 3px solid var(--red);
+  box-shadow: 0 24px 60px rgba(0,0,0,.8);
+  width: 360px; max-width: calc(100vw - 32px);
+  padding: 6px 0;
+  max-height: 440px; overflow-y: auto;
+  z-index: 9999;
+}
+.notif-dropdown.show { display: block; }
+.notif-head {
+  padding: 14px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0;
+  background: rgba(11,14,19,.98);
+  font-weight: 800; font-size: 0.86rem; color: #fff;
+}
+.notif-head .badge {
+  background: linear-gradient(135deg,var(--red),var(--red-deep));
+  color: #fff;
+  font-size: 0.6rem; font-weight: 800;
+  padding: 3px 9px; border-radius: 20px;
+}
+.notif-item {
+  padding: 13px 20px;
+  display: flex; gap: 12px;
+  border-bottom: 1px solid var(--line);
+  transition: .2s;
+}
+.notif-item:hover{ background:rgba(225,6,0,.05); }
+.notif-item:last-of-type { border-bottom: none; }
+.notif-item .ni-icon {
+  width: 40px; height: 40px; flex-shrink: 0;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+}
+.notif-item .ni-body { flex: 1; min-width: 0; }
+.notif-item .ni-title { font-size: 0.8rem; font-weight: 700; color: #fff; }
+.notif-item .ni-desc { font-size: 0.72rem; color: var(--text-soft); margin-top: 3px; word-wrap: break-word; }
+.notif-item .ni-time { font-size: 0.62rem; color: var(--text-mute); margin-top: 4px; }
+.notif-footer {
+  display: block; padding: 12px; text-align: center;
+  font-size: 0.74rem; color: var(--amber); font-weight: 800;
+  text-decoration: none; border-top: 1px solid var(--line);
+  position: sticky; bottom: 0;
+  background: rgba(11,14,19,.98);
+}
+.notif-footer:hover { background: rgba(255,176,32,.08); color: #fff; }
+
+/* ===== MOBILE NAV ===== */
+.mobile-nav {
+  display: none;
+  background: linear-gradient(90deg, #1a0000 0%, #141922 50%, #0B0E13 100%);
+  border-bottom: 2px solid var(--red-deep);
+  padding: 10px 14px;
+  overflow-x: auto; overflow-y: hidden;
+  white-space: nowrap; gap: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.mobile-nav::-webkit-scrollbar { display: none; }
+.mobile-nav .nav-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; border: none;
+  padding: 8px 16px;
+  font-size: 0.76rem; font-weight: 700;
+  color: var(--text-soft);
+  border-radius: 30px;
+  cursor: pointer;
+  transition: 0.25s;
+  font-family: inherit;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.mobile-nav .nav-btn i { color: var(--red-bright); font-size: 0.8rem; }
+.mobile-nav .nav-btn:hover { background: rgba(225,6,0,.15); color: #fff; }
+.mobile-nav .nav-btn.active {
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(225,6,0,.45);
+}
+.mobile-nav .nav-btn.active i { color: #fff; }
+.mobile-nav .nav-btn.logout { color: #FF8A85; }
+.mobile-nav .nav-btn.logout i { color: #FF8A85; }
+
+/* ===== DASH BODY ===== */
+.dash-body {
+  flex: 1;
+  overflow-y: auto; overflow-x: hidden;
+  padding: 22px;
+  background: transparent;
+}
+.page-title-block { display: none; }
+.page-title-block h1 {
+  font-family:'Outfit',sans-serif;
+  font-size: 1.15rem; font-weight: 800;
+  color: #fff; letter-spacing: -.02em;
+}
+.page-title-block p { font-size: 0.74rem; color: var(--text-soft); margin-top: 3px; }
+
+.content-section { display: none; }
+.content-section.active { display: block; animation:fadeUp .4s var(--ease) both; }
+@keyframes fadeUp{
+  from{ opacity:0; transform:translateY(10px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+
+/* ===== CARD ===== */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-bd);
+  border-radius: 16px;
+  box-shadow: 0 8px 26px rgba(0,0,0,.4);
+  padding: 20px;
+  transition: 0.3s ease;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+}
+.card:hover {
+  border-color: rgba(225,6,0,.32);
+  box-shadow: 0 14px 38px rgba(0,0,0,.6), 0 0 0 1px rgba(225,6,0,.1);
+}
+.card-title {
+  font-family:'Outfit',sans-serif;
+  font-size: 0.95rem; font-weight: 800;
+  color: #fff;
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+  letter-spacing: -.01em;
+}
+.card-title i { color: var(--red-bright); }
+.card-title .head-right {
+  margin-left: auto;
+  font-size: 0.66rem; font-weight: 800;
+  color: var(--amber); text-decoration: none;
+  text-transform: uppercase; letter-spacing: 0.6px;
+}
+.card-title .head-right:hover { color: #fff; text-decoration: underline; }
+.card-title .head-pill {
+  margin-left: auto;
+  font-size: 0.58rem; font-weight: 800;
+  color: var(--text-soft);
+  background: rgba(11,14,19,.7);
+  padding: 4px 10px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  border: 1px solid var(--line);
+}
+
+/* ===== GRIDS ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px; margin-bottom: 20px;
+}
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px; margin-bottom: 20px;
+}
+.two-col-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 14px; margin-bottom: 20px;
+  align-items: start;
+}
+.right-stack {
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+/* ===== STATS ===== */
+.stat-icon {
+  width: 40px; height: 40px;
+  border-radius: 11px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1rem; margin-bottom: 10px;
+  border: 1px solid transparent;
+}
+.stat-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.stat-top .trend {
+  font-size: 0.66rem; font-weight: 800;
+  color: #4ade80;
+  background: rgba(34,197,94,.12);
+  padding: 3px 9px; border-radius: 20px;
+  border: 1px solid rgba(34,197,94,.25);
+}
+.stat-top .trend.soft {
+  color: var(--text-soft);
+  background: rgba(201,209,220,.08);
+  border-color: var(--line);
+}
+.stat-top .trend.warn {
+  color: var(--amber);
+  background: rgba(255,176,32,.12);
+  border-color: rgba(255,176,32,.3);
+}
+.stat-top .trend.down {
+  color: #FF8A85;
+  background: rgba(225,6,0,.12);
+  border-color: rgba(225,6,0,.25);
+}
+.stat-label {
+  font-size: 0.64rem;
+  color: var(--text-mute);
+  font-weight: 800; letter-spacing: 0.8px;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.stat-value {
+  font-family:'Outfit',sans-serif;
+  font-size: 1.5rem; font-weight: 900;
+  color: #fff; line-height: 1;
+  letter-spacing: -.02em;
+}
+.stat-value small {
+  font-size: 0.72rem; font-weight: 700;
+  color: var(--text-soft); margin-left: 2px;
+}
+
+.chart-wrap { height: 140px; width: 100%; }
+
+/* ===== LIST ITEMS ===== */
+.list-item {
+  background: rgba(11,14,19,.55);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex; justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  transition: .25s var(--ease);
+}
+.list-item:hover{
+  border-color:rgba(225,6,0,.3);
+  background:rgba(20,25,34,.8);
+  transform:translateX(2px);
+}
+.list-item:last-child { margin-bottom: 0; }
+.list-item .li-body { min-width: 0; flex: 1; }
+.list-item .li-title {
+  font-size: 0.82rem; font-weight: 800; color: #fff;
+  margin-bottom: 4px;
+  display:flex; align-items:center; gap:8px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.list-item .li-title .v-icon{
+  width:28px; height:28px;
+  border-radius:8px;
+  background:rgba(225,6,0,.15);
+  color:var(--red-bright);
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:.72rem;
+  flex-shrink:0;
+}
+.list-item .li-meta {
+  font-size: 0.7rem; color: var(--text-soft);
+  margin-bottom: 3px;
+}
+.list-item .li-date {
+  font-size: 0.66rem; color: var(--text-mute);
+}
+
+/* ===== PILLS ===== */
+.pill {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 0.6rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  white-space: nowrap; flex-shrink: 0;
+  border: 1px solid transparent;
+}
+.pill.completed  { background: rgba(34,197,94,.14);   color: #4ade80; border-color: rgba(34,197,94,.3); }
+.pill.scheduled  { background: rgba(255,176,32,.15);  color: var(--amber); border-color: rgba(255,176,32,.3); }
+.pill.progress   { background: rgba(225,6,0,.15);     color: #FF8A85; border-color: rgba(225,6,0,.3); }
+.pill.pending    { background: rgba(201,209,220,.1);  color: var(--text-soft); border-color: var(--line-2); }
+.pill.cancelled  { background: rgba(225,6,0,.18);     color: #FF8A85; border-color: rgba(225,6,0,.4); }
+.pill.due        { background: rgba(255,176,32,.15);  color: var(--amber); border-color: rgba(255,176,32,.3); }
+.pill.overdue    { background: rgba(225,6,0,.18);     color: #FF8A85; border-color: rgba(225,6,0,.4); }
+
+/* ===== PROGRESS ===== */
+.prog-bg {
+  background: rgba(11,14,19,.7);
+  height: 8px; border-radius: 10px;
+  overflow: hidden; margin-bottom: 10px;
+  border: 1px solid var(--line);
+}
+.prog-fill {
+  height: 100%; border-radius: 10px;
+  background: linear-gradient(90deg, var(--red), var(--amber));
+  transition: width 0.6s ease;
+  box-shadow: 0 0 12px rgba(255,176,32,.4);
+}
+.goal-text {
+  font-size: 0.74rem; color: var(--text-soft);
+  font-weight: 600; margin-bottom: 8px;
+}
+.goal-text strong { color: #fff; font-weight: 800; }
+.goal-hint {
+  font-size: 0.7rem; color: var(--text-soft);
+  line-height: 1.55;
+}
+.goal-hint strong { color: var(--amber); }
+
+/* ===== QUICK ACTIONS ===== */
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.quick-btn {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 13px 12px;
+  border-radius: 11px;
+  background: rgba(11,14,19,.6);
+  border: 1px solid var(--line-2);
+  color: var(--text);
+  font-size: 0.74rem; font-weight: 800;
+  text-align: center; text-decoration: none;
+  transition: 0.25s ease;
+  min-width: 0; overflow: hidden;
+}
+.quick-btn i {
+  color: var(--red-bright);
+  font-size: 0.82rem;
+  flex-shrink: 0; transition: 0.25s;
+}
+.quick-btn span {
+  overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.quick-btn:hover {
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  color: #fff; border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(225,6,0,.4);
+}
+.quick-btn:hover i { color: #fff; }
+
+/* ===== TABLE ===== */
+.table-wrap { overflow-x: auto; }
+table.activity {
+  width: 100%; border-collapse: collapse;
+  font-size: 0.78rem;
+}
+table.activity th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 0.62rem; font-weight: 800;
+  color: var(--text-mute);
+  text-transform: uppercase; letter-spacing: 0.6px;
+  border-bottom: 1px solid var(--line-2);
+  white-space: nowrap;
+}
+table.activity td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-soft);
+}
+table.activity tr:hover td { background: rgba(225,6,0,.04); }
+table.activity tr:last-child td { border-bottom: none; }
+table.activity td.strong { font-weight: 800; color: #fff; }
+table.activity td.amt { font-weight: 800; color: var(--amber); }
+
+/* ===== VEHICLE CARDS ===== */
+.vehicle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+.vehicle-card {
+  background: rgba(11,14,19,.55);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+  transition: 0.25s;
+  position:relative;
+  overflow:hidden;
+}
+.vehicle-card::before{
+  content:'';
+  position:absolute;
+  top:-40px; right:-40px;
+  width:130px; height:130px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(225,6,0,.15), transparent 70%);
+  pointer-events:none;
+}
+.vehicle-card:hover {
+  border-color: rgba(225,6,0,.4);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.6);
+}
+.vehicle-card .vc-head {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 16px;
+  position:relative; z-index:1;
+}
+.vehicle-card .v-icon {
+  width: 54px; height: 54px;
+  background: linear-gradient(135deg, rgba(225,6,0,.18), rgba(255,176,32,.1));
+  color: var(--red-bright);
+  border: 1px solid rgba(225,6,0,.3);
+  border-radius: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink:0;
+}
+.vehicle-card .v-title {
+  font-size: 0.92rem; font-weight: 800;
+  color: #fff; margin-bottom: 3px;
+}
+.vehicle-card .v-plate {
+  font-size: 0.68rem;
+  color: var(--amber);
+  font-weight: 800; letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+.vehicle-card .vc-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 14px;
+  position:relative; z-index:1;
+}
+.vehicle-card .vc-stat small {
+  display: block;
+  font-size: 0.58rem; font-weight: 800;
+  color: var(--text-mute);
+  text-transform: uppercase; letter-spacing: 0.6px;
+  margin-bottom: 4px;
+}
+.vehicle-card .vc-stat strong {
+  font-size: 0.82rem; font-weight: 800;
+  color: #fff;
+}
+.vehicle-card .vc-stat strong.warn { color: var(--amber); }
+.vehicle-card .vc-actions {
+  display: flex; gap: 8px;
+  position:relative; z-index:1;
+}
+.vehicle-card .v-btn {
+  flex: 1;
+  text-align: center;
+  padding: 9px 10px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: 0.25s;
+  letter-spacing:.3px;
+  border: 1px solid transparent;
+}
+.vehicle-card .v-btn.primary {
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(225,6,0,.35);
+}
+.vehicle-card .v-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(225,6,0,.55);
+}
+.vehicle-card .v-btn.ghost {
+  background: rgba(11,14,19,.6);
+  border-color: var(--line-2);
+  color: var(--text-soft);
+}
+.vehicle-card .v-btn.ghost:hover {
+  border-color: var(--silver);
+  color: #fff;
+}
+
+/* ===== WARRANTY CARDS ===== */
+.warranty-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+.warranty-card {
+  background: rgba(11,14,19,.55);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  transition: 0.25s;
+  position:relative;
+  overflow:hidden;
+}
+.warranty-card::before{
+  content:'';
+  position:absolute;
+  top:-30px; right:-30px;
+  width:110px; height:110px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,176,32,.15), transparent 70%);
+  pointer-events:none;
+}
+.warranty-card:hover {
+  border-color: rgba(255,176,32,.4);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.6);
+}
+.warranty-card .wc-icon {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, rgba(255,176,32,.15), rgba(225,6,0,.1));
+  color: var(--amber);
+  border: 1px solid rgba(255,176,32,.3);
+  border-radius: 12px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.15rem;
+  margin-bottom: 12px;
+  position:relative; z-index:1;
+}
+.warranty-card .wc-title {
+  font-size: 0.88rem; font-weight: 800;
+  color: #fff; margin-bottom: 5px;
+  position:relative; z-index:1;
+}
+.warranty-card .wc-vehicle {
+  font-size: 0.7rem;
+  color: var(--text-soft);
+  margin-bottom: 12px;
+  position:relative; z-index:1;
+}
+.warranty-card .wc-info {
+  display: flex; justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  position:relative; z-index:1;
+}
+.warranty-card .wc-info small {
+  font-size: 0.6rem;
+  color: var(--text-mute);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+.warranty-card .wc-info strong {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--amber);
+}
+
+/* ===== DOCUMENTS ===== */
+.doc-list {
+  display: flex; flex-direction: column; gap: 10px;
+}
+.doc-item {
+  background: rgba(11,14,19,.55);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 14px;
+  transition: .25s var(--ease);
+}
+.doc-item:hover {
+  border-color: rgba(225,6,0,.3);
+  background: rgba(20,25,34,.8);
+}
+.doc-item .d-icon {
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  background: rgba(225,6,0,.12);
+  color: var(--red-bright);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.doc-item .d-body { flex: 1; min-width: 0; }
+.doc-item .d-title {
+  font-size: 0.82rem; font-weight: 800;
+  color: #fff; margin-bottom: 3px;
+  overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.doc-item .d-meta {
+  font-size: 0.7rem;
+  color: var(--text-mute);
+}
+.doc-item .d-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  background: rgba(225,6,0,.12);
+  border: 1px solid rgba(225,6,0,.3);
+  color: var(--red-bright);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: .25s;
+  flex-shrink: 0;
+}
+.doc-item .d-btn:hover {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+}
+
+/* ===== ROADSIDE CARD ===== */
+.roadside-card {
+  background: linear-gradient(135deg, #1a0000 0%, #2a0505 45%, #0B0E13 100%);
+  border-radius: 16px;
+  padding: 26px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(225,6,0,.3);
+}
+.roadside-card::before {
+  content: '';
+  position: absolute;
+  top: -50px; right: -50px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(255,176,32,.25), transparent 70%);
+  border-radius: 50%;
+  pointer-events:none;
+}
+.roadside-card .r-label {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  font-weight: 800;
+  color: var(--amber);
+  position:relative; z-index:1;
+}
+.roadside-card .r-title {
+  font-family:'Outfit',sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin: 8px 0 8px;
+  letter-spacing: -.02em;
+  position:relative; z-index:1;
+}
+.roadside-card .r-sub {
+  font-size: 0.78rem;
+  color: var(--text-soft);
+  margin-bottom: 18px;
+  position:relative; z-index:1;
+  line-height:1.6;
+  max-width:420px;
+}
+.roadside-card .r-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border-radius: 60px;
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  color: #fff;
+  font-size: 0.84rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 12px 30px rgba(225,6,0,.45);
+  transition: .25s var(--ease);
+  position:relative; z-index:1;
+  letter-spacing:.3px;
+}
+.roadside-card .r-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(225,6,0,.65);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1023px) {
+  .sidebar { display: none; }
+  .mobile-nav { display: flex; }
+  .mobile-logo { display: block; }
+  .header-title { display: none; }
+  .page-title-block { display: block; margin-bottom: 16px; }
+  .main-header { height: 70px; padding: 0 16px; }
+  .date-pill { display: none; }
+  .user-text { display: none; }
+  .user-block { padding-left: 12px; }
+}
+
+@media (max-width: 900px) {
+  .two-col-grid { grid-template-columns: 1fr; }
+  .charts-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .charts-grid { grid-template-columns: 1fr; gap: 10px; }
+  .two-col-grid { gap: 10px; }
+  .right-stack { gap: 10px; }
+  .chart-wrap { height: 160px; }
+  .dash-body { padding: 14px; }
+  .card { padding: 16px; }
+  .stat-value { font-size: 1.25rem; }
+  .main-header { padding: 0 12px; height: 66px; }
+  .mobile-nav { padding: 8px 12px; }
+  .mobile-nav .nav-btn { padding: 7px 14px; font-size: 0.72rem; }
+
+  table.activity thead { display: none; }
+  table.activity, table.activity tbody, table.activity tr, table.activity td {
+    display: block; width: 100%;
+  }
+  table.activity tr {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  table.activity tr:last-child { border-bottom: none; }
+  table.activity td {
+    padding: 4px 0; border: none;
+    display: flex; justify-content: space-between;
+    align-items: center;
+    font-size: 0.74rem;
+  }
+  table.activity td::before {
+    content: attr(data-label);
+    font-size: 0.62rem; font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-right: 10px;
+  }
+
+  .notif-dropdown { width: calc(100vw - 24px); right: -60px; }
+  .profile-menu { right: 0; }
+}
+
+@media (max-width: 380px) {
+  .quick-btn { font-size: 0.68rem; padding: 11px 8px; }
+  .quick-btn i { font-size: 0.74rem; }
+  .quick-grid { gap: 8px; }
+  .mobile-nav .nav-btn { padding: 6px 12px; font-size: 0.68rem; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    transition-duration:.001ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html" style="text-decoration:none;">
+        <img src="logoo3.webp" alt="Automotive"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <span class="fallback-brand"><i class="fa-solid fa-car-side"></i> AUTOMOTIVE</span>
+      </a>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-link active" data-page="dashboard"><i class="fa-solid fa-border-all"></i><span>Dashboard</span></a>
+      <a class="nav-link" data-page="vehicles"><i class="fa-solid fa-warehouse"></i><span>My Garage</span></a>
+      <a class="nav-link" data-page="bookings"><i class="fa-solid fa-calendar-check"></i><span>Service Bookings</span></a>
+      <a class="nav-link" data-page="history"><i class="fa-solid fa-clock-rotate-left"></i><span>Service History</span></a>
+      <a class="nav-link" data-page="invoices"><i class="fa-solid fa-receipt"></i><span>Invoices</span></a>
+      <a class="nav-link" data-page="warranty"><i class="fa-solid fa-shield-halved"></i><span>Warranty</span></a>
+      <a class="nav-link" data-page="documents"><i class="fa-solid fa-folder-open"></i><span>Documents</span></a>
+
+      <div class="nav-divider"></div>
+
+      <a class="nav-link logout" href="login.html" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-badge">
+        <div class="icon-circle"><i class="fa-solid fa-user"></i></div>
+        <div class="role">Customer</div>
+        <div class="name" id="sidebarUserName">Automotive Owner</div>
+        <div class="status">Verified Owner</div>
+      </div>
+      <div class="sidebar-copy">© 2026 Automotive</div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main-wrapper">
+
+    <!-- HEADER -->
+    <header class="main-header">
+      <div class="header-left">
+        <div class="mobile-logo">
+          <a href="index.html">
+            <img src="logoo3.webp" alt="Automotive"
+                 onerror="this.style.display='none';">
+          </a>
+        </div>
+        <div class="header-title">
+          <h1 id="pageTitle">Customer Dashboard</h1>
+          <p id="pageSubtitle">Your garage, service history, and bookings.</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="date-pill" id="datePill">
+          <i class="fa-regular fa-calendar"></i>
+          <span id="dateText">Today, Oct 14 2026</span>
+          <i class="fa-solid fa-chevron-down" style="font-size:0.6rem;"></i>
+        </div>
+
+        <div style="position: relative;">
+          <button class="bell-btn" id="bellBtn" aria-label="Notifications">
+            <i class="fa-regular fa-bell"></i>
+            <span class="bell-badge">4</span>
+          </button>
+
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-head">
+              <span>Notifications</span>
+              <span class="badge">4 new</span>
+            </div>
+            <div class="notif-item">
+              <div class="ni-icon" style="background:rgba(255,176,32,.15);color:#FFB020;"><i class="fa-solid fa-wrench"></i></div>
+              <div class="ni-body">
+                <div class="ni-title">Annual service due in 5 days</div>
+                <div class="ni-desc">BMW M4 Competition · Book a slot to avoid a rush fee</div>
+                <div class="ni-time">10 min ago</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="ni-icon" style="background:rgba(34,197,94,.15);color:#4ade80;"><i class="fa-solid fa-check"></i></div>
+              <div class="ni-body">
+                <div class="ni-title">Service completed</div>
+                <div class="ni-desc">Brake pads replaced on Ford F-150 · Invoice ready</div>
+                <div class="ni-time">2 hours ago</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="ni-icon" style="background:rgba(225,6,0,.15);color:#FF2A1F;"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+              <div class="ni-body">
+                <div class="ni-title">Invoice #INV-8842 due</div>
+                <div class="ni-desc">$342.50 · due Oct 20, 2026</div>
+                <div class="ni-time">3 hours ago</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="ni-icon" style="background:rgba(201,209,220,.12);color:#C9D1DC;"><i class="fa-solid fa-shield-halved"></i></div>
+              <div class="ni-body">
+                <div class="ni-title">Warranty expiring soon</div>
+                <div class="ni-desc">Tesla Model S · extended warranty ends Nov 30</div>
+                <div class="ni-time">Yesterday</div>
+              </div>
+            </div>
+            <a href="404.html" class="notif-footer">View all notifications →</a>
+          </div>
+        </div>
+
+        <div class="user-block">
+          <div class="user-text">
+            <div class="name" id="headerUserName">Customer</div>
+            <div class="role">Customer</div>
+          </div>
+          <div class="user-avatar" id="profileBtn">
+            <span id="avatarInitials">C</span>
+            <div class="profile-menu" id="profileMenu">
+              <a href="404.html"><i class="fa-regular fa-user"></i>Profile</a>
+              <a href="404.html"><i class="fa-solid fa-bell"></i>Notification Settings</a>
+              <a href="404.html"><i class="fa-solid fa-gear"></i>Settings</a>
+              <hr>
+              <a href="login.html" class="danger" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MOBILE NAV -->
+    <div class="mobile-nav">
+      <a class="nav-btn active" data-page="dashboard"><i class="fa-solid fa-border-all"></i> Dashboard</a>
+      <a class="nav-btn" data-page="vehicles"><i class="fa-solid fa-warehouse"></i> Garage</a>
+      <a class="nav-btn" data-page="bookings"><i class="fa-solid fa-calendar-check"></i> Bookings</a>
+      <a class="nav-btn" data-page="history"><i class="fa-solid fa-clock-rotate-left"></i> History</a>
+      <a class="nav-btn" data-page="invoices"><i class="fa-solid fa-receipt"></i> Invoices</a>
+      <a class="nav-btn" data-page="warranty"><i class="fa-solid fa-shield-halved"></i> Warranty</a>
+      <a class="nav-btn" data-page="documents"><i class="fa-solid fa-folder-open"></i> Documents</a>
+      <a class="nav-btn logout" href="login.html" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </div>
+
+    <!-- DASHBOARD BODY -->
+    <div class="dash-body">
+
+      <div class="page-title-block">
+        <h1 id="pageTitleMobile">Customer Dashboard</h1>
+        <p id="pageSubtitleMobile">Your garage, service history, and bookings.</p>
+      </div>
+
+      <!-- ============ DASHBOARD ============ -->
+      <div id="section-dashboard" class="content-section active">
+
+        <div class="stats-grid">
+          <div class="card">
+            <div class="stat-top">
+              <div class="stat-icon" style="background:rgba(225,6,0,.15);color:#FF2A1F;"><i class="fa-solid fa-warehouse"></i></div>
+              <span class="trend soft">all registered</span>
+            </div>
+            <div class="stat-label">My Vehicles</div>
+            <div class="stat-value">3<small>cars</small></div>
+          </div>
+          <div class="card">
+            <div class="stat-top">
+              <div class="stat-icon" style="background:rgba(255,176,32,.15);color:#FFB020;"><i class="fa-solid fa-calendar-check"></i></div>
+              <span class="trend warn"><i class="fa-solid fa-clock"></i> 1 upcoming</span>
+            </div>
+            <div class="stat-label">Active Bookings</div>
+            <div class="stat-value">1<small>booking</small></div>
+          </div>
+          <div class="card">
+            <div class="stat-top">
+              <div class="stat-icon" style="background:rgba(34,197,94,.14);color:#4ade80;"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+              <span class="trend soft">lifetime</span>
+            </div>
+            <div class="stat-label">Services Done</div>
+            <div class="stat-value">14<small>services</small></div>
+          </div>
+          <div class="card">
+            <div class="stat-top">
+              <div class="stat-icon" style="background:rgba(225,6,0,.15);color:#FF2A1F;"><i class="fa-solid fa-receipt"></i></div>
+              <span class="trend down">1 due</span>
+            </div>
+            <div class="stat-label">Pending Invoices</div>
+            <div class="stat-value">$342<small>.50</small></div>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="card">
+            <div class="card-title">
+              💰 Service Spend
+              <span class="head-pill">6 months</span>
+            </div>
+            <div class="chart-wrap"><canvas id="spendChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              🔧 Service Type Split
+              <span class="head-pill">By category</span>
+            </div>
+            <div class="chart-wrap"><canvas id="serviceTypeChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              📊 Monthly Mileage
+              <span class="head-pill">Last 6 months</span>
+            </div>
+            <div class="chart-wrap"><canvas id="mileageChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="two-col-grid">
+          <div class="card">
+            <div class="card-title">
+              🚗 Next Service & Recent Activity
+              <a href="404.html" class="head-right">View All</a>
+            </div>
+
+            <div class="list-item">
+              <div class="li-body">
+                <div class="li-title"><span class="v-icon"><i class="fa-solid fa-wrench"></i></span> Annual Service · BMW M4 Competition</div>
+                <div class="li-meta">Booking #SRV-1043 · Multi-point inspection + oil change</div>
+                <div class="li-date">Oct 18, 2026 · 10:00 AM at Downtown Branch</div>
+              </div>
+              <span class="pill scheduled">Scheduled</span>
+            </div>
+
+            <div class="list-item">
+              <div class="li-body">
+                <div class="li-title"><span class="v-icon"><i class="fa-solid fa-circle-dot"></i></span> Brake Pad Replacement · Ford F-150</div>
+                <div class="li-meta">Booking #SRV-1041 · Front + rear pads replaced</div>
+                <div class="li-date">Completed Oct 10, 2026 · Invoice ready</div>
+              </div>
+              <span class="pill completed">Completed</span>
+            </div>
+
+            <div class="list-item">
+              <div class="li-body">
+                <div class="li-title"><span class="v-icon"><i class="fa-solid fa-car-battery"></i></span> Battery Health Check · Tesla Model S</div>
+                <div class="li-meta">Booking #SRV-1039 · Battery at 92% capacity</div>
+                <div class="li-date">Completed Sep 28, 2026 · Under warranty</div>
+              </div>
+              <span class="pill completed">Completed</span>
+            </div>
+          </div>
+
+          <div class="right-stack">
+            <div class="card">
+              <div class="card-title">🎯 Next Service Due</div>
+              <div class="goal-text"><strong>2,340 km</strong> until next service</div>
+              <div class="prog-bg"><div class="prog-fill" style="width:68%;"></div></div>
+              <div class="goal-hint">Book now to keep your <strong>full warranty</strong> active ✅</div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">⚡ Quick Actions</div>
+              <div class="quick-grid">
+                <a href="404.html" class="quick-btn">
+                  <i class="fa-solid fa-calendar-plus"></i><span>Book Service</span>
+                </a>
+                <a href="404.html" class="quick-btn">
+                  <i class="fa-solid fa-truck-fast"></i><span>Track Booking</span>
+                </a>
+                <a href="404.html" class="quick-btn">
+                  <i class="fa-solid fa-triangle-exclamation"></i><span>Roadside Help</span>
+                </a>
+                <a href="404.html" class="quick-btn">
+                  <i class="fa-solid fa-headset"></i><span>Contact Us</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="roadside-card">
+          <span class="r-label"><i class="fa-solid fa-triangle-exclamation"></i> 24/7 Assistance</span>
+          <div class="r-title">Need roadside help?</div>
+          <div class="r-sub">Flat tyre, dead battery, or breakdown — our team is available around the clock, 365 days a year. One tap to reach a certified technician.</div>
+          <a href="404.html" class="r-btn">
+            <i class="fa-solid fa-phone"></i> Call Roadside Assistance
+          </a>
+        </div>
+
+      </div>
+
+      <!-- ============ MY GARAGE ============ -->
+      <div id="section-vehicles" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-warehouse"></i> My Garage</div>
+
+          <div class="vehicle-grid">
+
+            <div class="vehicle-card">
+              <div class="vc-head">
+                <div class="v-icon"><i class="fa-solid fa-car-side"></i></div>
+                <div>
+                  <div class="v-title">BMW M4 Competition</div>
+                  <div class="v-plate">AUTO-8821</div>
+                </div>
+              </div>
+              <div class="vc-stats">
+                <div class="vc-stat">
+                  <small>Year</small>
+                  <strong>2024</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Mileage</small>
+                  <strong>8,420 km</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Next Service</small>
+                  <strong class="warn">In 5 days</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Warranty</small>
+                  <strong>Active</strong>
+                </div>
+              </div>
+              <div class="vc-actions">
+                <a href="404.html" class="v-btn primary">Book Service</a>
+                <a href="404.html" class="v-btn ghost">Details</a>
+              </div>
+            </div>
+
+            <div class="vehicle-card">
+              <div class="vc-head">
+                <div class="v-icon"><i class="fa-solid fa-car"></i></div>
+                <div>
+                  <div class="v-title">Tesla Model S Plaid</div>
+                  <div class="v-plate">AUTO-7714</div>
+                </div>
+              </div>
+              <div class="vc-stats">
+                <div class="vc-stat">
+                  <small>Year</small>
+                  <strong>2023</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Mileage</small>
+                  <strong>14,200 km</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Battery</small>
+                  <strong>92% health</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Warranty</small>
+                  <strong class="warn">Ends Nov 30</strong>
+                </div>
+              </div>
+              <div class="vc-actions">
+                <a href="404.html" class="v-btn primary">Book Service</a>
+                <a href="404.html" class="v-btn ghost">Details</a>
+              </div>
+            </div>
+
+            <div class="vehicle-card">
+              <div class="vc-head">
+                <div class="v-icon"><i class="fa-solid fa-truck-pickup"></i></div>
+                <div>
+                  <div class="v-title">Ford F-150 Raptor</div>
+                  <div class="v-plate">AUTO-5520</div>
+                </div>
+              </div>
+              <div class="vc-stats">
+                <div class="vc-stat">
+                  <small>Year</small>
+                  <strong>2022</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Mileage</small>
+                  <strong>42,100 km</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Last Service</small>
+                  <strong>Oct 10</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Warranty</small>
+                  <strong>Active</strong>
+                </div>
+              </div>
+              <div class="vc-actions">
+                <a href="404.html" class="v-btn primary">Book Service</a>
+                <a href="404.html" class="v-btn ghost">Details</a>
+              </div>
+            </div>
+
+          </div>
+
+          <a href="404.html" style="display:inline-block;margin-top:18px;background:linear-gradient(135deg,#E10600,#A80400);color:#fff;font-weight:800;font-size:0.78rem;padding:11px 22px;border-radius:10px;text-decoration:none;box-shadow:0 8px 22px rgba(225,6,0,.4);">
+            <i class="fa-solid fa-plus" style="margin-right:6px;"></i> Add Vehicle
+          </a>
+        </div>
+      </div>
+
+      <!-- ============ SERVICE BOOKINGS ============ -->
+      <div id="section-bookings" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-calendar-check"></i> Service Bookings</div>
+
+          <div class="list-item">
+            <div class="li-body">
+              <div class="li-title"><span class="v-icon"><i class="fa-solid fa-wrench"></i></span> Annual Service · BMW M4 Competition</div>
+              <div class="li-meta">Booking #SRV-1043 · Multi-point inspection + oil change</div>
+              <div class="li-date">Oct 18, 2026 · 10:00 AM at Downtown Branch</div>
+            </div>
+            <span class="pill scheduled">Scheduled</span>
+          </div>
+
+          <div class="list-item">
+            <div class="li-body">
+              <div class="li-title"><span class="v-icon"><i class="fa-solid fa-circle-notch"></i></span> Tyre Rotation & Balance · Ford F-150</div>
+              <div class="li-meta">Booking #SRV-1044 · Rotation + wheel alignment</div>
+              <div class="li-date">Oct 22, 2026 · 2:00 PM at Westside Branch</div>
+            </div>
+            <span class="pill scheduled">Scheduled</span>
+          </div>
+
+          <div class="list-item">
+            <div class="li-body">
+              <div class="li-title"><span class="v-icon"><i class="fa-solid fa-car-battery"></i></span> Battery Diagnostics · Tesla Model S</div>
+              <div class="li-meta">Booking #SRV-1045 · Full battery health + software check</div>
+              <div class="li-date">Nov 02, 2026 · 11:00 AM at Downtown Branch</div>
+            </div>
+            <span class="pill scheduled">Scheduled</span>
+          </div>
+
+          <a href="404.html" style="display:inline-block;margin-top:16px;background:linear-gradient(135deg,#E10600,#A80400);color:#fff;font-weight:800;font-size:0.78rem;padding:11px 22px;border-radius:10px;text-decoration:none;box-shadow:0 8px 22px rgba(225,6,0,.4);">
+            <i class="fa-solid fa-calendar-plus" style="margin-right:6px;"></i> Book New Service
+          </a>
+        </div>
+      </div>
+
+      <!-- ============ SERVICE HISTORY ============ -->
+      <div id="section-history" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Service History</div>
+          <div class="table-wrap">
+            <table class="activity">
+              <thead>
+                <tr>
+                  <th>Booking</th>
+                  <th>Date</th>
+                  <th>Vehicle</th>
+                  <th>Service</th>
+                  <th>Mileage</th>
+                  <th>Cost</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Booking" class="strong">#SRV-1041</td>
+                  <td data-label="Date">10 Oct 2026</td>
+                  <td data-label="Vehicle">Ford F-150</td>
+                  <td data-label="Service">Brake Pads</td>
+                  <td data-label="Mileage" class="strong">42,100 km</td>
+                  <td data-label="Cost" class="amt">$342.50</td>
+                  <td data-label="Status"><span class="pill completed">Completed</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Booking" class="strong">#SRV-1039</td>
+                  <td data-label="Date">28 Sep 2026</td>
+                  <td data-label="Vehicle">Tesla Model S</td>
+                  <td data-label="Service">Battery Check</td>
+                  <td data-label="Mileage" class="strong">14,200 km</td>
+                  <td data-label="Cost" class="amt">$0.00</td>
+                  <td data-label="Status"><span class="pill completed">Warranty</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Booking" class="strong">#SRV-1038</td>
+                  <td data-label="Date">15 Sep 2026</td>
+                  <td data-label="Vehicle">BMW M4</td>
+                  <td data-label="Service">Oil Change</td>
+                  <td data-label="Mileage" class="strong">7,980 km</td>
+                  <td data-label="Cost" class="amt">$184.20</td>
+                  <td data-label="Status"><span class="pill completed">Completed</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Booking" class="strong">#SRV-1035</td>
+                  <td data-label="Date">22 Aug 2026</td>
+                  <td data-label="Vehicle">Ford F-150</td>
+                  <td data-label="Service">Tyres</td>
+                  <td data-label="Mileage" class="strong">38,400 km</td>
+                  <td data-label="Cost" class="amt">$820.00</td>
+                  <td data-label="Status"><span class="pill completed">Completed</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Booking" class="strong">#SRV-1032</td>
+                  <td data-label="Date">05 Aug 2026</td>
+                  <td data-label="Vehicle">BMW M4</td>
+                  <td data-label="Service">Diagnostics</td>
+                  <td data-label="Mileage" class="strong">6,420 km</td>
+                  <td data-label="Cost" class="amt">$95.00</td>
+                  <td data-label="Status"><span class="pill completed">Completed</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Booking" class="strong">#SRV-1029</td>
+                  <td data-label="Date">18 Jul 2026</td>
+                  <td data-label="Vehicle">Tesla Model S</td>
+                  <td data-label="Service">AC Service</td>
+                  <td data-label="Mileage" class="strong">12,800 km</td>
+                  <td data-label="Cost" class="amt">$140.00</td>
+                  <td data-label="Status"><span class="pill completed">Completed</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ INVOICES ============ -->
+      <div id="section-invoices" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-receipt"></i> Invoices</div>
+
+          <div class="table-wrap">
+            <table class="activity">
+              <thead>
+                <tr>
+                  <th>Invoice</th>
+                  <th>Issued</th>
+                  <th>Due</th>
+                  <th>Vehicle</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Invoice" class="strong">#INV-8842</td>
+                  <td data-label="Issued">10 Oct 2026</td>
+                  <td data-label="Due">20 Oct 2026</td>
+                  <td data-label="Vehicle">Ford F-150</td>
+                  <td data-label="Amount" class="amt">$342.50</td>
+                  <td data-label="Status"><span class="pill due">Due</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Invoice" class="strong">#INV-8839</td>
+                  <td data-label="Issued">15 Sep 2026</td>
+                  <td data-label="Due">25 Sep 2026</td>
+                  <td data-label="Vehicle">BMW M4</td>
+                  <td data-label="Amount" class="amt">$184.20</td>
+                  <td data-label="Status"><span class="pill completed">Paid</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Invoice" class="strong">#INV-8835</td>
+                  <td data-label="Issued">22 Aug 2026</td>
+                  <td data-label="Due">01 Sep 2026</td>
+                  <td data-label="Vehicle">Ford F-150</td>
+                  <td data-label="Amount" class="amt">$820.00</td>
+                  <td data-label="Status"><span class="pill completed">Paid</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Invoice" class="strong">#INV-8832</td>
+                  <td data-label="Issued">05 Aug 2026</td>
+                  <td data-label="Due">15 Aug 2026</td>
+                  <td data-label="Vehicle">BMW M4</td>
+                  <td data-label="Amount" class="amt">$95.00</td>
+                  <td data-label="Status"><span class="pill completed">Paid</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Invoice" class="strong">#INV-8829</td>
+                  <td data-label="Issued">18 Jul 2026</td>
+                  <td data-label="Due">28 Jul 2026</td>
+                  <td data-label="Vehicle">Tesla Model S</td>
+                  <td data-label="Amount" class="amt">$140.00</td>
+                  <td data-label="Status"><span class="pill completed">Paid</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ WARRANTY ============ -->
+      <div id="section-warranty" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-shield-halved"></i> Warranty Coverage</div>
+
+          <div class="warranty-grid">
+
+            <div class="warranty-card">
+              <div class="wc-icon"><i class="fa-solid fa-car-side"></i></div>
+              <div class="wc-title">Full Manufacturer Warranty</div>
+              <div class="wc-vehicle">BMW M4 Competition · AUTO-8821</div>
+              <div class="wc-info">
+                <div>
+                  <small>Expires</small>
+                  <strong>Mar 2027</strong>
+                </div>
+                <span class="pill completed">Active</span>
+              </div>
+            </div>
+
+            <div class="warranty-card">
+              <div class="wc-icon"><i class="fa-solid fa-bolt"></i></div>
+              <div class="wc-title">EV Battery Warranty</div>
+              <div class="wc-vehicle">Tesla Model S · AUTO-7714</div>
+              <div class="wc-info">
+                <div>
+                  <small>Expires</small>
+                  <strong>Nov 30, 2026</strong>
+                </div>
+                <span class="pill due">Ends Soon</span>
+              </div>
+            </div>
+
+            <div class="warranty-card">
+              <div class="wc-icon"><i class="fa-solid fa-truck-pickup"></i></div>
+              <div class="wc-title">Powertrain Warranty</div>
+              <div class="wc-vehicle">Ford F-150 Raptor · AUTO-5520</div>
+              <div class="wc-info">
+                <div>
+                  <small>Expires</small>
+                  <strong>Jun 2027</strong>
+                </div>
+                <span class="pill completed">Active</span>
+              </div>
+            </div>
+
+            <div class="warranty-card">
+              <div class="wc-icon"><i class="fa-solid fa-wrench"></i></div>
+              <div class="wc-title">Extended Service Plan</div>
+              <div class="wc-vehicle">All vehicles · 5-year plan</div>
+              <div class="wc-info">
+                <div>
+                  <small>Expires</small>
+                  <strong>Jan 2029</strong>
+                </div>
+                <span class="pill completed">Active</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ DOCUMENTS ============ -->
+      <div id="section-documents" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-folder-open"></i> My Documents</div>
+
+          <div class="doc-list">
+            <div class="doc-item">
+              <div class="d-icon"><i class="fa-solid fa-file-shield"></i></div>
+              <div class="d-body">
+                <div class="d-title">BMW M4 · Insurance Certificate</div>
+                <div class="d-meta">Policy #INS-8821 · Valid until Mar 2027</div>
+              </div>
+              <a href="404.html" class="d-btn">View</a>
+            </div>
+
+            <div class="doc-item">
+              <div class="d-icon"><i class="fa-solid fa-file-lines"></i></div>
+              <div class="d-body">
+                <div class="d-title">Tesla Model S · Registration</div>
+                <div class="d-meta">Plate AUTO-7714 · Renewed Aug 2026</div>
+              </div>
+              <a href="404.html" class="d-btn">View</a>
+            </div>
+
+            <div class="doc-item">
+              <div class="d-icon"><i class="fa-solid fa-file-invoice"></i></div>
+              <div class="d-body">
+                <div class="d-title">Ford F-150 · Last Service Invoice</div>
+                <div class="d-meta">Invoice #INV-8842 · $342.50 · Oct 10, 2026</div>
+              </div>
+              <a href="404.html" class="d-btn">View</a>
+            </div>
+
+            <div class="doc-item">
+              <div class="d-icon"><i class="fa-solid fa-file-contract"></i></div>
+              <div class="d-body">
+                <div class="d-title">Extended Service Plan · Contract</div>
+                <div class="d-meta">5-year plan · Covers all 3 vehicles · Until Jan 2029</div>
+              </div>
+              <a href="404.html" class="d-btn">View</a>
+            </div>
+
+            <div class="doc-item">
+              <div class="d-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+              <div class="d-body">
+                <div class="d-title">BMW M4 · Pre-Purchase Inspection Report</div>
+                <div class="d-meta">180-point check · Passed Mar 2024</div>
+              </div>
+              <a href="404.html" class="d-btn">View</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  const session = window.__AUTOMOTIVE_CUSTOMER__;
+  if (session && session.name) {
+    const name = session.name;
+    const initial = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('headerUserName', name);
+    set('avatarInitials', initial);
+    set('sidebarUserName', name);
+    set('pageSubtitle', 'Welcome back, ' + name.split(' ')[0] + '. Your garage is up to date.');
+    set('pageSubtitleMobile', 'Welcome back, ' + name.split(' ')[0] + '.');
+  }
+
+  const titles = {
+    dashboard: ['Customer Dashboard', 'Your garage, service history, and bookings.'],
+    vehicles:  ['My Garage', 'Manage every car you own.'],
+    bookings:  ['Service Bookings', 'Upcoming appointments and what to expect.'],
+    history:   ['Service History', 'Every service and repair, in one place.'],
+    invoices:  ['Invoices', 'Billing and payment history.'],
+    warranty:  ['Warranty', 'Active coverage across all vehicles.'],
+    documents: ['Documents', 'Insurance, registration, and service records.']
+  };
+
+  function navigateTo(page) {
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('section-' + page);
+    if (target) target.classList.add('active');
+
+    if (titles[page]) {
+      document.getElementById('pageTitle').textContent = titles[page][0];
+      document.getElementById('pageSubtitle').textContent = titles[page][1];
+      const mt = document.getElementById('pageTitleMobile');
+      const ms = document.getElementById('pageSubtitleMobile');
+      if (mt) mt.textContent = titles[page][0];
+      if (ms) ms.textContent = titles[page][1];
+    }
+
+    document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(l => {
+      l.classList.toggle('active', l.dataset.page === page);
+    });
+    document.querySelectorAll('.mobile-nav .nav-btn[data-page]').forEach(b => {
+      b.classList.toggle('active', b.dataset.page === page);
+    });
+
+    document.querySelector('.dash-body').scrollTop = 0;
+  }
+
+  document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(l => {
+    l.addEventListener('click', e => { e.preventDefault(); navigateTo(l.dataset.page); });
+  });
+  document.querySelectorAll('.mobile-nav .nav-btn[data-page]').forEach(b => {
+    b.addEventListener('click', e => { e.preventDefault(); navigateTo(b.dataset.page); });
+  });
+
+  /* date pill */
+  const datePill = document.getElementById('datePill');
+  if (datePill) {
+    datePill.addEventListener('click', () => {
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const t = new Date();
+      const dt = document.getElementById('dateText');
+      if (dt) dt.textContent = 'Today, ' + t.getDate() + ' ' + months[t.getMonth()] + ' ' + t.getFullYear();
+    });
+  }
+
+  /* notifications */
+  const bell = document.getElementById('bellBtn');
+  const notifDrop = document.getElementById('notifDropdown');
+  const profMenu = document.getElementById('profileMenu');
+  if (bell && notifDrop) {
+    bell.addEventListener('click', e => {
+      e.stopPropagation();
+      notifDrop.classList.toggle('show');
+      if (profMenu) profMenu.classList.remove('show');
+    });
+    document.addEventListener('click', e => {
+      if (!notifDrop.contains(e.target) && !bell.contains(e.target)) notifDrop.classList.remove('show');
+    });
+  }
+
+  /* profile menu */
+  const profBtn = document.getElementById('profileBtn');
+  if (profBtn && profMenu) {
+    profBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      profMenu.classList.toggle('show');
+      if (notifDrop) notifDrop.classList.remove('show');
+    });
+    document.addEventListener('click', e => {
+      if (!profMenu.contains(e.target) && !profBtn.contains(e.target)) profMenu.classList.remove('show');
+    });
+  }
+})();
+
+function handleLogout(e) {
+  if (e) e.preventDefault();
+  try {
+    sessionStorage.removeItem('automotive_session');
+    localStorage.removeItem('automotive_session');
+  } catch (_) {}
+  window.location.replace('login.html');
+}
+
+/* ============================================================
+   CHART SETUP
+   ============================================================ */
+window.addEventListener('load', function () {
+  if (typeof Chart === 'undefined') return;
+
+  Chart.defaults.color = '#A9B3C0';
+  Chart.defaults.borderColor = 'rgba(201,209,220,.12)';
+  Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+
+  const C = {
+    red: '#E10600',
+    redSoft: 'rgba(225,6,0,0.18)',
+    amber: '#FFB020',
+    amberSoft: 'rgba(255,176,32,0.18)',
+    green: '#22C55E',
+    grid: 'rgba(201,209,220,.08)',
+    tick: '#8B96A6'
+  };
+
+  const commonOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#141922',
+        borderColor: 'rgba(225,6,0,.3)',
+        borderWidth: 1,
+        titleColor: '#fff',
+        bodyColor: '#C9D1DC',
+        padding: 10,
+        cornerRadius: 8
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: C.grid },
+        ticks: { font: { size: 9 }, color: C.tick },
+        border: { display: false }
+      },
+      x: {
+        grid: { display: false },
+        ticks: { font: { size: 9 }, color: C.tick },
+        border: { display: false }
+      }
+    }
+  };
+
+  const sEl = document.getElementById('spendChart');
+  if (sEl) new Chart(sEl, {
+    type: 'line',
+    data: {
+      labels: ['May','Jun','Jul','Aug','Sep','Oct'],
+      datasets: [{
+        data: [180, 420, 95, 820, 184, 342],
+        borderColor: C.red,
+        backgroundColor: C.redSoft,
+        tension: 0.4,
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointBackgroundColor: C.red,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 1.5,
+        fill: true
+      }]
+    },
+    options: commonOpts
+  });
+
+  const tEl = document.getElementById('serviceTypeChart');
+  if (tEl) new Chart(tEl, {
+    type: 'doughnut',
+    data: {
+      labels: ['Engine','Brakes','Tyres','Diagnostics','AC','Battery'],
+      datasets: [{
+        data: [4, 3, 2, 2, 1, 2],
+        backgroundColor: ['#E10600','#FFB020','#22C55E','#8B96A6','#C9D1DC','#26A69A'],
+        borderWidth: 2,
+        borderColor: '#0B0E13',
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 10, padding: 8, font: { size: 9 }, color: C.tick }
+        }
+      }
+    }
+  });
+
+  const mEl = document.getElementById('mileageChart');
+  if (mEl) new Chart(mEl, {
+    type: 'bar',
+    data: {
+      labels: ['May','Jun','Jul','Aug','Sep','Oct'],
+      datasets: [{
+        data: [820, 1240, 980, 1420, 1100, 1180],
+        backgroundColor: C.amber,
+        hoverBackgroundColor: C.red,
+        borderRadius: 6,
+        barThickness: 16
+      }]
+    },
+    options: commonOpts
+  });
+});
+
+/* ============================================================
+   BFCACHE RE-VALIDATION
+   ============================================================ */
+window.addEventListener('pageshow', function (e) {
+  if (!e.persisted) return;
+  try {
+    const raw = sessionStorage.getItem('automotive_session') || localStorage.getItem('automotive_session');
+    const s = raw ? JSON.parse(raw) : null;
+    const valid = s && s.authenticated === true && s.expiresAt > Date.now() && s.role === 'customer';
+    if (!valid) window.location.replace('login.html');
+  } catch (err) {
+    window.location.replace('login.html');
+  }
+});
+</script>
+
+</body>
+</html>

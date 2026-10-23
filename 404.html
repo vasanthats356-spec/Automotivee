@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Automotive - 404 Page Not Found</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+
+<style>
+:root{
+  --carbon:      #0B0E13;
+  --graphite:    #141922;
+  --red:         #E10600;
+  --red-bright:  #FF2A1F;
+  --red-deep:    #A80400;
+  --amber:       #FFB020;
+  --amber-d:     #E08A00;
+  --silver:      #C9D1DC;
+  --text:        #EEF2F8;
+  --text-soft:   #A9B3C0;
+  --text-mute:   #8B96A6;
+  --line:        rgba(201,209,220,.12);
+  --line-2:      rgba(201,209,220,.22);
+  --ease:        cubic-bezier(.22,.61,.36,1);
+}
+
+*{
+  margin:0; padding:0; box-sizing:border-box;
+  font-family:'Inter','Segoe UI',Roboto,system-ui,sans-serif;
+}
+
+html, body{ overflow-x:hidden; }
+
+body{
+  background:
+    radial-gradient(1200px 700px at 78% -10%, rgba(225,6,0,.18), transparent 62%),
+    radial-gradient(900px 550px at 4% 6%, rgba(255,176,32,.08), transparent 60%),
+    var(--carbon);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px 24px;
+  position:relative;
+}
+
+body::before,
+body::after{
+  content:'';
+  position:fixed;
+  border-radius:50%;
+  filter:blur(90px);
+  z-index:0;
+  pointer-events:none;
+}
+body::before{
+  width:520px; height:520px;
+  background:#E10600;
+  opacity:.28;
+  top:-180px; left:-160px;
+}
+body::after{
+  width:480px; height:480px;
+  background:#FFB020;
+  opacity:.14;
+  bottom:-200px; right:-180px;
+}
+
+/* ===== CARD ===== */
+.error-card{
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:1100px;
+  background:linear-gradient(160deg, rgba(20,25,34,.95), rgba(11,14,19,.98));
+  border-radius:26px;
+  box-shadow:0 30px 70px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.05);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  overflow:hidden;
+  border:1.5px solid var(--line-2);
+}
+
+/* ===== LEFT VISUAL ===== */
+.error-visual{
+  position:relative;
+  background:linear-gradient(135deg, #1a0000 0%, #2a0505 45%, #0B0E13 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:50px 30px;
+  min-height:520px;
+  overflow:hidden;
+}
+.error-visual::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 25%, rgba(225,6,0,.35), transparent 55%),
+    radial-gradient(circle at 85% 80%, rgba(255,176,32,.18), transparent 55%);
+  pointer-events:none;
+}
+.error-visual::after{
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+  pointer-events:none;
+}
+
+.error-visual img{
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:340px;
+  height:auto;
+  object-fit:contain;
+  filter:drop-shadow(0 18px 35px rgba(0,0,0,.6));
+  animation:floatY 4.5s ease-in-out infinite;
+}
+@keyframes floatY{
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-14px); }
+}
+
+.error-visual .fallback-icon{
+  position:relative;
+  z-index:1;
+  font-size:9rem;
+  color:var(--red-bright);
+  filter:drop-shadow(0 14px 30px rgba(225,6,0,.55));
+  animation:floatY 4.5s ease-in-out infinite;
+  display:none;
+}
+
+/* ===== RIGHT CONTENT ===== */
+.error-content{
+  padding:70px 60px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+}
+
+.error-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  background:rgba(225,6,0,.12);
+  color:var(--red-bright);
+  font-size:.78rem;
+  font-weight:700;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-radius:60px;
+  border:1px solid rgba(225,6,0,.35);
+  margin-bottom:22px;
+}
+.error-badge i{ color:var(--amber); font-size:.9rem; }
+
+.error-code{
+  font-family:'Outfit',sans-serif;
+  font-size:4.6rem;
+  font-weight:800;
+  line-height:1;
+  color:#fff;
+  letter-spacing:-2px;
+  margin-bottom:6px;
+}
+.error-code span{
+  color:var(--red-bright);
+  text-shadow:0 4px 22px rgba(225,6,0,.55);
+}
+
+.error-title{
+  font-family:'Outfit',sans-serif;
+  font-size:1.7rem;
+  font-weight:700;
+  color:#fff;
+  margin-bottom:14px;
+  letter-spacing:-.4px;
+}
+
+.error-text{
+  font-size:1rem;
+  line-height:1.75;
+  color:var(--text-soft);
+  margin-bottom:32px;
+  max-width:440px;
+}
+.error-text .highlight{
+  color:var(--amber);
+  font-weight:700;
+  background:linear-gradient(180deg, transparent 62%, rgba(225,6,0,.35) 62%);
+  padding:0 3px;
+  border-radius:2px;
+}
+
+/* ===== BUTTONS ===== */
+.error-actions{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:.85rem 1.85rem;
+  border-radius:60px;
+  font-size:.95rem;
+  font-weight:700;
+  font-family:inherit;
+  cursor:pointer;
+  text-decoration:none;
+  border:1.5px solid transparent;
+  transition:all .3s ease;
+  white-space:nowrap;
+}
+
+/* Primary — Back to Home (red CTA) */
+.btn-primary{
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  border-color:transparent;
+  color:#fff;
+  box-shadow:0 10px 26px rgba(225,6,0,.42);
+}
+.btn-primary i{ color:#fff; }
+.btn-primary:hover{
+  background:linear-gradient(135deg, var(--red-bright), var(--red));
+  transform:translateY(-3px);
+  box-shadow:0 16px 36px rgba(225,6,0,.6);
+}
+
+/* Secondary — Go Back (outlined silver) */
+.btn-secondary{
+  background:rgba(255,255,255,.03);
+  border-color:rgba(201,209,220,.32);
+  color:var(--silver);
+}
+.btn-secondary i{ color:var(--silver); }
+.btn-secondary:hover{
+  background:rgba(201,209,220,.12);
+  border-color:var(--silver);
+  color:#fff;
+  transform:translateY(-3px);
+  box-shadow:0 12px 28px rgba(0,0,0,.5);
+}
+.btn-secondary:hover i{ color:#fff; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width:900px){
+  .error-card{ grid-template-columns:1fr; max-width:620px; }
+  .error-visual{ min-height:300px; padding:40px 24px; }
+  .error-visual img{ max-width:220px; }
+  .error-visual .fallback-icon{ font-size:6rem; }
+  .error-content{ padding:50px 40px; align-items:center; text-align:center; }
+  .error-text{ max-width:100%; }
+  .error-actions{ justify-content:center; }
+}
+
+@media (max-width:480px){
+  body{ padding:24px 16px; }
+  .error-card{ border-radius:20px; }
+  .error-visual{ min-height:240px; padding:32px 20px; }
+  .error-visual img{ max-width:180px; }
+  .error-visual .fallback-icon{ font-size:4.8rem; }
+  .error-content{ padding:38px 24px; }
+  .error-code{ font-size:3.4rem; }
+  .error-title{ font-size:1.35rem; }
+  .error-text{ font-size:.92rem; margin-bottom:26px; }
+  .error-actions{ width:100%; flex-direction:column; }
+  .btn{ width:100%; padding:.85rem 1.4rem; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:.001ms !important;
+    transition-duration:.001ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="error-card">
+
+  <!-- LEFT VISUAL -->
+  <div class="error-visual" data-aos="fade-right" data-aos-duration="900">
+    <img src="cp3.webp"
+         alt="Page not found illustration"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+    <i class="fa-solid fa-car-side fallback-icon"></i>
+  </div>
+
+  <!-- RIGHT CONTENT -->
+  <div class="error-content">
+
+    <span class="error-badge" data-aos="fade-down" data-aos-delay="100">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      Error 404
+    </span>
+
+    <h1 class="error-code" data-aos="zoom-in" data-aos-delay="200">
+      4<span>0</span>4
+    </h1>
+
+    <h2 class="error-title" data-aos="fade-up" data-aos-delay="300">
+      Wrong turn. This road is closed.
+    </h2>
+
+    <p class="error-text" data-aos="fade-up" data-aos-delay="400">
+      Looks like the page you're looking for has been <span class="highlight">moved</span>
+      or is temporarily off the road. Let's get you back in the driver's seat.
+    </p>
+
+    <div class="error-actions" data-aos="fade-up" data-aos-delay="500">
+      <a href="index.html" class="btn btn-primary">
+        <i class="fa-solid fa-house"></i> Back to Home
+      </a>
+      <a href="javascript:void(0)" class="btn btn-secondary" id="goBackBtn">
+        <i class="fa-solid fa-arrow-left"></i> Go Back
+      </a>
+    </div>
+
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 800,
+    easing: 'ease-out-cubic',
+    once: true,
+    offset: 60,
+    mirror: false
+  });
+
+  /* Go Back — with fallback to index.html if no history */
+  (function(){
+    var goBackBtn = document.getElementById('goBackBtn');
+    if (!goBackBtn) return;
+    goBackBtn.addEventListener('click', function(){
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>

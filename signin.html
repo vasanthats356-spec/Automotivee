@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Automotive — Sign Up</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================
+   AUTOMOTIVE COLOR SYSTEM — matches navbar + footer
+   ========================================================== */
+:root{
+  --carbon:      #0B0E13;
+  --graphite:    #141922;
+  --steel:       #232A36;
+
+  --red:         #E10600;
+  --red-bright:  #FF2A1F;
+  --red-deep:    #A80400;
+
+  --amber:       #FFB020;
+  --amber-d:     #E08A00;
+
+  --silver:      #C9D1DC;
+  --text:        #EEF2F8;
+  --text-soft:   #A9B3C0;
+  --text-mute:   #8B96A6;
+
+  --line:        rgba(201,209,220,.12);
+  --line-2:      rgba(201,209,220,.22);
+
+  --input-bg:    rgba(11,14,19,.55);
+  --input-bd:    rgba(201,209,220,.18);
+
+  --ease:        cubic-bezier(.22,.61,.36,1);
+}
+
+*{
+  margin:0; padding:0; box-sizing:border-box;
+  font-family:'Inter','Segoe UI',Roboto,system-ui,sans-serif;
+}
+
+html, body{ overflow-x:hidden; }
+
+body{
+  background:
+    radial-gradient(1100px 600px at 78% -10%, rgba(225,6,0,.16), transparent 62%),
+    radial-gradient(900px 520px at 4% 6%, rgba(255,176,32,.07), transparent 60%),
+    var(--carbon);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  width:100%;
+  position:relative;
+  z-index:0;                     /* ← creates body stacking context */
+}
+
+/* floating blobs — pushed behind all content */
+body::before,
+body::after{
+  content:'';
+  position:fixed;
+  border-radius:50%;
+  filter:blur(90px);
+  z-index:-1;                    /* ← behind body content */
+  pointer-events:none;
+}
+body::before{
+  width:520px; height:520px;
+  background:#E10600;
+  opacity:.22;
+  top:-180px; left:-160px;
+  animation:blobDrift 16s ease-in-out infinite;
+}
+body::after{
+  width:460px; height:460px;
+  background:#FFB020;
+  opacity:.12;
+  bottom:-200px; right:-180px;
+  animation:blobDrift 20s ease-in-out infinite reverse;
+}
+@keyframes blobDrift{
+  0%,100%{ transform:translate(0,0) scale(1); }
+  50%{ transform:translate(40px,-30px) scale(1.1); }
+}
+
+/* NO stacking context here — lets fixed navbar + mobile menu escape */
+#header-placeholder,
+#footer-placeholder{ width:100%; flex-shrink:0; }
+
+.main-wrapper{
+  max-width:1140px;
+  width:100%;
+  margin:0 auto;
+  padding:0 16px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+.signup-wrapper{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:2.5rem 0;
+  width:100%;
+  flex:1;
+}
+
+/* ==========================================================
+   CARD
+   ========================================================== */
+.signup-card{
+  display:flex;
+  flex-direction:column;
+  max-width:860px;
+  width:100%;
+  background:linear-gradient(160deg, rgba(20,25,34,.96), rgba(11,14,19,.99));
+  border-radius:24px;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  border:1px solid var(--line-2);
+  overflow:hidden;
+  position:relative;
+}
+.signup-card::after{
+  content:'';
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+  pointer-events:none;
+}
+
+/* ==========================================================
+   VISUAL PANEL
+   ========================================================== */
+.signup-visual{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg, #1a0000 0%, #2a0505 45%, #0B0E13 100%);
+  padding:1.5rem;
+  min-height:240px;
+  overflow:hidden;
+}
+.signup-visual::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 25%, rgba(225,6,0,.35), transparent 55%),
+    radial-gradient(circle at 85% 80%, rgba(255,176,32,.18), transparent 55%);
+  pointer-events:none;
+}
+.signup-visual::after{
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+}
+
+.signup-visual img{
+  width:100%;
+  max-width:220px;
+  height:auto;
+  object-fit:contain;
+  display:block;
+  position:relative;
+  z-index:2;
+  filter:drop-shadow(0 14px 28px rgba(0,0,0,.6));
+  animation:floatImage 4s ease-in-out infinite;
+}
+@keyframes floatImage{
+  0%,100%{ transform:translateY(0) scale(1); }
+  50%{ transform:translateY(-10px) scale(1.02); }
+}
+
+.signup-svg-fallback{
+  width:100%;
+  max-width:220px;
+  display:none;
+  position:relative;
+  z-index:2;
+}
+.signup-svg-fallback svg{ width:100%; height:auto; display:block; }
+
+/* ==========================================================
+   FORM PANEL
+   ========================================================== */
+.signup-form{
+  flex:1;
+  padding:2rem 1.5rem;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  text-align:center;
+  position:relative;
+  z-index:1;
+}
+
+.signup-heading{
+  font-family:'Outfit',sans-serif;
+  font-size:1.6rem;
+  font-weight:800;
+  color:#fff;
+  margin-bottom:6px;
+  letter-spacing:-.02em;
+}
+.signup-subhead{
+  font-size:.86rem;
+  color:var(--text-soft);
+  margin-bottom:22px;
+  line-height:1.65;
+}
+.signup-subhead strong{
+  color:var(--amber);
+  font-weight:700;
+}
+
+/* ---------- Google button ---------- */
+.signup-google-row{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  margin-bottom:16px;
+  cursor:pointer;
+  font-weight:600;
+  color:#fff;
+  font-size:.86rem;
+  transition:all .25s var(--ease);
+  border-radius:10px;
+  padding:11px 16px;
+  background:var(--input-bg);
+  border:1.5px solid var(--input-bd);
+  justify-content:center;
+  text-decoration:none;
+}
+.signup-google-row:hover{
+  background:rgba(20,25,34,.95);
+  border-color:rgba(225,6,0,.4);
+  box-shadow:0 4px 14px rgba(225,6,0,.18);
+  transform:translateY(-1px);
+}
+.signup-google-icon{
+  display:inline-flex;
+  width:1.4rem;
+  height:1.4rem;
+  flex-shrink:0;
+  background:#fff;
+  border-radius:50%;
+  padding:2px;
+}
+.signup-google-icon svg{ width:100%; height:100%; display:block; }
+
+.signup-divider{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  margin:4px 0 18px;
+  justify-content:center;
+}
+.signup-divider hr{
+  flex:1;
+  border:none;
+  height:1px;
+  background:var(--line);
+}
+.signup-divider span{
+  color:var(--text-mute);
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+}
+
+/* ---------- Inputs ---------- */
+.signup-input-group{
+  position:relative;
+  margin-bottom:14px;
+  width:100%;
+}
+.signup-input-group i{
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--red-bright);
+  font-size:.9rem;
+  width:1.1rem;
+  text-align:center;
+  pointer-events:none;
+  z-index:2;
+}
+.signup-input-group input,
+.signup-input-group select{
+  width:100%;
+  padding:.78rem .9rem .78rem 2.6rem;
+  border:1.5px solid var(--input-bd);
+  border-radius:10px;
+  font-size:.9rem;
+  background:var(--input-bg);
+  transition:all .2s ease;
+  outline:none;
+  color:#fff;
+  font-family:inherit;
+  cursor:pointer;
+}
+.signup-input-group input::placeholder{ color:#7a8593; }
+.signup-input-group select{ color:var(--text-soft); }
+.signup-input-group select:valid{ color:#fff; }
+
+.signup-input-group select{
+  appearance:none;
+  -webkit-appearance:none;
+  padding-right:2.6rem;
+  background-image:url("car3.webp");
+  background-repeat:no-repeat;
+  background-position:right 1rem center;
+  background-size:12px;
+}
+
+.signup-input-group input:focus,
+.signup-input-group select:focus{
+  border-color:var(--red);
+  box-shadow:0 0 0 4px rgba(225,6,0,.15);
+  background:rgba(11,14,19,.85);
+}
+
+.signup-error-msg{
+  color:var(--red-bright);
+  font-size:.75rem;
+  font-weight:600;
+  margin-top:4px;
+  margin-bottom:12px;
+  display:none;
+  padding-left:.5rem;
+  text-align:left;
+  line-height:1.4;
+}
+.signup-error-msg.show{ display:block; }
+.signup-input-group.has-error{ margin-bottom:0; }
+.signup-terms-row.has-error{ margin-bottom:0; }
+
+/* ---------- Terms ---------- */
+.signup-terms-row{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  margin:.3rem 0 1.2rem 0;
+  font-size:.82rem;
+  color:var(--text-soft);
+  cursor:pointer;
+  justify-content:flex-start;
+  text-align:left;
+  font-weight:500;
+}
+.signup-terms-row input[type="checkbox"]{
+  width:16px;
+  height:16px;
+  accent-color:var(--red);
+  cursor:pointer;
+  flex-shrink:0;
+}
+.signup-terms-row a{
+  color:var(--amber);
+  text-decoration:none;
+  font-weight:700;
+}
+.signup-terms-row a:hover{ color:#fff; text-decoration:underline; }
+
+/* ---------- Submit ---------- */
+.signup-btn-wrapper{ display:flex; margin-bottom:18px; width:100%; }
+.signup-submit-btn{
+  width:100%;
+  padding:.88rem .9rem;
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  border:none;
+  border-radius:10px;
+  font-weight:800;
+  font-size:.9rem;
+  color:#fff;
+  cursor:pointer;
+  transition:all .35s var(--ease);
+  letter-spacing:.6px;
+  box-shadow:0 10px 26px rgba(225,6,0,.4);
+  text-transform:uppercase;
+  font-family:inherit;
+  position:relative;
+  overflow:hidden;
+}
+.signup-submit-btn::before{
+  content:'';
+  position:absolute;
+  top:0; left:-100%;
+  width:100%; height:100%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+  transition:left .5s ease;
+}
+.signup-submit-btn:hover::before{ left:100%; }
+.signup-submit-btn:hover{
+  background:linear-gradient(135deg, var(--red-bright), var(--red));
+  transform:translateY(-2px);
+  box-shadow:0 16px 36px rgba(225,6,0,.6);
+}
+.signup-submit-btn:disabled{ opacity:.95; cursor:wait; transform:none; }
+
+/* ---------- Feedback ---------- */
+.signup-feedback{
+  display:none;
+  padding:11px 15px;
+  border-radius:10px;
+  font-size:.8rem;
+  font-weight:600;
+  line-height:1.5;
+  margin-bottom:16px;
+  text-align:left;
+}
+.signup-feedback.show{ display:block; }
+.signup-feedback.success{
+  background:rgba(67,160,71,.10);
+  color:#8FE39B;
+  border:1px solid rgba(67,160,71,.35);
+  border-left:4px solid #43A047;
+}
+.signup-feedback.error{
+  background:rgba(225,6,0,.10);
+  color:#FF8A85;
+  border:1px solid rgba(225,6,0,.35);
+  border-left:4px solid var(--red);
+}
+.signup-feedback i{ margin-right:6px; }
+
+.signin-text{
+  text-align:center;
+  font-size:.85rem;
+  color:var(--text-soft);
+}
+.signin-text a{
+  color:var(--amber);
+  font-weight:700;
+  text-decoration:none;
+}
+.signin-text a:hover{ color:#fff; text-decoration:underline; }
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+@media (min-width:768px){
+  .signup-card{
+    flex-direction:row;
+    min-height:560px;
+    border-radius:24px;
+  }
+  .signup-visual{
+    flex:.9;
+    min-height:280px;
+    padding:2rem;
+    border-right:1px solid var(--line-2);
+  }
+  .signup-visual img{ max-width:240px; }
+  .signup-form{
+    padding:2.5rem 2.5rem 2.5rem 2rem;
+    flex:1.1;
+    text-align:left;
+  }
+  .signup-heading{ font-size:1.8rem; }
+  .signup-subhead{ font-size:.9rem; margin-bottom:24px; }
+  .signup-divider{ justify-content:flex-start; }
+  .signup-google-row{ justify-content:flex-start; }
+}
+
+@media (max-width:767px){
+  .signup-wrapper{ padding:1.5rem 0; }
+  .signup-card{ max-width:460px; margin:0 auto; border-radius:18px; }
+  .signup-form{ padding:2rem 1.5rem; text-align:center; }
+  .signup-visual{ border-bottom:1px solid var(--line-2); }
+}
+
+@media (max-width:420px){
+  .signup-form{ padding:1.5rem 1rem; }
+  .signup-heading{ font-size:1.4rem; }
+  .signup-subhead{ font-size:.8rem; margin-bottom:18px; }
+  .signup-input-group input,
+  .signup-input-group select{ padding:.68rem .7rem .68rem 2.4rem; font-size:.84rem; }
+  .signup-submit-btn{ padding:.78rem .6rem; font-size:.82rem; }
+  .signup-visual{ min-height:200px; padding:1rem; }
+  .signup-visual img{ max-width:170px; }
+  .signup-error-msg{ font-size:.72rem; padding-left:.4rem; }
+  .signup-terms-row{ font-size:.75rem; }
+}
+
+::-webkit-scrollbar{ width:8px; }
+::-webkit-scrollbar-track{ background:var(--carbon); }
+::-webkit-scrollbar-thumb{ background:var(--steel); border-radius:4px; border:2px solid var(--carbon); }
+::-webkit-scrollbar-thumb:hover{ background:var(--red); }
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:.001ms !important;
+    transition-duration:.001ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+  <div id="header-placeholder"></div>
+
+  <div class="main-wrapper">
+    <div class="signup-wrapper">
+      <div class="signup-card">
+
+        <!-- ============ VISUAL PANEL ============ -->
+        <div class="signup-visual">
+          <img src="car1.webp" alt="Automotive" loading="lazy"
+               onerror="this.style.display='none'; document.getElementById('signupSvgFallback').style.display='block';" />
+
+          <div id="signupSvgFallback" class="signup-svg-fallback" style="display:none;">
+            <svg viewBox="0 0 300 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="carGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#FF2A1F"/>
+                  <stop offset="100%" stop-color="#A80400"/>
+                </linearGradient>
+              </defs>
+              <rect width="300" height="340" rx="16" fill="#0B0E13"/>
+              <circle cx="150" cy="150" r="105" fill="#E10600" opacity="0.15"/>
+              <circle cx="150" cy="150" r="72" fill="none" stroke="#FFB020" stroke-width="2" stroke-dasharray="6 6" opacity="0.55"/>
+
+              <!-- Car body -->
+              <path d="M70 175 L95 135 Q100 128 108 128 L192 128 Q200 128 205 135 L230 175 L245 178 Q255 180 255 190 L255 210 Q255 218 247 218 L235 218 Q230 205 218 205 Q206 205 201 218 L99 218 Q94 205 82 205 Q70 205 65 218 L53 218 Q45 218 45 210 L45 190 Q45 180 55 178 Z"
+                    fill="url(#carGrad)" stroke="#FFB020" stroke-width="2" stroke-linejoin="round"/>
+              <!-- Windows -->
+              <path d="M105 138 L125 138 L125 165 L96 165 Z" fill="#0B0E13" opacity="0.6"/>
+              <path d="M133 138 L167 138 L167 165 L133 165 Z" fill="#0B0E13" opacity="0.6"/>
+              <path d="M175 138 L195 138 L204 165 L175 165 Z" fill="#0B0E13" opacity="0.6"/>
+              <!-- Headlight -->
+              <ellipse cx="240" cy="188" rx="6" ry="5" fill="#FFB020"/>
+              <!-- Wheels -->
+              <circle cx="82" cy="218" r="17" fill="#232A36" stroke="#FFB020" stroke-width="2"/>
+              <circle cx="82" cy="218" r="6" fill="#FFB020"/>
+              <circle cx="218" cy="218" r="17" fill="#232A36" stroke="#FFB020" stroke-width="2"/>
+              <circle cx="218" cy="218" r="6" fill="#FFB020"/>
+
+              <text x="150" y="272" text-anchor="middle" font-family="Outfit, Inter, sans-serif" font-size="16" font-weight="800" fill="#ffffff" letter-spacing="1">AUTOMOTIVE</text>
+              <text x="150" y="292" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#FFB020" letter-spacing="1">Certified · Precision · Performance</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- ============ FORM PANEL ============ -->
+        <div class="signup-form">
+          <h1 class="signup-heading">Create Your Account</h1>
+          <p class="signup-subhead">
+            Join <strong>Automotive</strong> — certified vehicles, expert servicing, and genuine parts at your fingertips. Same-day booking, transparent pricing, and trusted by 50,000+ drivers.
+          </p>
+
+          <div class="signup-feedback" id="signupFeedback" role="status" aria-live="polite"></div>
+
+          <!-- Google Sign Up -->
+          <a href="404.html" class="signup-google-row" id="googleSignupBtn">
+            <span class="signup-google-icon">
+              <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+              </svg>
+            </span>
+            <span>Sign up with Google</span>
+          </a>
+
+          <div class="signup-divider"><hr /><span>Or</span><hr /></div>
+
+          <!-- Role selector -->
+          <div class="signup-input-group">
+            <i class="fas fa-user-tag"></i>
+            <select id="signupRole" required>
+              <option value="">Select your account type</option>
+              <option value="customer">Customer · Personal Vehicle</option>
+              <option value="business">Business · Fleet / Wholesale</option>
+            </select>
+          </div>
+          <div class="signup-error-msg" id="roleError">Please select your account type.</div>
+
+          <!-- Full name -->
+          <div class="signup-input-group">
+            <i class="fas fa-user"></i>
+            <input type="text" id="fullName" placeholder="Enter your full name" required />
+          </div>
+          <div class="signup-error-msg" id="nameError">Please enter your full name (letters and spaces only).</div>
+
+          <!-- Email -->
+          <div class="signup-input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="email" placeholder="Enter your email address" required />
+          </div>
+          <div class="signup-error-msg" id="emailError">Please enter a valid email address.</div>
+
+          <!-- Password -->
+          <div class="signup-input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" placeholder="Create a password" required />
+          </div>
+          <div class="signup-error-msg" id="passwordError">Password: min 8 chars, 1 uppercase, 1 number, 1 special.</div>
+
+          <!-- Terms -->
+          <div class="signup-terms-row">
+            <input type="checkbox" id="termsCheck" />
+            <label for="termsCheck">I agree to the <a href="404.html">Terms &amp; Conditions</a></label>
+          </div>
+          <div class="signup-error-msg" id="termsError">You must agree to the Terms &amp; Conditions.</div>
+
+          <!-- Submit -->
+          <div class="signup-btn-wrapper">
+            <button class="signup-submit-btn" id="signupBtn">Create Account</button>
+          </div>
+
+          <div class="signin-text">
+            Already have an account? <a href="login.html" id="signinLink">Sign In</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+<script>
+/* ============================
+   LOAD HEADER + FOOTER
+   ============================ */
+document.addEventListener('DOMContentLoaded', function () {
+  fetch('header.html')
+    .then(r => r.ok ? r.text() : Promise.reject('Header not found'))
+    .then(d => {
+      document.getElementById('header-placeholder').innerHTML = d;
+      initHeader();
+    })
+    .catch(err => console.warn('Header not loaded:', err));
+
+  fetch('footer.html')
+    .then(r => r.ok ? r.text() : Promise.reject('Footer not found'))
+    .then(d => {
+      document.getElementById('footer-placeholder').innerHTML = d;
+      initFooter();
+    })
+    .catch(err => console.warn('Footer not loaded:', err));
+});
+
+/* ============================
+   HEADER INIT
+   ============================ */
+function initHeader(){
+  const hamburger = document.getElementById('hamburgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (!hamburger || !mobileMenu) return;
+
+  function toggleMenu(){
+    const isOpen = !mobileMenu.classList.contains('active');
+    hamburger.classList.toggle('active', isOpen);
+    mobileMenu.classList.toggle('active', isOpen);
+    document.documentElement.classList.toggle('menu-open', isOpen);
+    document.body.classList.toggle('menu-open', isOpen);
+    document.documentElement.style.overflow = isOpen ? 'hidden' : '';
+    document.body.style.overflow            = isOpen ? 'hidden' : '';
+    hamburger.setAttribute('aria-expanded', isOpen);
+  }
+  function closeMenu(){
+    if (!mobileMenu.classList.contains('active')) return;
+    hamburger.classList.remove('active');
+    mobileMenu.classList.remove('active');
+    document.documentElement.classList.remove('menu-open');
+    document.body.classList.remove('menu-open');
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    hamburger.setAttribute('aria-expanded', 'false');
+  }
+
+  hamburger.addEventListener('click', toggleMenu);
+  document.addEventListener('click', function (e) {
+    if (mobileMenu.classList.contains('active')) {
+      if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) closeMenu();
+    }
+  });
+  window.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
+  document.querySelectorAll('.mobile-nav-link, .mobile-action-link').forEach(l =>
+    l.addEventListener('click', closeMenu));
+}
+
+/* ============================
+   FOOTER INIT — newsletter validation
+   ============================ */
+function initFooter(){
+  function validateEmail(email){
+    return /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(email);
+  }
+
+  /* DESKTOP */
+  (function(){
+    var btn = document.getElementById('footerSubscribeBtn');
+    var input = document.getElementById('footerEmail');
+    var err = document.getElementById('footerEmailError');
+    if (!btn || !input || !err) return;
+
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var email = input.value.trim();
+      if (!email){
+        err.textContent = 'Please enter your email address';
+        err.classList.add('show');
+        input.classList.add('error');
+      } else if (!validateEmail(email)){
+        err.textContent = 'Please enter a valid email address';
+        err.classList.add('show');
+        input.classList.add('error');
+      } else {
+        err.classList.remove('show');
+        input.classList.remove('error');
+        window.location.href = '404.html';
+      }
+    });
+
+    input.addEventListener('input', function(){
+      if (this.value.trim()){ err.classList.remove('show'); this.classList.remove('error'); }
+    });
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') btn.click();
+    });
+  })();
+
+  /* MOBILE */
+  (function(){
+    var btn = document.getElementById('mobileFooterSubscribeBtn');
+    var input = document.getElementById('mobileFooterEmail');
+    var err = document.getElementById('mobileFooterEmailError');
+    if (!btn || !input || !err) return;
+
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var email = input.value.trim();
+      if (!email){
+        err.textContent = 'Please enter your email address';
+        err.classList.add('show');
+        input.classList.add('error');
+      } else if (!validateEmail(email)){
+        err.textContent = 'Please enter a valid email address';
+        err.classList.add('show');
+        input.classList.add('error');
+      } else {
+        err.classList.remove('show');
+        input.classList.remove('error');
+        window.location.href = '404.html';
+      }
+    });
+
+    input.addEventListener('input', function(){
+      if (this.value.trim()){ err.classList.remove('show'); this.classList.remove('error'); }
+    });
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') btn.click();
+    });
+  })();
+}
+
+/* ============================
+   SIGNUP LOGIC
+   ============================ */
+(function signup(){
+  const roleSelect = document.getElementById('signupRole');
+  const fullNameInput = document.getElementById('fullName');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const termsCheck = document.getElementById('termsCheck');
+
+  const roleError = document.getElementById('roleError');
+  const nameError = document.getElementById('nameError');
+  const emailError = document.getElementById('emailError');
+  const passwordError = document.getElementById('passwordError');
+  const termsError = document.getElementById('termsError');
+  const feedback = document.getElementById('signupFeedback');
+
+  const signupBtn = document.getElementById('signupBtn');
+  const USERS_KEY = 'automotive_users';
+
+  function setError(errEl, group, show){
+    if (show){ errEl.classList.add('show'); if (group) group.classList.add('has-error'); }
+    else { errEl.classList.remove('show'); if (group) group.classList.remove('has-error'); }
+  }
+  function clearGlobal(){ feedback.className = 'signup-feedback'; feedback.innerHTML = ''; }
+  function showGlobal(msg, type){
+    feedback.className = 'signup-feedback show ' + type;
+    feedback.innerHTML = (type === 'success'
+      ? '<i class="fas fa-check-circle"></i>'
+      : '<i class="fas fa-exclamation-circle"></i>') + msg;
+  }
+  function getUsers(){
+    try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); }
+    catch(e){ return []; }
+  }
+  function saveUsers(list){
+    try { localStorage.setItem(USERS_KEY, JSON.stringify(list)); return true; }
+    catch(e){ return false; }
+  }
+  function emailExists(email){
+    return getUsers().some(u => u.email === email.toLowerCase());
+  }
+  function newUserId(count, role){
+    const prefix = role === 'business' ? 'AU-B' : 'AU-C';
+    return prefix + String(1000 + count + 1).padStart(4, '0');
+  }
+
+  /* ---- live input listeners ---- */
+  roleSelect.addEventListener('change', function(){
+    if (roleSelect.value) setError(roleError, roleSelect.closest('.signup-input-group'), false);
+    clearGlobal();
+  });
+  fullNameInput.addEventListener('input', function(){
+    this.value = this.value.replace(/[^A-Za-z\s]/g, '');
+    if (this.value.trim()) setError(nameError, fullNameInput.closest('.signup-input-group'), false);
+    clearGlobal();
+  });
+  emailInput.addEventListener('input', function(){
+    if (this.value.trim()) setError(emailError, emailInput.closest('.signup-input-group'), false);
+    clearGlobal();
+  });
+  passwordInput.addEventListener('input', function(){
+    if (this.value.trim()) setError(passwordError, passwordInput.closest('.signup-input-group'), false);
+    clearGlobal();
+  });
+  termsCheck.addEventListener('change', function(){
+    if (this.checked) setError(termsError, termsCheck.closest('.signup-terms-row'), false);
+    clearGlobal();
+  });
+
+  /* ---- validators ---- */
+  const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  const pwdOk = v => v.length >= 8
+                  && /[A-Z]/.test(v)
+                  && /[0-9]/.test(v)
+                  && /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(v);
+
+  /* ---- submit ---- */
+  signupBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    clearGlobal();
+    let valid = true;
+
+    if (!roleSelect.value){
+      roleError.textContent = 'Please select your account type (Customer or Business / Fleet).';
+      setError(roleError, roleSelect.closest('.signup-input-group'), true);
+      valid = false;
+    } else {
+      setError(roleError, roleSelect.closest('.signup-input-group'), false);
+    }
+
+    const name = fullNameInput.value.trim();
+    if (!name || name.length < 2){
+      nameError.textContent = 'Please enter your full name (min 2 characters).';
+      setError(nameError, fullNameInput.closest('.signup-input-group'), true);
+      valid = false;
+    } else {
+      setError(nameError, fullNameInput.closest('.signup-input-group'), false);
+    }
+
+    const email = emailInput.value.trim().toLowerCase();
+    if (!email || !emailOk(email)){
+      emailError.textContent = 'Please enter a valid email address.';
+      setError(emailError, emailInput.closest('.signup-input-group'), true);
+      valid = false;
+    } else {
+      setError(emailError, emailInput.closest('.signup-input-group'), false);
+    }
+
+    const pwd = passwordInput.value;
+    if (!pwd || !pwdOk(pwd)){
+      passwordError.textContent = 'Password: min 8 chars, 1 uppercase, 1 number & 1 special character.';
+      setError(passwordError, passwordInput.closest('.signup-input-group'), true);
+      valid = false;
+    } else {
+      setError(passwordError, passwordInput.closest('.signup-input-group'), false);
+    }
+
+    if (!termsCheck.checked){
+      termsError.textContent = 'You must agree to the Terms & Conditions.';
+      setError(termsError, termsCheck.closest('.signup-terms-row'), true);
+      valid = false;
+    } else {
+      setError(termsError, termsCheck.closest('.signup-terms-row'), false);
+    }
+
+    if (!valid) return;
+
+    if (emailExists(email)){
+      showGlobal('An account with <strong>' + email + '</strong> already exists. Please sign in instead.', 'error');
+      emailError.textContent = 'This email is already registered.';
+      setError(emailError, emailInput.closest('.signup-input-group'), true);
+      return;
+    }
+
+    const users = getUsers();
+    const newUser = {
+      userId: newUserId(users.length, roleSelect.value),
+      name: name,
+      email: email,
+      password: pwd,
+      role: roleSelect.value,
+      createdAt: Date.now()
+    };
+    users.push(newUser);
+
+    if (!saveUsers(users)){
+      showGlobal('Could not save your account. Please enable browser storage and try again.', 'error');
+      return;
+    }
+
+    const roleNames = {
+      customer: 'Customer · Personal Vehicle',
+      business: 'Business · Fleet / Wholesale'
+    };
+    const roleName = roleNames[newUser.role] || 'Member';
+
+    try {
+      sessionStorage.setItem('automotive_signup_success',
+        'Welcome, <strong>' + name.split(' ')[0] + '</strong>! ' +
+        'Your <strong>' + roleName + '</strong> account (' +
+        '<strong>' + newUser.userId + '</strong>) is ready. Please sign in to continue.');
+    } catch(e){}
+
+    signupBtn.disabled = true;
+    signupBtn.innerHTML = '<i class="fas fa-check"></i> Account Created!';
+    signupBtn.style.background = 'linear-gradient(135deg, #43A047, #2E7D32)';
+
+    showGlobal('Welcome to Automotive, <strong>' + name.split(' ')[0] + '</strong>! ' +
+               'Registered as <strong>' + roleName + '</strong>. ' +
+               'Redirecting to login…', 'success');
+
+    setTimeout(() => { window.location.href = 'login.html'; }, 1800);
+  });
+
+  /* ---- Enter submits ---- */
+  document.querySelectorAll('.signup-input-group input, .signup-input-group select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') signupBtn.click(); });
+  });
+
+  /* ---- Sign-in link ---- */
+  document.getElementById('signinLink').addEventListener('click', function(e){
+    e.preventDefault();
+    window.location.href = 'login.html';
+  });
+
+  console.log('🚗 Sign Up ready — Automotive (2 dashboards: customer / business)');
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,2352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Automotive — Business Fleet Dashboard</title>
+
+<!-- ============================================================
+     AUTH GUARD — business only
+     ============================================================ -->
+<script>
+(function guardBusinessDashboard() {
+  console.log('%c[AUTH] Business guard running...', 'color:#FFB020;font-weight:bold');
+
+  let session = null;
+  try {
+    const raw = sessionStorage.getItem('automotive_session') || localStorage.getItem('automotive_session');
+    session = raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    console.warn('[AUTH] Storage blocked:', e);
+  }
+
+  const isValid = session &&
+                  session.authenticated === true &&
+                  typeof session.expiresAt === 'number' &&
+                  session.expiresAt > Date.now() &&
+                  session.role === 'business';
+
+  if (!isValid) {
+    console.log('%c[AUTH] ❌ Invalid — redirecting to login.html', 'color:#dc2626;font-weight:bold');
+    try {
+      sessionStorage.removeItem('automotive_session');
+      localStorage.removeItem('automotive_session');
+    } catch (_) {}
+    window.location.replace('login.html');
+    return;
+  }
+
+  console.log('%c[AUTH] ✅ Valid — showing fleet dashboard', 'color:#16a34a;font-weight:bold');
+  window.__AUTOMOTIVE_BUSINESS__ = session;
+})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+/* ==========================================================
+   AUTOMOTIVE COLOR SYSTEM
+   ========================================================== */
+:root{
+  --carbon:      #0B0E13;
+  --graphite:    #141922;
+  --steel:       #232A36;
+
+  --red:         #E10600;
+  --red-bright:  #FF2A1F;
+  --red-deep:    #A80400;
+
+  --amber:       #FFB020;
+  --amber-d:     #E08A00;
+
+  --green:       #22C55E;
+
+  --silver:      #C9D1DC;
+  --text:        #EEF2F8;
+  --text-soft:   #A9B3C0;
+  --text-mute:   #8B96A6;
+
+  --line:        rgba(201,209,220,.12);
+  --line-2:      rgba(201,209,220,.22);
+
+  --card-bg:     linear-gradient(160deg, rgba(20,25,34,.96), rgba(11,14,19,.99));
+  --card-bd:     rgba(201,209,220,.14);
+
+  --ease:        cubic-bezier(.22,.61,.36,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { max-width: 100vw; overflow-x: hidden !important; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background:
+    radial-gradient(1200px 700px at 78% -10%, rgba(225,6,0,.14), transparent 62%),
+    radial-gradient(900px 500px at 4% 6%, rgba(255,176,32,.06), transparent 60%),
+    var(--carbon);
+  height: 100vh;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 14px;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--carbon); }
+::-webkit-scrollbar-thumb { background: var(--steel); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--red); }
+
+/* ===== APP SHELL ===== */
+.app { display:flex; height:100vh; width:100%; overflow:hidden; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 268px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #1a0000 0%, #141922 40%, #0B0E13 100%);
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid var(--red-deep);
+  box-shadow: 4px 0 28px rgba(0,0,0,.6);
+  overflow: hidden;
+  z-index: 20;
+  position: relative;
+}
+.sidebar::after{
+  content:'';
+  position:absolute;
+  left:0; right:0; top:0;
+  height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+  pointer-events:none;
+}
+
+.sidebar-logo {
+  height: 84px;
+  display: flex; align-items: center;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--line);
+  flex-shrink: 0;
+}
+.sidebar-logo img {
+  height: 56px; width: auto;
+  object-fit: contain; display: block;
+  filter: drop-shadow(0 0 14px rgba(255,255,255,.08));
+}
+.sidebar-logo .fallback-brand{
+  display:none; align-items:center; gap:10px;
+  color:var(--red-bright);
+  font-family:'Outfit',sans-serif;
+  font-weight:900; font-size:1.05rem;
+}
+.sidebar-logo .fallback-brand i{
+  width:38px; height:38px;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--red),var(--red-deep));
+  color:#fff;
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:1rem;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 12px;
+  overflow-y: auto;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.sidebar-nav::-webkit-scrollbar { width: 3px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: var(--red); border-radius: 10px; }
+
+.nav-link {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  color: var(--text-soft);
+  text-decoration: none;
+  font-size: 0.83rem; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border-left: 3px solid transparent;
+  white-space: nowrap;
+}
+.nav-link i {
+  width: 18px; font-size: 0.88rem;
+  color: var(--red-bright);
+  text-align: center;
+  transition: 0.25s;
+}
+.nav-link:hover {
+  background: rgba(225,6,0,.12);
+  color: #fff;
+  border-left-color: rgba(255,176,32,.6);
+}
+.nav-link:hover i { color: var(--amber); }
+.nav-link.active {
+  background: linear-gradient(135deg, rgba(225,6,0,.22), rgba(255,176,32,.10));
+  color: #fff;
+  border-left-color: var(--red-bright);
+  box-shadow: inset 0 0 0 1px rgba(225,6,0,.25);
+}
+.nav-link.active i { color: var(--amber); }
+
+.nav-divider { height: 1px; background: var(--line); margin: 10px 4px; }
+
+.nav-link.logout { color: #FF8A85; }
+.nav-link.logout i { color: #FF8A85; }
+.nav-link.logout:hover { background: rgba(225,6,0,.18); color: #FFD9D7; }
+
+.sidebar-footer {
+  padding: 16px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--line);
+}
+.user-badge {
+  background: rgba(20,25,34,.9);
+  border: 1px solid rgba(225,6,0,.28);
+  border-radius: 14px;
+  padding: 14px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.user-badge::before{
+  content:'';
+  position:absolute;
+  top:-30px; right:-30px;
+  width:80px; height:80px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(225,6,0,.3), transparent 70%);
+  pointer-events:none;
+}
+.user-badge .icon-circle {
+  width: 36px; height: 36px;
+  background: linear-gradient(135deg,var(--red),var(--red-deep));
+  border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 0.88rem;
+  margin-bottom: 8px;
+  box-shadow: 0 6px 16px rgba(225,6,0,.4);
+}
+.user-badge .role {
+  font-size: 0.68rem; font-weight: 800;
+  color: #fff; letter-spacing: .4px;
+  text-transform: uppercase;
+}
+.user-badge .name {
+  font-size: 0.65rem; color: var(--text-soft);
+  margin: 3px 0 9px; word-break: break-word;
+  font-weight: 600;
+}
+.user-badge .status {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: rgba(34,197,94,.15);
+  border: 1px solid rgba(34,197,94,.35);
+  border-radius: 20px;
+  padding: 4px 11px;
+  font-size: 0.58rem; font-weight: 800;
+  color: #4ade80; letter-spacing: .3px;
+}
+.user-badge .status::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: #4ade80;
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(74,222,128,.7);
+  animation:ping 1.6s infinite;
+}
+@keyframes ping{
+  0%{ box-shadow:0 0 0 0 rgba(74,222,128,.6); }
+  70%{ box-shadow:0 0 0 8px rgba(74,222,128,0); }
+  100%{ box-shadow:0 0 0 0 rgba(74,222,128,0); }
+}
+.sidebar-copy {
+  text-align: center;
+  font-size: 0.58rem;
+  color: var(--text-mute);
+  margin-top: 10px;
+}
+
+/* ===== MAIN ===== */
+.main-wrapper {
+  flex: 1;
+  display: flex; flex-direction: column;
+  height: 100vh; min-width: 0;
+  overflow: hidden;
+}
+
+/* ===== HEADER ===== */
+.main-header {
+  background: rgba(20,25,34,.85);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+  border-bottom: 1px solid var(--line);
+  padding: 0 24px;
+  height: 76px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px;
+  flex-shrink: 0;
+  z-index: 10;
+  position: relative;
+}
+.main-header::after{
+  content:'';
+  position:absolute;
+  bottom:0; left:0; right:0;
+  height:2px;
+  background:linear-gradient(90deg, var(--red), var(--amber) 30%, transparent 80%);
+  pointer-events:none;
+}
+.header-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.mobile-logo { display: none; }
+.mobile-logo img { height: 48px; width: auto; }
+
+.header-title h1 {
+  font-family:'Outfit',sans-serif;
+  font-size: 1.2rem; font-weight: 800;
+  color: #fff; letter-spacing: -0.3px;
+  line-height: 1.2;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.header-title p {
+  font-size: 0.72rem; color: var(--text-soft);
+  margin-top: 2px; font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.header-right { display: flex; align-items: center; gap: 16px; flex-shrink: 0; }
+
+.date-pill {
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(11,14,19,.65);
+  border: 1px solid var(--line-2);
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 0.72rem; font-weight: 600;
+  color: var(--text); cursor: pointer;
+  transition: 0.2s;
+}
+.date-pill:hover { background: rgba(11,14,19,.9); border-color: rgba(225,6,0,.35); }
+.date-pill i { color: var(--red-bright); }
+
+.bell-btn {
+  position: relative;
+  cursor: pointer;
+  color: var(--silver);
+  font-size: 1.1rem;
+  transition: 0.2s;
+  background: transparent; border: none; padding: 6px;
+}
+.bell-btn:hover { color: var(--amber); }
+.bell-badge {
+  position: absolute;
+  top: 0; right: -2px;
+  background: linear-gradient(135deg,var(--red),var(--red-deep));
+  color: #fff;
+  font-size: 0.55rem; font-weight: 800;
+  width: 18px; height: 18px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  border: 2px solid var(--graphite);
+  box-shadow: 0 4px 10px rgba(225,6,0,.5);
+}
+
+.user-block {
+  display: flex; align-items: center; gap: 12px;
+  padding-left: 16px;
+  border-left: 1px solid var(--line);
+}
+.user-text { text-align: right; }
+.user-text .name { font-size: 0.78rem; font-weight: 800; color: #fff; }
+.user-text .role {
+  font-size: 0.58rem; color: var(--amber);
+  font-weight: 800; text-transform: uppercase;
+  letter-spacing: 0.6px; margin-top: 3px;
+}
+.user-avatar {
+  position: relative;
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 800; font-size: 0.78rem;
+  cursor: pointer;
+  transition: 0.25s;
+  box-shadow: 0 8px 22px rgba(225,6,0,.4);
+  border: 2px solid rgba(255,255,255,.08);
+}
+.user-avatar:hover { transform: scale(1.05); }
+
+.profile-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px); right: 0;
+  background: linear-gradient(160deg, rgba(20,25,34,.98), rgba(11,14,19,.99));
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.7);
+  width: 200px; padding: 6px 0;
+  z-index: 9999;
+}
+.profile-menu.show { display: block; }
+.profile-menu a {
+  display: block; padding: 10px 16px;
+  font-size: 0.78rem; color: var(--text-soft);
+  text-decoration: none; transition: 0.2s; font-weight: 500;
+}
+.profile-menu a i { color: var(--red-bright); margin-right: 10px; width: 14px; }
+.profile-menu a:hover { background: rgba(225,6,0,.1); color: #fff; }
+.profile-menu hr { border: none; border-top: 1px solid var(--line); margin: 4px 0; }
+.profile-menu a.danger { color: #FF8A85; }
+.profile-menu a.danger i { color: #FF8A85; }
+.profile-menu a.danger:hover { background: rgba(225,6,0,.15); }
+
+.notif-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 12px); right: 0;
+  background: linear-gradient(160deg, rgba(20,25,34,.98), rgba(11,14,19,.99));
+  border-radius: 14px;
+  border: 1px solid var(--line-2);
+  border-top: 3px solid var(--red);
+  box-shadow: 0 24px 60px rgba(0,0,0,.8);
+  width: 380px; max-width: calc(100vw - 32px);
+  padding: 6px 0;
+  max-height: 460px; overflow-y: auto;
+  z-index: 9999;
+}
+.notif-dropdown.show { display: block; }
+.notif-head {
+  padding: 14px 20px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0;
+  background: rgba(11,14,19,.98);
+  font-weight: 800; font-size: 0.86rem; color: #fff;
+}
+.notif-head .badge {
+  background: linear-gradient(135deg,var(--red),var(--red-deep));
+  color: #fff;
+  font-size: 0.6rem; font-weight: 800;
+  padding: 3px 9px; border-radius: 20px;
+}
+.notif-item {
+  padding: 13px 20px;
+  display: flex; gap: 12px;
+  border-bottom: 1px solid var(--line);
+  transition: .2s;
+}
+.notif-item:hover{ background:rgba(225,6,0,.05); }
+.notif-item:last-of-type { border-bottom: none; }
+.notif-item .ni-icon {
+  width: 40px; height: 40px; flex-shrink: 0;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+}
+.notif-item .ni-body { flex: 1; min-width: 0; }
+.notif-item .ni-title { font-size: 0.8rem; font-weight: 700; color: #fff; }
+.notif-item .ni-desc { font-size: 0.72rem; color: var(--text-soft); margin-top: 3px; word-wrap: break-word; }
+.notif-item .ni-time { font-size: 0.62rem; color: var(--text-mute); margin-top: 4px; }
+.notif-footer {
+  display: block; padding: 12px; text-align: center;
+  font-size: 0.74rem; color: var(--amber); font-weight: 800;
+  text-decoration: none; border-top: 1px solid var(--line);
+  position: sticky; bottom: 0;
+  background: rgba(11,14,19,.98);
+}
+.notif-footer:hover { background: rgba(255,176,32,.08); color: #fff; }
+
+/* ===== MOBILE NAV ===== */
+.mobile-nav {
+  display: none;
+  background: linear-gradient(90deg, #1a0000 0%, #141922 50%, #0B0E13 100%);
+  border-bottom: 2px solid var(--red-deep);
+  padding: 10px 14px;
+  overflow-x: auto; overflow-y: hidden;
+  white-space: nowrap; gap: 8px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex-shrink: 0;
+}
+.mobile-nav::-webkit-scrollbar { display: none; }
+.mobile-nav .nav-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: transparent; border: none;
+  padding: 8px 16px;
+  font-size: 0.76rem; font-weight: 700;
+  color: var(--text-soft);
+  border-radius: 30px;
+  cursor: pointer;
+  transition: 0.25s;
+  font-family: inherit;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.mobile-nav .nav-btn i { color: var(--red-bright); font-size: 0.8rem; }
+.mobile-nav .nav-btn:hover { background: rgba(225,6,0,.15); color: #fff; }
+.mobile-nav .nav-btn.active {
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(225,6,0,.45);
+}
+.mobile-nav .nav-btn.active i { color: #fff; }
+.mobile-nav .nav-btn.logout { color: #FF8A85; }
+.mobile-nav .nav-btn.logout i { color: #FF8A85; }
+
+/* ===== DASH BODY ===== */
+.dash-body {
+  flex: 1;
+  overflow-y: auto; overflow-x: hidden;
+  padding: 22px;
+}
+.page-title-block { display: none; }
+.page-title-block h1 {
+  font-family:'Outfit',sans-serif;
+  font-size: 1.15rem; font-weight: 800;
+  color: #fff; letter-spacing: -.02em;
+}
+.page-title-block p { font-size: 0.74rem; color: var(--text-soft); margin-top: 3px; }
+
+.content-section { display: none; }
+.content-section.active { display: block; animation:fadeUp .4s var(--ease) both; }
+@keyframes fadeUp{
+  from{ opacity:0; transform:translateY(10px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+
+/* ===== CARD ===== */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-bd);
+  border-radius: 16px;
+  box-shadow: 0 8px 26px rgba(0,0,0,.4);
+  padding: 20px;
+  transition: 0.3s ease;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+}
+.card:hover {
+  border-color: rgba(225,6,0,.32);
+  box-shadow: 0 14px 38px rgba(0,0,0,.6), 0 0 0 1px rgba(225,6,0,.1);
+}
+.card-title {
+  font-family:'Outfit',sans-serif;
+  font-size: 0.95rem; font-weight: 800;
+  color: #fff;
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.card-title i { color: var(--red-bright); }
+.card-title .head-right {
+  margin-left: auto;
+  font-size: 0.66rem; font-weight: 800;
+  color: var(--amber); text-decoration: none;
+  text-transform: uppercase; letter-spacing: 0.6px;
+}
+.card-title .head-right:hover { color: #fff; text-decoration: underline; }
+.card-title .head-pill {
+  margin-left: auto;
+  font-size: 0.58rem; font-weight: 800;
+  color: var(--text-soft);
+  background: rgba(11,14,19,.7);
+  padding: 4px 10px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  border: 1px solid var(--line);
+}
+
+/* ===== GRIDS ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px; margin-bottom: 20px;
+}
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px; margin-bottom: 20px;
+}
+.two-col-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 14px; margin-bottom: 20px;
+  align-items: start;
+}
+.right-stack {
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+/* ===== STATS ===== */
+.stat-icon {
+  width: 40px; height: 40px;
+  border-radius: 11px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1rem; margin-bottom: 10px;
+  border: 1px solid transparent;
+}
+.stat-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 6px;
+}
+.stat-top .trend {
+  font-size: 0.66rem; font-weight: 800;
+  color: #4ade80;
+  background: rgba(34,197,94,.12);
+  padding: 3px 9px; border-radius: 20px;
+  border: 1px solid rgba(34,197,94,.25);
+}
+.stat-top .trend.soft {
+  color: var(--text-soft);
+  background: rgba(201,209,220,.08);
+  border-color: var(--line);
+}
+.stat-top .trend.warn {
+  color: var(--amber);
+  background: rgba(255,176,32,.12);
+  border-color: rgba(255,176,32,.3);
+}
+.stat-top .trend.down {
+  color: #FF8A85;
+  background: rgba(225,6,0,.12);
+  border-color: rgba(225,6,0,.25);
+}
+.stat-label {
+  font-size: 0.64rem;
+  color: var(--text-mute);
+  font-weight: 800; letter-spacing: 0.8px;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.stat-value {
+  font-family:'Outfit',sans-serif;
+  font-size: 1.5rem; font-weight: 900;
+  color: #fff; line-height: 1;
+  letter-spacing: -.02em;
+}
+.stat-value small {
+  font-size: 0.72rem; font-weight: 700;
+  color: var(--text-soft); margin-left: 2px;
+}
+
+.chart-wrap { height: 140px; width: 100%; }
+
+/* ===== LIST ITEMS ===== */
+.list-item {
+  background: rgba(11,14,19,.55);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex; justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  transition: .25s var(--ease);
+}
+.list-item:hover{
+  border-color:rgba(225,6,0,.3);
+  background:rgba(20,25,34,.8);
+  transform:translateX(2px);
+}
+.list-item:last-child { margin-bottom: 0; }
+.list-item .li-body { min-width: 0; flex: 1; }
+.list-item .li-title {
+  font-size: 0.82rem; font-weight: 800; color: #fff;
+  margin-bottom: 4px;
+  display:flex; align-items:center; gap:8px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.list-item .li-title .v-icon{
+  width:28px; height:28px;
+  border-radius:8px;
+  background:rgba(225,6,0,.15);
+  color:var(--red-bright);
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:.72rem;
+  flex-shrink:0;
+}
+.list-item .li-meta {
+  font-size: 0.7rem; color: var(--text-soft);
+  margin-bottom: 3px;
+}
+.list-item .li-date {
+  font-size: 0.66rem; color: var(--text-mute);
+}
+
+/* ===== PILLS ===== */
+.pill {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: 20px;
+  font-size: 0.6rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  white-space: nowrap; flex-shrink: 0;
+  border: 1px solid transparent;
+}
+.pill.available   { background: rgba(34,197,94,.14);   color: #4ade80; border-color: rgba(34,197,94,.3); }
+.pill.inservice   { background: rgba(255,176,32,.15);  color: var(--amber); border-color: rgba(255,176,32,.3); }
+.pill.offline     { background: rgba(201,209,220,.1);  color: var(--text-soft); border-color: var(--line-2); }
+.pill.maintenance { background: rgba(225,6,0,.15);     color: #FF8A85; border-color: rgba(225,6,0,.3); }
+.pill.paid        { background: rgba(34,197,94,.14);   color: #4ade80; border-color: rgba(34,197,94,.3); }
+.pill.pending     { background: rgba(255,176,32,.15);  color: var(--amber); border-color: rgba(255,176,32,.3); }
+.pill.overdue     { background: rgba(225,6,0,.15);     color: #FF8A85; border-color: rgba(225,6,0,.3); }
+.pill.approved    { background: rgba(34,197,94,.14);   color: #4ade80; border-color: rgba(34,197,94,.3); }
+.pill.shipped     { background: rgba(255,176,32,.15);  color: var(--amber); border-color: rgba(255,176,32,.3); }
+.pill.delivered   { background: rgba(34,197,94,.14);   color: #4ade80; border-color: rgba(34,197,94,.3); }
+
+/* ===== PROGRESS ===== */
+.prog-bg {
+  background: rgba(11,14,19,.7);
+  height: 8px; border-radius: 10px;
+  overflow: hidden; margin-bottom: 10px;
+  border: 1px solid var(--line);
+}
+.prog-fill {
+  height: 100%; border-radius: 10px;
+  background: linear-gradient(90deg, var(--red), var(--amber));
+  transition: width 0.6s ease;
+  box-shadow: 0 0 12px rgba(255,176,32,.4);
+}
+.goal-text {
+  font-size: 0.74rem; color: var(--text-soft);
+  font-weight: 600; margin-bottom: 8px;
+}
+.goal-text strong { color: #fff; font-weight: 800; }
+.goal-hint {
+  font-size: 0.7rem; color: var(--text-soft);
+  line-height: 1.55;
+}
+.goal-hint strong { color: var(--amber); }
+
+/* ===== QUICK ACTIONS ===== */
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.quick-btn {
+  display: flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 13px 12px;
+  border-radius: 11px;
+  background: rgba(11,14,19,.6);
+  border: 1px solid var(--line-2);
+  color: var(--text);
+  font-size: 0.74rem; font-weight: 800;
+  text-align: center; text-decoration: none;
+  transition: 0.25s ease;
+  min-width: 0; overflow: hidden;
+}
+.quick-btn i {
+  color: var(--red-bright);
+  font-size: 0.82rem;
+  flex-shrink: 0; transition: 0.25s;
+}
+.quick-btn span {
+  overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.quick-btn:hover {
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  color: #fff; border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(225,6,0,.4);
+}
+.quick-btn:hover i { color: #fff; }
+
+/* ===== TABLE ===== */
+.table-wrap { overflow-x: auto; }
+table.activity {
+  width: 100%; border-collapse: collapse;
+  font-size: 0.78rem;
+}
+table.activity th {
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 0.62rem; font-weight: 800;
+  color: var(--text-mute);
+  text-transform: uppercase; letter-spacing: 0.6px;
+  border-bottom: 1px solid var(--line-2);
+  white-space: nowrap;
+}
+table.activity td {
+  padding: 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text-soft);
+}
+table.activity tr:hover td { background: rgba(225,6,0,.04); }
+table.activity tr:last-child td { border-bottom: none; }
+table.activity td.strong { font-weight: 800; color: #fff; }
+table.activity td.amt { font-weight: 800; color: var(--amber); }
+
+/* ===== BALANCE CARD ===== */
+.balance-card {
+  background: linear-gradient(135deg, #1a0000 0%, #2a0505 45%, #0B0E13 100%);
+  border-radius: 16px;
+  padding: 24px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid rgba(225,6,0,.3);
+}
+.balance-card::before {
+  content: '';
+  position: absolute;
+  top: -50px; right: -50px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(255,176,32,.25), transparent 70%);
+  border-radius: 50%;
+  pointer-events:none;
+}
+.balance-card::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: -60px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(225,6,0,.25), transparent 70%);
+  border-radius: 50%;
+  pointer-events:none;
+}
+.balance-card .label {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  font-weight: 800;
+  color: var(--amber);
+  position:relative; z-index:1;
+}
+.balance-card .amount {
+  font-family:'Outfit',sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  margin: 8px 0 6px;
+  letter-spacing: -.03em;
+  position:relative; z-index:1;
+}
+.balance-card .amount small {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+.balance-card .sub {
+  font-size: 0.74rem;
+  color: var(--text-soft);
+  position:relative; z-index:1;
+}
+.balance-card .balance-stats{
+  display:flex;
+  gap:22px;
+  margin-top:18px;
+  padding-top:18px;
+  border-top:1px solid rgba(201,209,220,.12);
+  position:relative;
+  z-index:1;
+  flex-wrap:wrap;
+}
+.balance-card .bstat{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+}
+.balance-card .bstat small{
+  font-size:.62rem;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  color:var(--text-mute);
+  font-weight:800;
+}
+.balance-card .bstat strong{
+  font-family:'Outfit',sans-serif;
+  font-size:1.05rem;
+  font-weight:900;
+  color:#fff;
+  letter-spacing:-.02em;
+}
+.balance-card .bstat strong.up{ color:#4ade80; }
+.balance-card .bstat strong.warn{ color:var(--amber); }
+
+/* ===== VEHICLE GRID ===== */
+.vehicle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+.vehicle-card {
+  background: rgba(11,14,19,.55);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  transition: 0.25s;
+  position:relative;
+  overflow:hidden;
+}
+.vehicle-card::before{
+  content:'';
+  position:absolute;
+  top:-40px; right:-40px;
+  width:120px; height:120px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(225,6,0,.15), transparent 70%);
+  pointer-events:none;
+}
+.vehicle-card:hover {
+  border-color: rgba(225,6,0,.4);
+  transform: translateY(-4px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.6);
+}
+.vehicle-card .vc-head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+  position:relative; z-index:1;
+}
+.vehicle-card .v-icon {
+  width: 54px; height: 54px;
+  background: linear-gradient(135deg, rgba(225,6,0,.18), rgba(255,176,32,.1));
+  color: var(--red-bright);
+  border: 1px solid rgba(225,6,0,.3);
+  border-radius: 14px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink:0;
+}
+.vehicle-card .v-title {
+  font-size: 0.9rem; font-weight: 800;
+  color: #fff; margin-bottom: 3px;
+}
+.vehicle-card .v-plate {
+  font-size: 0.68rem;
+  color: var(--amber);
+  font-weight: 800; letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+.vehicle-card .vc-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 14px;
+  position:relative; z-index:1;
+}
+.vehicle-card .vc-stat small {
+  display: block;
+  font-size: 0.58rem; font-weight: 800;
+  color: var(--text-mute);
+  text-transform: uppercase; letter-spacing: 0.6px;
+  margin-bottom: 4px;
+}
+.vehicle-card .vc-stat strong {
+  font-size: 0.82rem; font-weight: 800;
+  color: #fff;
+}
+.vehicle-card .vc-stat strong.warn { color: var(--amber); }
+.vehicle-card .vc-stat strong.bad { color: #FF8A85; }
+.vehicle-card .vc-actions {
+  display: flex; gap: 8px;
+  position:relative; z-index:1;
+  margin-bottom: 12px;
+}
+.vehicle-card .v-btn {
+  flex: 1;
+  text-align: center;
+  padding: 9px 10px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: 0.25s;
+  letter-spacing:.3px;
+  border: 1px solid transparent;
+}
+.vehicle-card .v-btn.primary {
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(225,6,0,.35);
+}
+.vehicle-card .v-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(225,6,0,.55);
+}
+.vehicle-card .v-btn.ghost {
+  background: rgba(11,14,19,.6);
+  border-color: var(--line-2);
+  color: var(--text-soft);
+}
+.vehicle-card .v-btn.ghost:hover {
+  border-color: var(--silver);
+  color: #fff;
+}
+.vehicle-card .v-pill-row {
+  display: flex; justify-content: flex-start;
+  position:relative; z-index:1;
+}
+
+/* ===== DRIVERS ===== */
+.driver-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+}
+.driver-card {
+  background: rgba(11,14,19,.55);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  transition: 0.25s;
+  position:relative;
+  overflow:hidden;
+}
+.driver-card:hover {
+  border-color: rgba(225,6,0,.4);
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(0,0,0,.6);
+}
+.driver-card .dr-head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 14px;
+}
+.driver-card .dr-avatar {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--red), var(--red-deep));
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.9rem;
+  display: inline-flex; align-items: center; justify-content: center;
+  box-shadow: 0 6px 16px rgba(225,6,0,.4);
+  flex-shrink:0;
+}
+.driver-card .dr-name {
+  font-size: 0.88rem; font-weight: 800;
+  color: #fff;
+  margin-bottom: 3px;
+}
+.driver-card .dr-role {
+  font-size: 0.66rem;
+  color: var(--text-mute);
+  font-weight: 600;
+}
+.driver-card .dr-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.driver-card .dr-stat small {
+  display: block;
+  font-size: 0.56rem; font-weight: 800;
+  color: var(--text-mute);
+  text-transform: uppercase; letter-spacing: 0.6px;
+  margin-bottom: 3px;
+}
+.driver-card .dr-stat strong {
+  font-size: 0.8rem; font-weight: 800;
+  color: #fff;
+}
+
+/* ===== MAINTENANCE TIMELINE ===== */
+.maintenance-list {
+  display: flex; flex-direction: column; gap: 12px;
+}
+.mnt-item {
+  display: flex; gap: 14px;
+  background: rgba(11,14,19,.55);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px;
+  align-items: center;
+  transition: .25s var(--ease);
+}
+.mnt-item:hover {
+  border-color: rgba(225,6,0,.3);
+  background: rgba(20,25,34,.8);
+}
+.mnt-item .m-date {
+  width: 60px; flex-shrink: 0;
+  text-align: center;
+  padding: 8px 4px;
+  border-radius: 10px;
+  background: rgba(225,6,0,.12);
+  border: 1px solid rgba(225,6,0,.25);
+}
+.mnt-item .m-date small {
+  display: block;
+  font-size: 0.55rem; font-weight: 800;
+  color: var(--amber);
+  text-transform: uppercase; letter-spacing: 0.8px;
+}
+.mnt-item .m-date strong {
+  font-family:'Outfit',sans-serif;
+  font-size: 1.2rem; font-weight: 900;
+  color: #fff;
+  line-height: 1;
+  margin-top: 3px;
+  display: block;
+}
+.mnt-item .m-body { flex: 1; min-width: 0; }
+.mnt-item .m-title {
+  font-size: 0.82rem; font-weight: 800;
+  color: #fff;
+  margin-bottom: 3px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mnt-item .m-meta {
+  font-size: 0.68rem;
+  color: var(--text-soft);
+}
+.mnt-item .m-tech {
+  font-size: 0.66rem;
+  color: var(--text-mute);
+  margin-top: 3px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1023px) {
+  .sidebar { display: none; }
+  .mobile-nav { display: flex; }
+  .mobile-logo { display: block; }
+  .header-title { display: none; }
+  .page-title-block { display: block; margin-bottom: 16px; }
+  .main-header { height: 70px; padding: 0 16px; }
+  .date-pill { display: none; }
+  .user-text { display: none; }
+  .user-block { padding-left: 12px; }
+}
+
+@media (max-width: 900px) {
+  .two-col-grid { grid-template-columns: 1fr; }
+  .charts-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .charts-grid { grid-template-columns: 1fr; gap: 10px; }
+  .two-col-grid { gap: 10px; }
+  .right-stack { gap: 10px; }
+  .chart-wrap { height: 160px; }
+  .dash-body { padding: 14px; }
+  .card { padding: 16px; }
+  .stat-value { font-size: 1.25rem; }
+  .main-header { padding: 0 12px; height: 66px; }
+  .mobile-nav { padding: 8px 12px; }
+  .mobile-nav .nav-btn { padding: 7px 14px; font-size: 0.72rem; }
+
+  table.activity thead { display: none; }
+  table.activity, table.activity tbody, table.activity tr, table.activity td {
+    display: block; width: 100%;
+  }
+  table.activity tr {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  table.activity tr:last-child { border-bottom: none; }
+  table.activity td {
+    padding: 4px 0; border: none;
+    display: flex; justify-content: space-between;
+    align-items: center;
+    font-size: 0.74rem;
+  }
+  table.activity td::before {
+    content: attr(data-label);
+    font-size: 0.62rem; font-weight: 800;
+    color: var(--text-mute);
+    text-transform: uppercase; letter-spacing: 0.5px;
+    margin-right: 10px;
+  }
+
+  .notif-dropdown { width: calc(100vw - 24px); right: -60px; }
+  .profile-menu { right: 0; }
+  .balance-card { padding: 20px; }
+  .balance-card .amount { font-size: 1.8rem; }
+}
+
+@media (max-width: 380px) {
+  .quick-btn { font-size: 0.68rem; padding: 11px 8px; }
+  .quick-btn i { font-size: 0.74rem; }
+  .quick-grid { gap: 8px; }
+  .mobile-nav .nav-btn { padding: 6px 12px; font-size: 0.68rem; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    transition-duration:.001ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html" style="text-decoration:none;">
+        <img src="logoo3.webp" alt="Automotive"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <span class="fallback-brand"><i class="fa-solid fa-car-side"></i> AUTOMOTIVE</span>
+      </a>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="nav-link active" data-page="dashboard"><i class="fa-solid fa-border-all"></i><span>Dashboard</span></a>
+      <a class="nav-link" data-page="fleet"><i class="fa-solid fa-truck-front"></i><span>Fleet</span></a>
+      <a class="nav-link" data-page="maintenance"><i class="fa-solid fa-screwdriver-wrench"></i><span>Maintenance</span></a>
+      <a class="nav-link" data-page="drivers"><i class="fa-solid fa-id-card"></i><span>Drivers</span></a>
+      <a class="nav-link" data-page="purchase-orders"><i class="fa-solid fa-clipboard-list"></i><span>Purchase Orders</span></a>
+      <a class="nav-link" data-page="invoices"><i class="fa-solid fa-receipt"></i><span>Invoices</span></a>
+      <a class="nav-link" data-page="reports"><i class="fa-solid fa-chart-line"></i><span>Reports</span></a>
+
+      <div class="nav-divider"></div>
+
+      <a class="nav-link logout" href="login.html" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i><span>Logout</span></a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-badge">
+        <div class="icon-circle"><i class="fa-solid fa-building"></i></div>
+        <div class="role">Business Fleet</div>
+        <div class="name" id="sidebarUserName">Fleet Manager</div>
+        <div class="status">Active · 14 vehicles</div>
+      </div>
+      <div class="sidebar-copy">© 2026 Automotive</div>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <main class="main-wrapper">
+
+    <!-- HEADER -->
+    <header class="main-header">
+      <div class="header-left">
+        <div class="mobile-logo">
+          <a href="index.html">
+            <img src="logoo3.webp" alt="Automotive"
+                 onerror="this.style.display='none';">
+          </a>
+        </div>
+        <div class="header-title">
+          <h1 id="pageTitle">Fleet Dashboard</h1>
+          <p id="pageSubtitle">Fleet status, maintenance, and procurement.</p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="date-pill" id="datePill">
+          <i class="fa-regular fa-calendar"></i>
+          <span id="dateText">Today, Oct 14 2026</span>
+          <i class="fa-solid fa-chevron-down" style="font-size:0.6rem;"></i>
+        </div>
+
+        <div style="position: relative;">
+          <button class="bell-btn" id="bellBtn" aria-label="Notifications">
+            <i class="fa-regular fa-bell"></i>
+            <span class="bell-badge">5</span>
+          </button>
+
+          <div class="notif-dropdown" id="notifDropdown">
+            <div class="notif-head">
+              <span>Notifications</span>
+              <span class="badge">5 new</span>
+            </div>
+            <div class="notif-item">
+              <div class="ni-icon" style="background:rgba(225,6,0,.15);color:#FF2A1F;"><i class="fa-solid fa-triangle-exclamation"></i></div>
+              <div class="ni-body">
+                <div class="ni-title">Vehicle MOT due</div>
+                <div class="ni-desc">TRK-004 · MOT expires Nov 02 · Book within 7 days</div>
+                <div class="ni-time">12 min ago</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="ni-icon" style="background:rgba(255,176,32,.15);color:#FFB020;"><i class="fa-solid fa-boxes-packing"></i></div>
+              <div class="ni-body">
+                <div class="ni-title">Parts shipment arriving</div>
+                <div class="ni-desc">PO-8842 · 12 brake pad sets · arriving today 4 PM</div>
+                <div class="ni-time">1 hour ago</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="ni-icon" style="background:rgba(34,197,94,.15);color:#4ade80;"><i class="fa-solid fa-check"></i></div>
+              <div class="ni-body">
+                <div class="ni-title">Maintenance completed</div>
+                <div class="ni-desc">TRK-002 · Mercedes Sprinter · 60k km service done</div>
+                <div class="ni-time">3 hours ago</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="ni-icon" style="background:rgba(225,6,0,.15);color:#FF2A1F;"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+              <div class="ni-body">
+                <div class="ni-title">Invoice #INV-2044 overdue</div>
+                <div class="ni-desc">$2,450 · due Oct 15 · payment pending</div>
+                <div class="ni-time">Yesterday</div>
+              </div>
+            </div>
+            <div class="notif-item">
+              <div class="ni-icon" style="background:rgba(201,209,220,.12);color:#C9D1DC;"><i class="fa-solid fa-user-check"></i></div>
+              <div class="ni-body">
+                <div class="ni-title">Driver licence renewal</div>
+                <div class="ni-desc">Marcus Chen · licence expires Nov 20</div>
+                <div class="ni-time">2 days ago</div>
+              </div>
+            </div>
+            <a href="404.html" class="notif-footer">View all notifications →</a>
+          </div>
+        </div>
+
+        <div class="user-block">
+          <div class="user-text">
+            <div class="name" id="headerUserName">Fleet Manager</div>
+            <div class="role">Business</div>
+          </div>
+          <div class="user-avatar" id="profileBtn">
+            <span id="avatarInitials">FM</span>
+            <div class="profile-menu" id="profileMenu">
+              <a href="404.html"><i class="fa-regular fa-user"></i>My Profile</a>
+              <a href="404.html"><i class="fa-solid fa-building"></i>Company Details</a>
+              <a href="404.html"><i class="fa-solid fa-users"></i>Team Access</a>
+              <a href="404.html"><i class="fa-solid fa-gear"></i>Settings</a>
+              <hr>
+              <a href="login.html" class="danger" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i>Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MOBILE NAV -->
+    <div class="mobile-nav">
+      <a class="nav-btn active" data-page="dashboard"><i class="fa-solid fa-border-all"></i> Dashboard</a>
+      <a class="nav-btn" data-page="fleet"><i class="fa-solid fa-truck-front"></i> Fleet</a>
+      <a class="nav-btn" data-page="maintenance"><i class="fa-solid fa-screwdriver-wrench"></i> Maintenance</a>
+      <a class="nav-btn" data-page="drivers"><i class="fa-solid fa-id-card"></i> Drivers</a>
+      <a class="nav-btn" data-page="purchase-orders"><i class="fa-solid fa-clipboard-list"></i> POs</a>
+      <a class="nav-btn" data-page="invoices"><i class="fa-solid fa-receipt"></i> Invoices</a>
+      <a class="nav-btn" data-page="reports"><i class="fa-solid fa-chart-line"></i> Reports</a>
+      <a class="nav-btn logout" href="login.html" onclick="handleLogout(event)"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    </div>
+
+    <!-- DASHBOARD BODY -->
+    <div class="dash-body">
+
+      <div class="page-title-block">
+        <h1 id="pageTitleMobile">Fleet Dashboard</h1>
+        <p id="pageSubtitleMobile">Fleet status, maintenance, and procurement.</p>
+      </div>
+
+      <!-- ============ DASHBOARD ============ -->
+      <div id="section-dashboard" class="content-section active">
+
+        <div class="stats-grid">
+          <div class="card">
+            <div class="stat-top">
+              <div class="stat-icon" style="background:rgba(225,6,0,.15);color:#FF2A1F;"><i class="fa-solid fa-truck-front"></i></div>
+              <span class="trend soft">all active</span>
+            </div>
+            <div class="stat-label">Fleet Size</div>
+            <div class="stat-value">14<small>vehicles</small></div>
+          </div>
+          <div class="card">
+            <div class="stat-top">
+              <div class="stat-icon" style="background:rgba(34,197,94,.14);color:#4ade80;"><i class="fa-solid fa-circle-check"></i></div>
+              <span class="trend"><i class="fa-solid fa-arrow-up"></i> 92%</span>
+            </div>
+            <div class="stat-label">Operational</div>
+            <div class="stat-value">13<small>of 14</small></div>
+          </div>
+          <div class="card">
+            <div class="stat-top">
+              <div class="stat-icon" style="background:rgba(255,176,32,.15);color:#FFB020;"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+              <span class="trend warn"><i class="fa-solid fa-clock"></i> 3 scheduled</span>
+            </div>
+            <div class="stat-label">In Maintenance</div>
+            <div class="stat-value">1<small>in shop</small></div>
+          </div>
+          <div class="card">
+            <div class="stat-top">
+              <div class="stat-icon" style="background:rgba(225,6,0,.15);color:#FF2A1F;"><i class="fa-solid fa-receipt"></i></div>
+              <span class="trend down">2 due</span>
+            </div>
+            <div class="stat-label">Payables</div>
+            <div class="stat-value">$6,840</div>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="card">
+            <div class="card-title">
+              💰 Fleet Spend
+              <span class="head-pill">6 months</span>
+            </div>
+            <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              🚗 Fleet Status
+              <span class="head-pill">By state</span>
+            </div>
+            <div class="chart-wrap"><canvas id="fleetChart"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              🔧 Maintenance Events
+              <span class="head-pill">Last 6 months</span>
+            </div>
+            <div class="chart-wrap"><canvas id="maintenanceChart"></canvas></div>
+          </div>
+        </div>
+
+        <div class="two-col-grid">
+          <div class="card">
+            <div class="card-title">
+              🔧 Upcoming Maintenance & Parts
+              <a href="404.html" class="head-right">View All</a>
+            </div>
+
+            <div class="list-item">
+              <div class="li-body">
+                <div class="li-title"><span class="v-icon"><i class="fa-solid fa-circle-notch"></i></span> Brake Pad Replacement · TRK-004 (Isuzu NPR)</div>
+                <div class="li-meta">Work Order #WO-8821 · Parts arriving today</div>
+                <div class="li-date">Scheduled Oct 16, 2026 · 9:00 AM · Bay 3</div>
+              </div>
+              <span class="pill pending">Scheduled</span>
+            </div>
+
+            <div class="list-item">
+              <div class="li-body">
+                <div class="li-title"><span class="v-icon"><i class="fa-solid fa-oil-can"></i></span> 60k km Full Service · TRK-002 (Mercedes Sprinter)</div>
+                <div class="li-meta">Work Order #WO-8820 · Oil + filters + inspection</div>
+                <div class="li-date">Scheduled Oct 20, 2026 · 8:00 AM · Bay 1</div>
+              </div>
+              <span class="pill approved">Approved</span>
+            </div>
+
+            <div class="list-item">
+              <div class="li-body">
+                <div class="li-title"><span class="v-icon"><i class="fa-solid fa-clipboard-check"></i></span> Annual MOT Inspection · TRK-004</div>
+                <div class="li-meta">Work Order #WO-8819 · Government compliance</div>
+                <div class="li-date">Due Nov 02, 2026 · Book within 7 days</div>
+              </div>
+              <span class="pill overdue">Action Required</span>
+            </div>
+          </div>
+
+          <div class="right-stack">
+            <div class="card">
+              <div class="card-title">🎯 Monthly Budget</div>
+              <div class="goal-text"><strong>$18,420</strong> / $25,000 spent</div>
+              <div class="prog-bg"><div class="prog-fill" style="width:74%;"></div></div>
+              <div class="goal-hint">$6,580 remaining — <strong>on track</strong> for the month ✅</div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">⚡ Quick Actions</div>
+              <div class="quick-grid">
+                <a href="404.html" class="quick-btn">
+                  <i class="fa-solid fa-clipboard-list"></i><span>New PO</span>
+                </a>
+                <a href="404.html" class="quick-btn">
+                  <i class="fa-solid fa-truck-front"></i><span>Add Vehicle</span>
+                </a>
+                <a href="404.html" class="quick-btn">
+                  <i class="fa-solid fa-screwdriver-wrench"></i><span>Schedule Service</span>
+                </a>
+                <a href="404.html" class="quick-btn">
+                  <i class="fa-solid fa-user-plus"></i><span>Add Driver</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            📋 Recent Purchase Orders
+            <a href="404.html" class="head-right">View All</a>
+          </div>
+          <div class="table-wrap">
+            <table class="activity">
+              <thead>
+                <tr>
+                  <th>PO Number</th>
+                  <th>Order Date</th>
+                  <th>Supplier</th>
+                  <th>Description</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="PO" class="strong">#PO-8842</td>
+                  <td data-label="Date">12 Oct 2026</td>
+                  <td data-label="Supplier">Brembo Direct</td>
+                  <td data-label="Description">Brake pads · 12 sets</td>
+                  <td data-label="Amount" class="amt">$1,480.50</td>
+                  <td data-label="Status"><span class="pill shipped">Shipped</span></td>
+                </tr>
+                <tr>
+                  <td data-label="PO" class="strong">#PO-8841</td>
+                  <td data-label="Date">10 Oct 2026</td>
+                  <td data-label="Supplier">Mobil Lubricants</td>
+                  <td data-label="Description">5W-30 synthetic · 60L</td>
+                  <td data-label="Amount" class="amt">$1,240.00</td>
+                  <td data-label="Status"><span class="pill approved">Confirmed</span></td>
+                </tr>
+                <tr>
+                  <td data-label="PO" class="strong">#PO-8840</td>
+                  <td data-label="Date">08 Oct 2026</td>
+                  <td data-label="Supplier">EV Solutions Ltd</td>
+                  <td data-label="Description">Type-2 charging cables · 4 units</td>
+                  <td data-label="Amount" class="amt">$2,880.00</td>
+                  <td data-label="Status"><span class="pill pending">Awaiting Approval</span></td>
+                </tr>
+                <tr>
+                  <td data-label="PO" class="strong">#PO-8839</td>
+                  <td data-label="Date">05 Oct 2026</td>
+                  <td data-label="Supplier">Bosch Filters</td>
+                  <td data-label="Description">Air filters · 40 units</td>
+                  <td data-label="Amount" class="amt">$620.00</td>
+                  <td data-label="Status"><span class="pill delivered">Delivered</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ FLEET ============ -->
+      <div id="section-fleet" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-truck-front"></i> Fleet Vehicles</div>
+          <div class="vehicle-grid">
+
+            <div class="vehicle-card">
+              <div class="vc-head">
+                <div class="v-icon"><i class="fa-solid fa-truck"></i></div>
+                <div>
+                  <div class="v-title">Ford Transit 350</div>
+                  <div class="v-plate">TRK-001</div>
+                </div>
+              </div>
+              <div class="vc-stats">
+                <div class="vc-stat">
+                  <small>Year</small>
+                  <strong>2022</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Mileage</small>
+                  <strong>82,400 km</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Assigned Driver</small>
+                  <strong>Marcus C.</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Next Service</small>
+                  <strong class="warn">In 12 days</strong>
+                </div>
+              </div>
+              <div class="vc-actions">
+                <a href="404.html" class="v-btn primary">Book Service</a>
+                <a href="404.html" class="v-btn ghost">Details</a>
+              </div>
+              <div class="v-pill-row"><span class="pill available">Available</span></div>
+            </div>
+
+            <div class="vehicle-card">
+              <div class="vc-head">
+                <div class="v-icon"><i class="fa-solid fa-truck-moving"></i></div>
+                <div>
+                  <div class="v-title">Mercedes Sprinter</div>
+                  <div class="v-plate">TRK-002</div>
+                </div>
+              </div>
+              <div class="vc-stats">
+                <div class="vc-stat">
+                  <small>Year</small>
+                  <strong>2023</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Mileage</small>
+                  <strong>54,120 km</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Assigned Driver</small>
+                  <strong>Sarah M.</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Next Service</small>
+                  <strong>60k km</strong>
+                </div>
+              </div>
+              <div class="vc-actions">
+                <a href="404.html" class="v-btn primary">Book Service</a>
+                <a href="404.html" class="v-btn ghost">Details</a>
+              </div>
+              <div class="v-pill-row"><span class="pill available">Available</span></div>
+            </div>
+
+            <div class="vehicle-card">
+              <div class="vc-head">
+                <div class="v-icon"><i class="fa-solid fa-truck-pickup"></i></div>
+                <div>
+                  <div class="v-title">Toyota Hilux</div>
+                  <div class="v-plate">TRK-003</div>
+                </div>
+              </div>
+              <div class="vc-stats">
+                <div class="vc-stat">
+                  <small>Year</small>
+                  <strong>2020</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Mileage</small>
+                  <strong>120,780 km</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Assigned Driver</small>
+                  <strong>Unassigned</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Status</small>
+                  <strong class="bad">Offline</strong>
+                </div>
+              </div>
+              <div class="vc-actions">
+                <a href="404.html" class="v-btn primary">Review</a>
+                <a href="404.html" class="v-btn ghost">Details</a>
+              </div>
+              <div class="v-pill-row"><span class="pill offline">Offline</span></div>
+            </div>
+
+            <div class="vehicle-card">
+              <div class="vc-head">
+                <div class="v-icon"><i class="fa-solid fa-truck-ramp-box"></i></div>
+                <div>
+                  <div class="v-title">Isuzu NPR</div>
+                  <div class="v-plate">TRK-004</div>
+                </div>
+              </div>
+              <div class="vc-stats">
+                <div class="vc-stat">
+                  <small>Year</small>
+                  <strong>2021</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Mileage</small>
+                  <strong>95,200 km</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>Assigned Driver</small>
+                  <strong>Diego L.</strong>
+                </div>
+                <div class="vc-stat">
+                  <small>MOT Expires</small>
+                  <strong class="bad">Nov 02</strong>
+                </div>
+              </div>
+              <div class="vc-actions">
+                <a href="404.html" class="v-btn primary">Book MOT</a>
+                <a href="404.html" class="v-btn ghost">Details</a>
+              </div>
+              <div class="v-pill-row"><span class="pill maintenance">Action Required</span></div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ MAINTENANCE ============ -->
+      <div id="section-maintenance" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-screwdriver-wrench"></i> Maintenance Schedule</div>
+
+          <div class="maintenance-list">
+
+            <div class="mnt-item">
+              <div class="m-date">
+                <small>Oct</small>
+                <strong>16</strong>
+              </div>
+              <div class="m-body">
+                <div class="m-title">Brake Pad Replacement · TRK-004 (Isuzu NPR)</div>
+                <div class="m-meta">Work Order #WO-8821 · Bay 3 · 9:00 AM – 12:00 PM</div>
+                <div class="m-tech">Technician: Rajesh Kumar</div>
+              </div>
+              <span class="pill pending">Scheduled</span>
+            </div>
+
+            <div class="mnt-item">
+              <div class="m-date">
+                <small>Oct</small>
+                <strong>20</strong>
+              </div>
+              <div class="m-body">
+                <div class="m-title">60k km Full Service · TRK-002 (Mercedes Sprinter)</div>
+                <div class="m-meta">Work Order #WO-8820 · Bay 1 · 8:00 AM – 4:00 PM</div>
+                <div class="m-tech">Technician: Emily Johnson</div>
+              </div>
+              <span class="pill approved">Approved</span>
+            </div>
+
+            <div class="mnt-item">
+              <div class="m-date">
+                <small>Nov</small>
+                <strong>02</strong>
+              </div>
+              <div class="m-body">
+                <div class="m-title">Annual MOT Inspection · TRK-004</div>
+                <div class="m-meta">Work Order #WO-8819 · Government compliance · Due date</div>
+                <div class="m-tech">Technician: To be assigned</div>
+              </div>
+              <span class="pill overdue">Action Required</span>
+            </div>
+
+            <div class="mnt-item">
+              <div class="m-date">
+                <small>Nov</small>
+                <strong>08</strong>
+              </div>
+              <div class="m-body">
+                <div class="m-title">Tyre Rotation & Alignment · TRK-001</div>
+                <div class="m-meta">Work Order #WO-8822 · Bay 2 · 10:00 AM – 1:00 PM</div>
+                <div class="m-tech">Technician: Marcus Chen</div>
+              </div>
+              <span class="pill pending">Scheduled</span>
+            </div>
+
+            <div class="mnt-item">
+              <div class="m-date">
+                <small>Nov</small>
+                <strong>15</strong>
+              </div>
+              <div class="m-body">
+                <div class="m-title">Annual Safety Inspection · TRK-003</div>
+                <div class="m-meta">Work Order #WO-8823 · Multi-point inspection</div>
+                <div class="m-tech">Technician: To be assigned</div>
+              </div>
+              <span class="pill pending">Scheduled</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ DRIVERS ============ -->
+      <div id="section-drivers" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-id-card"></i> Drivers & Operators</div>
+
+          <div class="driver-grid">
+
+            <div class="driver-card">
+              <div class="dr-head">
+                <div class="dr-avatar">MC</div>
+                <div>
+                  <div class="dr-name">Marcus Chen</div>
+                  <div class="dr-role">Senior Driver · Licence #D-8821</div>
+                </div>
+              </div>
+              <div class="dr-stats">
+                <div class="dr-stat">
+                  <small>Assigned To</small>
+                  <strong>TRK-001</strong>
+                </div>
+                <div class="dr-stat">
+                  <small>Licence Expires</small>
+                  <strong>Nov 20, 2026</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="driver-card">
+              <div class="dr-head">
+                <div class="dr-avatar">SM</div>
+                <div>
+                  <div class="dr-name">Sarah Mitchell</div>
+                  <div class="dr-role">Driver · Licence #D-8832</div>
+                </div>
+              </div>
+              <div class="dr-stats">
+                <div class="dr-stat">
+                  <small>Assigned To</small>
+                  <strong>TRK-002</strong>
+                </div>
+                <div class="dr-stat">
+                  <small>Licence Expires</small>
+                  <strong>Aug 14, 2027</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="driver-card">
+              <div class="dr-head">
+                <div class="dr-avatar">DL</div>
+                <div>
+                  <div class="dr-name">Diego Lopez</div>
+                  <div class="dr-role">Driver · Licence #D-8841</div>
+                </div>
+              </div>
+              <div class="dr-stats">
+                <div class="dr-stat">
+                  <small>Assigned To</small>
+                  <strong>TRK-004</strong>
+                </div>
+                <div class="dr-stat">
+                  <small>Licence Expires</small>
+                  <strong>Mar 05, 2027</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="driver-card">
+              <div class="dr-head">
+                <div class="dr-avatar">AP</div>
+                <div>
+                  <div class="dr-name">Anita Patel</div>
+                  <div class="dr-role">Lead Technician · Cert #T-2201</div>
+                </div>
+              </div>
+              <div class="dr-stats">
+                <div class="dr-stat">
+                  <small>Specialty</small>
+                  <strong>Diesel Engines</strong>
+                </div>
+                <div class="dr-stat">
+                  <small>Cert Expires</small>
+                  <strong>Jan 12, 2028</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="driver-card">
+              <div class="dr-head">
+                <div class="dr-avatar">RK</div>
+                <div>
+                  <div class="dr-name">Rajesh Kumar</div>
+                  <div class="dr-role">Technician · Cert #T-2202</div>
+                </div>
+              </div>
+              <div class="dr-stats">
+                <div class="dr-stat">
+                  <small>Specialty</small>
+                  <strong>Brakes & Suspension</strong>
+                </div>
+                <div class="dr-stat">
+                  <small>Cert Expires</small>
+                  <strong>Sep 30, 2027</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="driver-card">
+              <div class="dr-head">
+                <div class="dr-avatar">EJ</div>
+                <div>
+                  <div class="dr-name">Emily Johnson</div>
+                  <div class="dr-role">Technician · Cert #T-2203</div>
+                </div>
+              </div>
+              <div class="dr-stats">
+                <div class="dr-stat">
+                  <small>Specialty</small>
+                  <strong>Diagnostics</strong>
+                </div>
+                <div class="dr-stat">
+                  <small>Cert Expires</small>
+                  <strong>Jun 22, 2028</strong>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ PURCHASE ORDERS ============ -->
+      <div id="section-purchase-orders" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-clipboard-list"></i> Purchase Orders</div>
+
+          <div class="table-wrap">
+            <table class="activity">
+              <thead>
+                <tr>
+                  <th>PO Number</th>
+                  <th>Order Date</th>
+                  <th>Supplier</th>
+                  <th>Items</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="PO" class="strong">#PO-8842</td>
+                  <td data-label="Date">12 Oct 2026</td>
+                  <td data-label="Supplier">Brembo Direct</td>
+                  <td data-label="Items">Brake pads (12)</td>
+                  <td data-label="Amount" class="amt">$1,480.50</td>
+                  <td data-label="Status"><span class="pill shipped">Shipped</span></td>
+                </tr>
+                <tr>
+                  <td data-label="PO" class="strong">#PO-8841</td>
+                  <td data-label="Date">10 Oct 2026</td>
+                  <td data-label="Supplier">Mobil Lubricants</td>
+                  <td data-label="Items">Synthetic 5W-30 (60L)</td>
+                  <td data-label="Amount" class="amt">$1,240.00</td>
+                  <td data-label="Status"><span class="pill approved">Confirmed</span></td>
+                </tr>
+                <tr>
+                  <td data-label="PO" class="strong">#PO-8840</td>
+                  <td data-label="Date">08 Oct 2026</td>
+                  <td data-label="Supplier">EV Solutions Ltd</td>
+                  <td data-label="Items">Charging cables (4)</td>
+                  <td data-label="Amount" class="amt">$2,880.00</td>
+                  <td data-label="Status"><span class="pill pending">Awaiting Approval</span></td>
+                </tr>
+                <tr>
+                  <td data-label="PO" class="strong">#PO-8839</td>
+                  <td data-label="Date">05 Oct 2026</td>
+                  <td data-label="Supplier">Bosch Filters</td>
+                  <td data-label="Items">Air filters (40)</td>
+                  <td data-label="Amount" class="amt">$620.00</td>
+                  <td data-label="Status"><span class="pill delivered">Delivered</span></td>
+                </tr>
+                <tr>
+                  <td data-label="PO" class="strong">#PO-8838</td>
+                  <td data-label="Date">02 Oct 2026</td>
+                  <td data-label="Supplier">Michelin Fleet</td>
+                  <td data-label="Items">Commercial tyres (16)</td>
+                  <td data-label="Amount" class="amt">$4,320.00</td>
+                  <td data-label="Status"><span class="pill delivered">Delivered</span></td>
+                </tr>
+                <tr>
+                  <td data-label="PO" class="strong">#PO-8837</td>
+                  <td data-label="Date">28 Sep 2026</td>
+                  <td data-label="Supplier">Varta Batteries</td>
+                  <td data-label="Items">AGM batteries (6)</td>
+                  <td data-label="Amount" class="amt">$1,140.00</td>
+                  <td data-label="Status"><span class="pill delivered">Delivered</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <a href="404.html" style="display:inline-block;margin-top:18px;background:linear-gradient(135deg,#E10600,#A80400);color:#fff;font-weight:800;font-size:0.78rem;padding:11px 22px;border-radius:10px;text-decoration:none;box-shadow:0 8px 22px rgba(225,6,0,.4);">
+            <i class="fa-solid fa-plus" style="margin-right:6px;"></i> Create Purchase Order
+          </a>
+        </div>
+      </div>
+
+      <!-- ============ INVOICES ============ -->
+      <div id="section-invoices" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-receipt"></i> Invoices</div>
+
+          <div class="balance-card">
+            <div class="label">Outstanding Balance</div>
+            <div class="amount">$6,840 <small>USD</small></div>
+            <div class="sub">3 invoices · next due Oct 20, 2026</div>
+            <div class="balance-stats">
+              <div class="bstat">
+                <small>Paid this month</small>
+                <strong class="up">$11,580</strong>
+              </div>
+              <div class="bstat">
+                <small>Overdue</small>
+                <strong class="warn">$2,450</strong>
+              </div>
+              <div class="bstat">
+                <small>Due soon</small>
+                <strong>$4,390</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="activity">
+              <thead>
+                <tr>
+                  <th>Invoice</th>
+                  <th>Issued</th>
+                  <th>Due</th>
+                  <th>Supplier</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-label="Invoice" class="strong">#INV-2045</td>
+                  <td data-label="Issued">12 Oct 2026</td>
+                  <td data-label="Due">20 Oct 2026</td>
+                  <td data-label="Supplier">Michelin Fleet</td>
+                  <td data-label="Amount" class="amt">$4,390.00</td>
+                  <td data-label="Status"><span class="pill pending">Pending</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Invoice" class="strong">#INV-2044</td>
+                  <td data-label="Issued">05 Oct 2026</td>
+                  <td data-label="Due">15 Oct 2026</td>
+                  <td data-label="Supplier">EV Solutions Ltd</td>
+                  <td data-label="Amount" class="amt">$2,450.00</td>
+                  <td data-label="Status"><span class="pill overdue">Overdue</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Invoice" class="strong">#INV-2043</td>
+                  <td data-label="Issued">28 Sep 2026</td>
+                  <td data-label="Due">08 Oct 2026</td>
+                  <td data-label="Supplier">Brembo Direct</td>
+                  <td data-label="Amount" class="amt">$5,820.00</td>
+                  <td data-label="Status"><span class="pill paid">Paid</span></td>
+                </tr>
+                <tr>
+                  <td data-label="Invoice" class="strong">#INV-2042</td>
+                  <td data-label="Issued">15 Sep 2026</td>
+                  <td data-label="Due">25 Sep 2026</td>
+                  <td data-label="Supplier">Bosch Filters</td>
+                  <td data-label="Amount" class="amt">$5,760.00</td>
+                  <td data-label="Status"><span class="pill paid">Paid</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ REPORTS ============ -->
+      <div id="section-reports" class="content-section">
+        <div class="card">
+          <div class="card-title"><i class="fa-solid fa-chart-line"></i> Fleet Reports</div>
+
+          <div class="balance-card">
+            <div class="label">This Quarter</div>
+            <div class="amount">$54,920 <small>total spend</small></div>
+            <div class="sub">Across 42 POs · 14 vehicles · 68% preventive maintenance</div>
+            <div class="balance-stats">
+              <div class="bstat">
+                <small>Fleet Uptime</small>
+                <strong class="up">94.6%</strong>
+              </div>
+              <div class="bstat">
+                <small>Avg Downtime</small>
+                <strong>2.3 days</strong>
+              </div>
+              <div class="bstat">
+                <small>Preventive vs Reactive</small>
+                <strong class="warn">68% / 32%</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="charts-grid" style="margin-bottom:0;">
+            <div class="card">
+              <div class="card-title">💰 Spend by Category<span class="head-pill">Q3</span></div>
+              <div class="chart-wrap"><canvas id="catChart"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-title">🔧 Maintenance Events<span class="head-pill">6 mo</span></div>
+              <div class="chart-wrap"><canvas id="unitsChart"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-title">⏱️ Avg Downtime (days)<span class="head-pill">6 mo</span></div>
+              <div class="chart-wrap"><canvas id="delivChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  const session = window.__AUTOMOTIVE_BUSINESS__;
+  if (session && session.name) {
+    const name = session.name;
+    const initial = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+    const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    set('headerUserName', name);
+    set('avatarInitials', initial);
+    set('sidebarUserName', name);
+    set('pageSubtitle', 'Welcome back, ' + name.split(' ')[0] + '. Fleet overview ready.');
+    set('pageSubtitleMobile', 'Welcome back, ' + name.split(' ')[0] + '.');
+  }
+
+  const titles = {
+    dashboard:        ['Fleet Dashboard', 'Fleet status, maintenance, and procurement.'],
+    fleet:            ['Fleet Management', 'Every vehicle, its status, driver, and next service.'],
+    maintenance:      ['Maintenance Schedule', 'Upcoming work orders and inspections.'],
+    drivers:          ['Drivers & Operators', 'Licensed drivers and certified technicians.'],
+    'purchase-orders':['Purchase Orders', 'Parts and equipment procurement from suppliers.'],
+    invoices:         ['Invoices', 'Supplier billing, payments, and outstanding balances.'],
+    reports:          ['Fleet Reports', 'Performance, uptime, and cost analytics.']
+  };
+
+  function navigateTo(page) {
+    document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('section-' + page);
+    if (target) target.classList.add('active');
+
+    if (titles[page]) {
+      document.getElementById('pageTitle').textContent = titles[page][0];
+      document.getElementById('pageSubtitle').textContent = titles[page][1];
+      const mt = document.getElementById('pageTitleMobile');
+      const ms = document.getElementById('pageSubtitleMobile');
+      if (mt) mt.textContent = titles[page][0];
+      if (ms) ms.textContent = titles[page][1];
+    }
+
+    document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(l => {
+      l.classList.toggle('active', l.dataset.page === page);
+    });
+    document.querySelectorAll('.mobile-nav .nav-btn[data-page]').forEach(b => {
+      b.classList.toggle('active', b.dataset.page === page);
+    });
+
+    document.querySelector('.dash-body').scrollTop = 0;
+  }
+
+  document.querySelectorAll('.sidebar .nav-link[data-page]').forEach(l => {
+    l.addEventListener('click', e => { e.preventDefault(); navigateTo(l.dataset.page); });
+  });
+  document.querySelectorAll('.mobile-nav .nav-btn[data-page]').forEach(b => {
+    b.addEventListener('click', e => { e.preventDefault(); navigateTo(b.dataset.page); });
+  });
+
+  /* date pill */
+  const datePill = document.getElementById('datePill');
+  if (datePill) {
+    datePill.addEventListener('click', () => {
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const t = new Date();
+      const dt = document.getElementById('dateText');
+      if (dt) dt.textContent = 'Today, ' + t.getDate() + ' ' + months[t.getMonth()] + ' ' + t.getFullYear();
+    });
+  }
+
+  /* notifications */
+  const bell = document.getElementById('bellBtn');
+  const notifDrop = document.getElementById('notifDropdown');
+  const profMenu = document.getElementById('profileMenu');
+  if (bell && notifDrop) {
+    bell.addEventListener('click', e => {
+      e.stopPropagation();
+      notifDrop.classList.toggle('show');
+      if (profMenu) profMenu.classList.remove('show');
+    });
+    document.addEventListener('click', e => {
+      if (!notifDrop.contains(e.target) && !bell.contains(e.target)) notifDrop.classList.remove('show');
+    });
+  }
+
+  /* profile menu */
+  const profBtn = document.getElementById('profileBtn');
+  if (profBtn && profMenu) {
+    profBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      profMenu.classList.toggle('show');
+      if (notifDrop) notifDrop.classList.remove('show');
+    });
+    document.addEventListener('click', e => {
+      if (!profMenu.contains(e.target) && !profBtn.contains(e.target)) profMenu.classList.remove('show');
+    });
+  }
+})();
+
+function handleLogout(e) {
+  if (e) e.preventDefault();
+  try {
+    sessionStorage.removeItem('automotive_session');
+    localStorage.removeItem('automotive_session');
+  } catch (_) {}
+  window.location.replace('login.html');
+}
+
+/* ============================================================
+   CHART SETUP
+   ============================================================ */
+window.addEventListener('load', function () {
+  if (typeof Chart === 'undefined') return;
+
+  Chart.defaults.color = '#A9B3C0';
+  Chart.defaults.borderColor = 'rgba(201,209,220,.12)';
+  Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+
+  const C = {
+    red: '#E10600',
+    redSoft: 'rgba(225,6,0,0.18)',
+    amber: '#FFB020',
+    amberSoft: 'rgba(255,176,32,0.18)',
+    green: '#22C55E',
+    grid: 'rgba(201,209,220,.08)',
+    tick: '#8B96A6'
+  };
+
+  const commonOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#141922',
+        borderColor: 'rgba(225,6,0,.3)',
+        borderWidth: 1,
+        titleColor: '#fff',
+        bodyColor: '#C9D1DC',
+        padding: 10,
+        cornerRadius: 8
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: C.grid },
+        ticks: { font: { size: 9 }, color: C.tick },
+        border: { display: false }
+      },
+      x: {
+        grid: { display: false },
+        ticks: { font: { size: 9 }, color: C.tick },
+        border: { display: false }
+      }
+    }
+  };
+
+  const mEl = document.getElementById('monthlyChart');
+  if (mEl) new Chart(mEl, {
+    type: 'line',
+    data: {
+      labels: ['May','Jun','Jul','Aug','Sep','Oct'],
+      datasets: [{
+        data: [12400, 14100, 13200, 15800, 14900, 18420],
+        borderColor: C.red,
+        backgroundColor: C.redSoft,
+        tension: 0.4,
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointBackgroundColor: C.red,
+        pointBorderColor: '#fff',
+        pointBorderWidth: 1.5,
+        fill: true
+      }]
+    },
+    options: commonOpts
+  });
+
+  const fEl = document.getElementById('fleetChart');
+  if (fEl) new Chart(fEl, {
+    type: 'doughnut',
+    data: {
+      labels: ['Operational','Maintenance','Offline','Reserved'],
+      datasets: [{
+        data: [10, 2, 1, 1],
+        backgroundColor: [C.green, C.amber, '#8B96A6', C.red],
+        borderWidth: 2,
+        borderColor: '#0B0E13',
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 10, padding: 8, font: { size: 9 }, color: C.tick }
+        }
+      }
+    }
+  });
+
+  const mnEl = document.getElementById('maintenanceChart');
+  if (mnEl) new Chart(mnEl, {
+    type: 'bar',
+    data: {
+      labels: ['May','Jun','Jul','Aug','Sep','Oct'],
+      datasets: [{
+        data: [18, 22, 16, 24, 19, 26],
+        backgroundColor: C.amber,
+        hoverBackgroundColor: C.red,
+        borderRadius: 6,
+        barThickness: 16
+      }]
+    },
+    options: commonOpts
+  });
+
+  const cEl = document.getElementById('catChart');
+  if (cEl) new Chart(cEl, {
+    type: 'bar',
+    data: {
+      labels: ['Parts','Labour','Tyres','Fuel','Insurance','MOT'],
+      datasets: [{
+        data: [18420, 12180, 9240, 14880, 6460, 3740],
+        backgroundColor: [C.red, C.amber, C.green, '#8B96A6', C.red, C.amber],
+        borderRadius: 6,
+        barThickness: 18
+      }]
+    },
+    options: commonOpts
+  });
+
+  const uEl = document.getElementById('unitsChart');
+  if (uEl) new Chart(uEl, {
+    type: 'line',
+    data: {
+      labels: ['May','Jun','Jul','Aug','Sep','Oct'],
+      datasets: [{
+        data: [18, 22, 16, 24, 19, 26],
+        borderColor: C.amber,
+        backgroundColor: C.amberSoft,
+        tension: 0.4,
+        borderWidth: 2.5,
+        pointRadius: 3,
+        pointBackgroundColor: C.amber,
+        fill: true
+      }]
+    },
+    options: commonOpts
+  });
+
+  const dEl = document.getElementById('delivChart');
+  if (dEl) new Chart(dEl, {
+    type: 'bar',
+    data: {
+      labels: ['May','Jun','Jul','Aug','Sep','Oct'],
+      datasets: [{
+        data: [3.2, 2.8, 2.4, 2.6, 2.1, 1.9],
+        backgroundColor: C.green,
+        borderRadius: 6,
+        barThickness: 22
+      }]
+    },
+    options: commonOpts
+  });
+});
+
+/* ============================================================
+   BFCACHE RE-VALIDATION
+   ============================================================ */
+window.addEventListener('pageshow', function (e) {
+  if (!e.persisted) return;
+  try {
+    const raw = sessionStorage.getItem('automotive_session') || localStorage.getItem('automotive_session');
+    const s = raw ? JSON.parse(raw) : null;
+    const valid = s && s.authenticated === true && s.expiresAt > Date.now() && s.role === 'business';
+    if (!valid) window.location.replace('login.html');
+  } catch (err) {
+    window.location.replace('login.html');
+  }
+});
+</script>
+
+</body>
+</html>

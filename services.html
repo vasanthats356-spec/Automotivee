@@ -1,0 +1,2001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Automotive — Services</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+
+<style>
+/* ==========================================================
+   COLOR SYSTEM
+   ========================================================== */
+:root{
+  --carbon:      #0B0E13;
+  --graphite:    #141922;
+  --steel:       #232A36;
+  --red:         #E10600;
+  --red-bright:  #FF2A1F;
+  --red-deep:    #A80400;
+  --amber:       #FFB020;
+  --amber-d:     #E08A00;
+  --green:       #22C55E;
+  --silver:      #C9D1DC;
+  --text:        #EEF2F8;
+  --text-soft:   #A9B3C0;
+  --text-mute:   #8B96A6;
+  --line:        rgba(201,209,220,.12);
+  --line-2:      rgba(201,209,220,.22);
+  --card-bg:     linear-gradient(160deg, rgba(20,25,34,.96), rgba(11,14,19,.99));
+  --card-bd:     rgba(201,209,220,.14);
+  --ease:        cubic-bezier(.22,.61,.36,1);
+  --ease-bounce: cubic-bezier(.34,1.56,.64,1);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; font-family:'Inter','Segoe UI',Roboto,system-ui,sans-serif; }
+html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; width:100%; max-width:100%; overflow-x:hidden; }
+
+body{
+  background:
+    radial-gradient(1100px 600px at 78% -10%, rgba(225,6,0,.14), transparent 62%),
+    radial-gradient(900px 520px at 4% 6%, rgba(255,176,32,.06), transparent 60%),
+    var(--carbon);
+  color:var(--text);
+  min-height:100vh;
+  display:flex; flex-direction:column; align-items:center;
+  width:100%; max-width:100%; min-width:0;
+  overflow-x:hidden;
+  position:relative; z-index:0;
+}
+
+body::before,
+body::after{
+  content:''; position:fixed; border-radius:50%; filter:blur(90px);
+  z-index:-1; pointer-events:none;
+}
+body::before{
+  width:520px; height:520px; background:#E10600; opacity:.18;
+  top:-180px; left:-160px;
+  animation:blobDrift 16s ease-in-out infinite;
+}
+body::after{
+  width:460px; height:460px; background:#FFB020; opacity:.10;
+  bottom:-200px; right:-180px;
+  animation:blobDrift 20s ease-in-out infinite reverse;
+}
+@keyframes blobDrift{
+  0%,100%{ transform:translate(0,0) scale(1); }
+  50%{ transform:translate(40px,-30px) scale(1.1); }
+}
+
+#header-placeholder,
+#footer-placeholder{ width:100%; flex-shrink:0; }
+
+.wrap{ width:100%; max-width:1280px; margin:0 auto; padding:0 24px; }
+main{ width:100%; max-width:100%; overflow-x:clip; flex:1; }
+
+h1,h2,h3,h4{
+  font-family:'Outfit','Inter',sans-serif;
+  font-weight:800; letter-spacing:-.025em; line-height:1.1; color:#fff;
+}
+
+a{ text-decoration:none; color:inherit; }
+button{ font-family:inherit; cursor:pointer; border:none; background:none; }
+img{ display:block; max-width:100%; }
+
+::-webkit-scrollbar{ width:8px; height:8px; }
+::-webkit-scrollbar-track{ background:var(--carbon); }
+::-webkit-scrollbar-thumb{ background:var(--steel); border-radius:4px; border:2px solid var(--carbon); }
+::-webkit-scrollbar-thumb:hover{ background:var(--red); }
+::selection{ background:var(--red); color:#fff; }
+
+.sec{ padding:90px 0; position:relative; overflow-x:clip; }
+
+.mini-eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:.66rem; font-weight:800; letter-spacing:2px;
+  text-transform:uppercase; color:var(--amber); margin-bottom:16px;
+}
+.mini-eyebrow::before{
+  content:''; width:24px; height:2px;
+  background:linear-gradient(90deg, var(--red), var(--amber));
+  border-radius:2px;
+}
+.mini-eyebrow i{ color:var(--red-bright); font-size:.72rem; }
+
+.btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:10px; padding:14px 28px; border-radius:60px;
+  font-size:.86rem; font-weight:800; letter-spacing:.4px;
+  white-space:nowrap; border:1.5px solid transparent;
+  transition:all .35s var(--ease); text-decoration:none; min-height:48px;
+}
+.btn i{ font-size:.92em; transition:transform .35s var(--ease); }
+.btn-red{
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  color:#fff; box-shadow:0 12px 30px rgba(225,6,0,.4);
+}
+.btn-red:hover{
+  background:linear-gradient(135deg, var(--red-bright), var(--red));
+  transform:translateY(-3px);
+  box-shadow:0 18px 40px rgba(225,6,0,.55);
+}
+.btn-ghost{
+  background:rgba(255,255,255,.03);
+  border-color:rgba(201,209,220,.32);
+  color:var(--silver);
+}
+.btn-ghost:hover{
+  background:rgba(201,209,220,.10);
+  border-color:var(--silver);
+  color:#fff; transform:translateY(-3px);
+}
+
+/* ==========================================================
+   SECTION 1 — HERO
+   ========================================================== */
+.hero-offset{
+  position:relative;
+  padding:50px 0 70px;
+  overflow:hidden;
+}
+.hero-offset::before{
+  content:''; position:absolute;
+  top:-160px; left:40%;
+  width:700px; height:700px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(225,6,0,.18), transparent 62%);
+  filter:blur(60px);
+  pointer-events:none;
+}
+
+.hero-offset .hero-grid{
+  position:relative; z-index:2;
+  display:grid;
+  grid-template-columns:.9fr 1.1fr;
+  gap:56px;
+  align-items:center;
+}
+
+.hero-left{
+  display:flex;
+  gap:24px;
+  align-items:flex-start;
+  min-width:0;
+}
+
+.hero-vert-badge{
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);
+  display:flex; align-items:center; gap:14px;
+  font-size:.62rem; font-weight:800;
+  letter-spacing:3px; text-transform:uppercase;
+  color:var(--text-mute);
+  padding:14px 0;
+  border-right:1px solid var(--line-2);
+  flex-shrink:0;
+}
+.hero-vert-badge::before{
+  content:''; width:2px; height:32px;
+  background:linear-gradient(180deg, var(--red), var(--amber));
+  border-radius:2px;
+}
+.hero-vert-badge i{ color:var(--red-bright); }
+
+.hero-copy{ min-width:0; flex:1; }
+.hero-copy h1{
+  font-size:clamp(2.2rem, 4.6vw, 3.6rem);
+  font-weight:900; line-height:1;
+  letter-spacing:-.04em; margin-bottom:22px;
+}
+.hero-copy h1 em{
+  font-style:normal; color:var(--red-bright);
+  position:relative; display:inline-block;
+}
+.hero-copy h1 em::after{
+  content:''; position:absolute;
+  left:0; right:0; bottom:3px; height:10px;
+  background:linear-gradient(90deg, rgba(225,6,0,.4), rgba(255,176,32,.2));
+  border-radius:5px; z-index:-1;
+}
+.hero-copy > p{
+  font-size:.98rem; color:var(--text-soft);
+  line-height:1.8; max-width:460px; margin-bottom:32px;
+}
+.hero-actions{ display:flex; gap:12px; flex-wrap:wrap; }
+
+/* Hero right — aspect-ratio-based container */
+.hero-right{
+  position:relative;
+  width:100%;
+  max-width:520px;
+  aspect-ratio:5/6;
+  margin-left:auto;
+}
+.hero-img-main{
+  position:absolute;
+  top:0; right:0;
+  width:80%;
+  aspect-ratio:4/5;
+  border-radius:24px;
+  overflow:hidden;
+  border:1px solid var(--line-2);
+  box-shadow:0 30px 70px rgba(0,0,0,.7);
+  background:var(--graphite);
+}
+.hero-img-main img{
+  width:100%; height:100%;
+  object-fit:cover;
+  transition:transform 1s var(--ease);
+}
+.hero-img-main:hover img{ transform:scale(1.05); }
+.hero-img-main::before{
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+  z-index:2; pointer-events:none;
+}
+.hero-img-main::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 55%, rgba(11,14,19,.6) 100%);
+  pointer-events:none;
+}
+
+.hero-service-list{
+  position:absolute;
+  bottom:0; left:0;
+  width:64%;
+  z-index:3;
+  display:flex; flex-direction:column; gap:10px;
+}
+
+/* Service item — DIV (not link) — only the arrow is clickable */
+.hero-service-item{
+  background:rgba(11,14,19,.96);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+  border:1px solid var(--line-2);
+  border-radius:14px;
+  padding:14px 16px;
+  display:flex; align-items:center;
+  gap:12px;
+  box-shadow:0 14px 32px rgba(0,0,0,.55);
+  transition:border-color .3s ease, background .3s ease;
+}
+.hero-service-item:hover{
+  border-color:rgba(225,6,0,.4);
+  background:rgba(20,25,34,1);
+}
+.hero-service-item > i:first-child{
+  width:36px; height:36px;
+  border-radius:9px;
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.82rem;
+  flex-shrink:0;
+}
+.hero-service-item .hsi-body{ flex:1; min-width:0; }
+.hero-service-item .hsi-title{
+  font-size:.8rem; font-weight:800; color:#fff; margin-bottom:2px;
+}
+.hero-service-item .hsi-meta{
+  font-size:.64rem; color:var(--text-mute); font-weight:600;
+}
+
+/* ONLY the arrow is clickable */
+.hero-service-item .hsi-arrow{
+  width:32px; height:32px;
+  border-radius:8px;
+  background:rgba(225,6,0,.12);
+  border:1px solid rgba(225,6,0,.25);
+  color:var(--amber);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:.72rem;
+  text-decoration:none;
+  flex-shrink:0;
+  transition:all .3s var(--ease);
+}
+.hero-service-item .hsi-arrow:hover{
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  border-color:transparent;
+  color:#fff;
+  transform:translateX(3px);
+}
+
+/* ==========================================================
+   SECTION 2 — BENTO
+   ========================================================== */
+.bento-section{ padding-top:40px; padding-bottom:90px; }
+
+.bento-head{
+  text-align:center;
+  max-width:640px;
+  margin:0 auto 44px;
+}
+.bento-head h2{
+  font-size:clamp(1.75rem, 3.6vw, 2.6rem);
+  margin-bottom:14px;
+}
+.bento-head h2 em{ font-style:normal; color:var(--red-bright); }
+.bento-head p{
+  font-size:.96rem; color:var(--text-soft); line-height:1.75;
+}
+
+.bento-grid{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  grid-auto-rows:220px;
+  gap:16px;
+}
+
+.bento-card{
+  position:relative;
+  border-radius:20px;
+  overflow:hidden;
+  background:var(--graphite);
+  border:1px solid var(--card-bd);
+  box-shadow:0 14px 34px rgba(0,0,0,.5);
+  transition:border-color .4s var(--ease), box-shadow .4s var(--ease);
+  isolation:isolate;
+}
+.bento-card:hover{
+  border-color:rgba(225,6,0,.4);
+  box-shadow:0 22px 50px rgba(0,0,0,.65);
+}
+.bento-card .bc-img{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  z-index:-2;
+  transition:transform 1s var(--ease);
+}
+.bento-card:hover .bc-img{ transform:scale(1.06); }
+.bento-card::after{
+  content:''; position:absolute; inset:0; z-index:-1;
+  background:linear-gradient(180deg, rgba(11,14,19,.1) 0%, rgba(11,14,19,.35) 45%, rgba(11,14,19,.94) 100%);
+}
+.bento-card .bc-body{
+  position:absolute; inset:auto 0 0 0;
+  padding:20px 20px 22px; z-index:2;
+}
+.bento-card .bc-tag{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:.58rem; font-weight:900; letter-spacing:1.2px;
+  text-transform:uppercase; color:#fff;
+  padding:5px 11px; border-radius:100px;
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  margin-bottom:10px;
+  box-shadow:0 6px 16px rgba(225,6,0,.4);
+}
+.bento-card .bc-tag.green{ background:linear-gradient(135deg, var(--green), #15803D); box-shadow:0 6px 16px rgba(34,197,94,.4); }
+.bento-card .bc-tag.amber{ background:linear-gradient(135deg, var(--amber), var(--amber-d)); color:#1a1300; box-shadow:0 6px 16px rgba(255,176,32,.4); }
+.bento-card .bc-title{
+  font-family:'Outfit',sans-serif;
+  font-size:1.02rem; font-weight:800;
+  color:#fff; letter-spacing:-.015em;
+  margin-bottom:5px; line-height:1.25;
+}
+.bento-card .bc-desc{
+  font-size:.74rem; color:var(--text-soft);
+  line-height:1.55; margin-bottom:12px;
+  display:-webkit-box;
+  -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.bento-card .bc-link{
+  display:inline-flex; align-items:center; gap:7px;
+  font-size:.68rem; font-weight:800; letter-spacing:.4px;
+  text-transform:uppercase; color:var(--amber);
+  transition:gap .3s ease, color .3s ease;
+}
+.bento-card .bc-link:hover{ gap:12px; color:#fff; }
+
+.bento-card.large{ grid-column:span 2; grid-row:span 2; }
+.bento-card.large .bc-body{ padding:28px 28px 30px; }
+.bento-card.large .bc-title{ font-size:1.5rem; }
+.bento-card.large .bc-desc{
+  font-size:.86rem; max-width:380px;
+  -webkit-line-clamp:3; margin-bottom:16px;
+}
+
+.bento-cta{
+  display:flex; justify-content:center; margin-top:36px;
+}
+
+/* ==========================================================
+   SECTION 3 — PROCESS
+   ========================================================== */
+.process-section{ padding-top:20px; padding-bottom:90px; }
+
+.process-head{
+  text-align:center;
+  max-width:640px;
+  margin:0 auto 48px;
+}
+.process-head h2{
+  font-size:clamp(1.75rem, 3.6vw, 2.6rem);
+  margin-bottom:14px;
+}
+.process-head h2 em{ font-style:normal; color:var(--red-bright); }
+.process-head p{
+  font-size:.96rem; color:var(--text-soft); line-height:1.75;
+}
+
+.process-track{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  gap:8px;
+  max-width:1100px;
+  margin:0 auto;
+}
+
+.proc-step{
+  flex:1;
+  min-width:0;
+  display:flex; flex-direction:column;
+  align-items:center; text-align:center;
+}
+
+.proc-circle{
+  position:relative;
+  width:76px; height:76px;
+  border-radius:50%;
+  background:linear-gradient(160deg, rgba(20,25,34,.98), rgba(11,14,19,.99));
+  border:2px solid var(--line-2);
+  color:var(--red-bright);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.35rem; margin-bottom:20px;
+  transition:all .4s var(--ease-bounce);
+  flex-shrink:0;
+}
+.proc-step:hover .proc-circle{
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  border-color:transparent; color:#fff;
+  transform:scale(1.06) rotate(-6deg);
+  box-shadow:0 14px 32px rgba(225,6,0,.45);
+}
+.proc-num{
+  position:absolute;
+  top:-6px; right:-6px;
+  width:30px; height:30px;
+  border-radius:50%;
+  background:linear-gradient(135deg, var(--amber), var(--amber-d));
+  color:#1a1300;
+  font-family:'Outfit',sans-serif;
+  font-size:.72rem; font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 6px 14px rgba(255,176,32,.4);
+  z-index:2;
+}
+.proc-title{
+  font-family:'Outfit',sans-serif;
+  font-size:.96rem; font-weight:800;
+  color:#fff; margin-bottom:6px; letter-spacing:-.01em;
+}
+.proc-desc{
+  font-size:.78rem; color:var(--text-soft);
+  line-height:1.6; max-width:200px; margin:0 auto;
+}
+
+.proc-connector{
+  flex:0 0 auto;
+  padding:26px 8px 0;
+  color:rgba(225,6,0,.5);
+  font-size:.94rem;
+  align-self:flex-start;
+}
+
+.process-cta{
+  display:flex; justify-content:center; margin-top:56px;
+}
+
+/* ==========================================================
+   SECTION 4 — PRICING
+   ========================================================== */
+.pricing-section{ padding-top:20px; padding-bottom:90px; }
+
+.pricing-head{
+  text-align:center;
+  max-width:640px;
+  margin:0 auto 56px;
+}
+.pricing-head h2{
+  font-size:clamp(1.75rem, 3.6vw, 2.6rem);
+  margin-bottom:14px;
+}
+.pricing-head h2 em{ font-style:normal; color:var(--red-bright); }
+.pricing-head p{
+  font-size:.96rem; color:var(--text-soft); line-height:1.75;
+}
+
+.pricing-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:20px;
+  align-items:stretch;
+  max-width:1100px;
+  margin:0 auto;
+}
+
+.price-card{
+  position:relative;
+  background:linear-gradient(160deg, rgba(20,25,34,.96), rgba(11,14,19,.99));
+  border:1px solid var(--card-bd);
+  border-radius:24px;
+  padding:36px 30px 32px;
+  display:flex; flex-direction:column;
+  transition:border-color .4s var(--ease), box-shadow .4s var(--ease), transform .4s var(--ease);
+}
+.price-card:hover{
+  border-color:rgba(225,6,0,.32);
+  transform:translateY(-4px);
+  box-shadow:0 20px 50px rgba(0,0,0,.6);
+}
+.price-card.featured{
+  background:linear-gradient(160deg, #1a0505 0%, #0B0E13 100%);
+  border:1.5px solid rgba(225,6,0,.5);
+  box-shadow:0 24px 60px rgba(225,6,0,.2);
+}
+.price-card.featured:hover{
+  transform:translateY(-4px);
+  box-shadow:0 28px 70px rgba(225,6,0,.35);
+}
+.price-card.featured::before{
+  content:'MOST POPULAR';
+  position:absolute;
+  top:-13px; left:50%;
+  transform:translateX(-50%);
+  background:linear-gradient(135deg, var(--amber), var(--amber-d));
+  color:#1a1300;
+  font-size:.58rem; font-weight:900;
+  letter-spacing:1.5px;
+  padding:6px 16px; border-radius:100px;
+  box-shadow:0 8px 20px rgba(255,176,32,.5);
+  z-index:2; white-space:nowrap;
+}
+.price-card .pc-tag{
+  font-size:.62rem; font-weight:900;
+  letter-spacing:2px; text-transform:uppercase;
+  color:var(--amber); margin-bottom:14px;
+}
+.price-card.featured .pc-tag{ color:var(--red-bright); }
+.price-card h3{
+  font-size:1.35rem; margin-bottom:8px; letter-spacing:-.02em;
+}
+.price-card .pc-sub{
+  font-size:.82rem; color:var(--text-soft);
+  line-height:1.6; margin-bottom:24px; min-height:44px;
+}
+.price-card .pc-price{
+  display:flex; align-items:flex-start; gap:4px;
+  padding-bottom:24px;
+  border-bottom:1px solid var(--line);
+  margin-bottom:24px;
+}
+.price-card .pc-price .currency{
+  font-family:'Outfit',sans-serif;
+  font-size:1.15rem; font-weight:800;
+  color:var(--text-soft); margin-top:10px;
+}
+.price-card .pc-price .amount{
+  font-family:'Outfit',sans-serif;
+  font-size:3rem; font-weight:900;
+  color:#fff; letter-spacing:-.04em; line-height:1;
+}
+.price-card.featured .pc-price .amount{ color:var(--red-bright); }
+.price-card .pc-price .period{
+  font-size:.76rem; color:var(--text-mute);
+  font-weight:600; margin-top:auto; margin-bottom:10px;
+}
+.price-card .pc-features{
+  list-style:none;
+  display:flex; flex-direction:column; gap:11px;
+  margin-bottom:26px; flex:1;
+}
+.price-card .pc-features li{
+  display:flex; align-items:flex-start;
+  gap:10px;
+  font-size:.82rem; color:var(--text-soft);
+  line-height:1.55;
+}
+.price-card .pc-features li i{
+  color:var(--green); font-size:.74rem;
+  margin-top:3px; flex-shrink:0;
+}
+.price-card .pc-features li.muted{ color:var(--text-mute); }
+.price-card .pc-features li.muted i{ color:var(--text-mute); opacity:.5; }
+.price-card .pc-btn{ width:100%; justify-content:center; }
+
+/* ==========================================================
+   SECTION 5 — WHY US
+   ========================================================== */
+.whyus-section{ padding-top:20px; padding-bottom:90px; }
+.whyus-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:56px;
+  align-items:center;
+}
+
+.whyus-visual{
+  position:relative;
+  aspect-ratio:4/5;
+  border-radius:24px;
+  overflow:hidden;
+  border:1px solid var(--line-2);
+  box-shadow:0 30px 70px rgba(0,0,0,.7);
+  background:var(--graphite);
+}
+.whyus-visual img{
+  width:100%; height:100%;
+  object-fit:cover;
+  transition:transform 1s var(--ease);
+}
+.whyus-visual:hover img{ transform:scale(1.05); }
+.whyus-visual::before{
+  content:''; position:absolute;
+  top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+  z-index:2; pointer-events:none;
+}
+.whyus-visual::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 55%, rgba(11,14,19,.7) 100%);
+  pointer-events:none;
+}
+.whyus-badge{
+  position:absolute;
+  bottom:24px; left:24px; right:24px;
+  z-index:3;
+  background:rgba(11,14,19,.94);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+  border:1px solid var(--line-2);
+  border-radius:14px;
+  padding:14px 16px;
+  display:flex; align-items:center;
+  gap:12px;
+  box-shadow:0 16px 36px rgba(0,0,0,.55);
+}
+.whyus-badge i{
+  width:40px; height:40px;
+  border-radius:11px;
+  background:linear-gradient(135deg, var(--green), #15803D);
+  color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.98rem;
+  flex-shrink:0;
+}
+.whyus-badge strong{ display:block; font-size:.82rem; font-weight:800; color:#fff; }
+.whyus-badge small{ display:block; font-size:.68rem; color:var(--text-mute); margin-top:2px; font-weight:600; }
+
+.whyus-copy h2{
+  font-size:clamp(1.75rem, 3.6vw, 2.6rem);
+  margin-bottom:14px;
+}
+.whyus-copy h2 em{ font-style:normal; color:var(--red-bright); }
+.whyus-copy > p{
+  font-size:.96rem; color:var(--text-soft);
+  line-height:1.78; margin-bottom:28px; max-width:480px;
+}
+
+.whyus-list{
+  list-style:none;
+  display:flex; flex-direction:column;
+}
+.whyus-list li{
+  display:flex; gap:18px;
+  padding:20px 0;
+  border-bottom:1px solid var(--line);
+  transition:padding .3s var(--ease);
+}
+.whyus-list li:last-child{ border-bottom:none; }
+.whyus-list li:hover{ padding-left:6px; }
+.whyus-list .wl-num{
+  font-family:'Outfit',sans-serif;
+  font-size:1.05rem; font-weight:900;
+  color:var(--red-bright); letter-spacing:-.02em;
+  flex-shrink:0; width:30px; line-height:1.1;
+  padding-top:1px;
+  transition:color .3s ease;
+}
+.whyus-list li:hover .wl-num{ color:var(--amber); }
+.whyus-list .wl-body h4{
+  font-family:'Outfit',sans-serif;
+  font-size:.98rem; font-weight:800;
+  color:#fff; margin-bottom:6px; letter-spacing:-.01em;
+}
+.whyus-list .wl-body p{
+  font-size:.82rem; color:var(--text-soft); line-height:1.65;
+}
+
+.whyus-cta{
+  margin-top:32px;
+  display:flex; gap:12px; flex-wrap:wrap;
+}
+
+/* ==========================================================
+   SECTION 6 — STATS
+   ========================================================== */
+.stats-section{ padding-top:20px; padding-bottom:90px; }
+
+.stats-band{
+  position:relative;
+  border-radius:28px;
+  overflow:hidden;
+  padding:70px 60px;
+  border:1px solid rgba(225,6,0,.28);
+  background:linear-gradient(120deg, #0B0E13 0%, #1a0505 55%, #0B0E13 100%);
+  box-shadow:0 24px 60px rgba(0,0,0,.7);
+  isolation:isolate;
+}
+.stats-band::before{
+  content:''; position:absolute;
+  top:-180px; left:-80px;
+  width:460px; height:460px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(225,6,0,.32), transparent 62%);
+  pointer-events:none; z-index:-1;
+}
+.stats-band::after{
+  content:''; position:absolute;
+  bottom:-180px; right:-80px;
+  width:500px; height:500px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(255,176,32,.14), transparent 62%);
+  pointer-events:none; z-index:-1;
+}
+.stats-dots{
+  position:absolute; inset:0; z-index:-1;
+  opacity:.35;
+  background-image:radial-gradient(circle, rgba(201,209,220,.15) 1px, transparent 1px);
+  background-size:24px 24px;
+  pointer-events:none;
+}
+
+.stats-head{
+  text-align:center;
+  margin-bottom:48px;
+  position:relative; z-index:1;
+}
+.stats-head h2{
+  font-size:clamp(1.75rem, 3.6vw, 2.5rem);
+  margin-bottom:12px;
+}
+.stats-head h2 em{ font-style:normal; color:var(--red-bright); }
+.stats-head p{
+  font-size:.94rem; color:var(--text-soft);
+  line-height:1.75; max-width:520px; margin:0 auto;
+}
+
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:20px;
+  position:relative; z-index:1;
+}
+.stat-tile{
+  text-align:center; padding:0 10px;
+  position:relative; min-width:0;
+}
+.stat-tile::after{
+  content:''; position:absolute;
+  top:20%; right:-10px;
+  height:60%; width:1px;
+  background:linear-gradient(180deg, transparent, var(--line-2), transparent);
+}
+.stat-tile:last-child::after{ display:none; }
+
+.stat-tile .st-num{
+  font-family:'Outfit',sans-serif;
+  font-size:clamp(2.4rem, 5vw, 3.4rem);
+  font-weight:900; color:#fff;
+  letter-spacing:-.04em; line-height:1;
+  margin-bottom:12px;
+  display:inline-flex;
+  align-items:baseline;
+  justify-content:center;
+  gap:1px;
+  white-space:nowrap;
+}
+.stat-tile .st-num span{
+  color:var(--red-bright);
+  font-size:.55em;
+  margin-left:2px;
+}
+.stat-tile .st-label{
+  font-size:.72rem; font-weight:800;
+  letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-soft); margin-bottom:6px;
+}
+.stat-tile .st-sub{
+  font-size:.68rem; color:var(--text-mute); font-weight:600;
+}
+
+/* ==========================================================
+   SECTION 7 — ACTION CARDS (no form)
+   ========================================================== */
+.action-section{ padding-top:20px; padding-bottom:90px; }
+
+.action-head{
+  text-align:center;
+  max-width:680px;
+  margin:0 auto 48px;
+}
+.action-head h2{
+  font-size:clamp(1.75rem, 3.6vw, 2.6rem);
+  margin-bottom:14px;
+}
+.action-head h2 em{ font-style:normal; color:var(--red-bright); }
+.action-head p{
+  font-size:.96rem; color:var(--text-soft); line-height:1.75;
+}
+
+.action-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:20px;
+  max-width:1100px;
+  margin:0 auto;
+}
+
+.action-card{
+  position:relative;
+  background:linear-gradient(160deg, rgba(20,25,34,.96), rgba(11,14,19,.99));
+  border:1px solid var(--card-bd);
+  border-radius:22px;
+  padding:36px 28px 32px;
+  display:flex; flex-direction:column;
+  align-items:flex-start;
+  transition:border-color .4s var(--ease), box-shadow .4s var(--ease), transform .4s var(--ease);
+  overflow:hidden;
+  isolation:isolate;
+}
+.action-card::before{
+  content:''; position:absolute;
+  top:-80px; right:-80px;
+  width:220px; height:220px;
+  border-radius:50%;
+  background:radial-gradient(circle, rgba(225,6,0,.14), transparent 70%);
+  pointer-events:none; z-index:0;
+  transition:opacity .4s ease;
+  opacity:.6;
+}
+.action-card:hover{
+  border-color:rgba(225,6,0,.4);
+  transform:translateY(-5px);
+  box-shadow:0 22px 50px rgba(0,0,0,.65);
+}
+.action-card:hover::before{ opacity:1; }
+
+.action-card .ac-num{
+  position:absolute;
+  top:22px; right:24px;
+  font-family:'Outfit',sans-serif;
+  font-size:3.4rem; font-weight:900;
+  color:rgba(225,6,0,.08);
+  letter-spacing:-.04em; line-height:1;
+  z-index:0; pointer-events:none;
+}
+.action-card .ac-icon{
+  width:64px; height:64px;
+  border-radius:18px;
+  background:linear-gradient(135deg, rgba(225,6,0,.18), rgba(255,176,32,.1));
+  border:1px solid rgba(225,6,0,.28);
+  color:var(--red-bright);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1.5rem; margin-bottom:22px;
+  transition:all .4s var(--ease);
+  position:relative; z-index:1;
+}
+.action-card:hover .ac-icon{
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  border-color:transparent; color:#fff;
+  transform:rotate(-6deg) scale(1.06);
+  box-shadow:0 12px 28px rgba(225,6,0,.42);
+}
+.action-card h3{
+  font-size:1.22rem; margin-bottom:10px; letter-spacing:-.02em;
+  position:relative; z-index:1;
+}
+.action-card p{
+  font-size:.86rem; color:var(--text-soft);
+  line-height:1.7; margin-bottom:24px; flex:1;
+  position:relative; z-index:1;
+}
+.action-card .ac-meta{
+  display:flex; align-items:center; gap:8px;
+  font-size:.72rem; color:var(--text-mute);
+  font-weight:700; margin-bottom:20px;
+  padding-top:16px;
+  border-top:1px dashed var(--line);
+  width:100%;
+  position:relative; z-index:1;
+}
+.action-card .ac-meta i{ color:var(--green); font-size:.72rem; }
+.action-card .ac-btn{
+  width:100%; justify-content:center;
+  position:relative; z-index:1;
+}
+
+.action-bottom{
+  margin-top:36px;
+  text-align:center;
+  padding:24px;
+  background:rgba(11,14,19,.55);
+  border:1px dashed var(--line-2);
+  border-radius:16px;
+  max-width:1100px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.action-bottom p{
+  font-size:.86rem; color:var(--text-soft);
+  margin-bottom:16px; line-height:1.6;
+}
+.action-bottom .ab-actions{
+  display:flex; gap:10px;
+  justify-content:center; flex-wrap:wrap;
+}
+
+/* ==========================================================
+   SECTION 8 — FINAL CTA
+   ========================================================== */
+.final-cta-section{
+  padding-top:20px;
+  padding-bottom:100px;
+}
+.final-cta{
+  position:relative;
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  border-radius:28px;
+  overflow:hidden;
+  min-height:420px;
+  box-shadow:0 24px 60px rgba(0,0,0,.7);
+  border:1px solid rgba(225,6,0,.28);
+  background:linear-gradient(135deg, #0B0E13 0%, #1a0505 100%);
+}
+.final-cta::before{
+  content:''; position:absolute;
+  top:0; bottom:0; left:0; width:100%;
+  background-image:radial-gradient(circle, rgba(201,209,220,.1) 1px, transparent 1px);
+  background-size:22px 22px;
+  opacity:.4;
+  pointer-events:none; z-index:0;
+}
+.final-cta .fc-copy{
+  position:relative; z-index:2;
+  padding:60px 50px;
+  display:flex; flex-direction:column;
+  justify-content:center;
+}
+.final-cta .fc-copy h2{
+  font-size:clamp(1.8rem, 3.8vw, 2.8rem);
+  margin-bottom:16px; line-height:1.08;
+}
+.final-cta .fc-copy h2 em{ font-style:normal; color:var(--red-bright); }
+.final-cta .fc-copy p{
+  font-size:.96rem; color:var(--text-soft);
+  line-height:1.78; margin-bottom:32px; max-width:480px;
+}
+.final-cta .fc-actions{
+  display:flex; gap:12px; flex-wrap:wrap;
+}
+.final-cta .fc-visual{
+  position:relative;
+  overflow:hidden; z-index:1;
+  min-height:320px;
+}
+.final-cta .fc-visual img{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+}
+.final-cta .fc-visual::before{
+  content:''; position:absolute; inset:0; z-index:1;
+  background:linear-gradient(90deg, rgba(11,14,19,.9) 0%, rgba(11,14,19,.2) 40%, rgba(11,14,19,.6) 100%);
+}
+.final-cta .fc-badge{
+  position:absolute;
+  bottom:28px; right:28px;
+  z-index:2;
+  background:rgba(11,14,19,.94);
+  -webkit-backdrop-filter:blur(14px);
+  backdrop-filter:blur(14px);
+  border:1px solid var(--line-2);
+  border-radius:14px;
+  padding:14px 18px;
+  display:flex; align-items:center; gap:12px;
+  box-shadow:0 16px 36px rgba(0,0,0,.55);
+  max-width:calc(100% - 56px);
+}
+.final-cta .fc-badge i{
+  width:40px; height:40px;
+  border-radius:11px;
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:.98rem; flex-shrink:0;
+}
+.final-cta .fc-badge strong{
+  display:block;
+  font-family:'Outfit',sans-serif;
+  font-size:1.15rem; font-weight:900;
+  color:#fff; letter-spacing:-.02em;
+  line-height:1; margin-bottom:3px;
+}
+.final-cta .fc-badge small{
+  display:block;
+  font-size:.62rem; font-weight:800;
+  letter-spacing:.8px; text-transform:uppercase;
+  color:var(--text-mute);
+}
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+@media (max-width:1100px){
+  .bento-grid{ grid-template-columns:repeat(3, 1fr); }
+  .bento-card.large{ grid-column:span 2; }
+}
+
+@media (max-width:1024px){
+  .sec{ padding:72px 0; }
+
+  .hero-offset .hero-grid{
+    grid-template-columns:1fr;
+    gap:44px;
+  }
+  .hero-vert-badge{ display:none; }
+  .hero-right{
+    aspect-ratio:auto;
+    max-width:none;
+    margin-left:0;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
+  .hero-img-main{
+    position:relative;
+    width:100%;
+    aspect-ratio:16/10;
+    top:auto; right:auto;
+  }
+  .hero-service-list{
+    position:relative;
+    width:100%;
+    bottom:auto; left:auto;
+    flex-direction:row;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .hero-service-item{
+    flex:1 1 calc(50% - 5px);
+    min-width:220px;
+  }
+
+  .bento-grid{ grid-template-columns:repeat(2, 1fr); }
+  .bento-card.large{ grid-column:span 2; grid-row:span 2; }
+
+  .process-track{ flex-wrap:wrap; gap:20px; }
+  .proc-step{ flex:1 1 calc(50% - 20px); max-width:none; }
+  .proc-connector{ display:none; }
+
+  .pricing-grid{
+    grid-template-columns:1fr;
+    gap:16px; max-width:520px;
+  }
+  .price-card .pc-sub{ min-height:0; }
+
+  .whyus-grid{ grid-template-columns:1fr; gap:36px; }
+  .whyus-visual{
+    max-width:520px;
+    margin:0 auto;
+    aspect-ratio:4/3;
+  }
+
+  .stats-grid{ grid-template-columns:repeat(2, 1fr); row-gap:36px; }
+  .stat-tile::after{ display:none; }
+  .stats-band{ padding:52px 36px; }
+
+  .action-grid{
+    grid-template-columns:1fr;
+    gap:16px; max-width:520px;
+  }
+
+  .final-cta{
+    grid-template-columns:1fr;
+    min-height:auto;
+  }
+  .final-cta .fc-copy{ padding:44px 32px; }
+  .final-cta .fc-visual{ min-height:260px; }
+}
+
+@media (max-width:768px){
+  .sec{ padding:60px 0; }
+  .wrap{ padding:0 18px; }
+
+  .hero-offset{ padding:30px 0 50px; }
+  .hero-left{ gap:16px; }
+  .hero-copy h1{ font-size:2rem; }
+  .hero-copy > p{ font-size:.92rem; margin-bottom:26px; }
+  .hero-img-main{ aspect-ratio:4/3; border-radius:20px; }
+  .hero-service-item{ flex:1 1 100%; min-width:0; }
+
+  .bento-grid{
+    grid-template-columns:1fr;
+    grid-auto-rows:auto;
+    gap:14px;
+  }
+  .bento-card,
+  .bento-card.large{
+    min-height:220px;
+    grid-column:span 1;
+    grid-row:span 1;
+  }
+  .bento-card.large{ min-height:260px; }
+  .bento-card.large .bc-body{ padding:24px 22px; }
+  .bento-card.large .bc-title{ font-size:1.3rem; }
+  .bento-card.large .bc-desc{ font-size:.84rem; }
+
+  .process-track{ flex-direction:column; gap:20px; }
+  .proc-step{
+    flex:1 1 auto;
+    flex-direction:row;
+    align-items:flex-start;
+    text-align:left;
+    gap:16px;
+    width:100%;
+  }
+  .proc-circle{
+    width:64px; height:64px;
+    font-size:1.2rem;
+    margin-bottom:0;
+    flex-shrink:0;
+  }
+  .proc-num{ width:26px; height:26px; font-size:.64rem; top:-4px; right:-4px; }
+  .proc-title{ font-size:.94rem; }
+  .proc-desc{ max-width:none; font-size:.76rem; }
+
+  .price-card{ padding:32px 24px 28px; }
+  .price-card .pc-price .amount{ font-size:2.4rem; }
+
+  .whyus-copy h2{ font-size:1.6rem; }
+  .whyus-list li{ padding:18px 0; }
+
+  .stats-band{ padding:44px 24px; }
+  .stats-grid{ gap:18px; row-gap:28px; }
+  .stat-tile .st-num{ font-size:2.2rem; }
+
+  .action-card{ padding:28px 22px 24px; }
+  .action-card .ac-num{ font-size:2.6rem; }
+  .action-card .ac-icon{ width:56px; height:56px; font-size:1.3rem; }
+  .action-card h3{ font-size:1.08rem; }
+
+  .final-cta .fc-copy{ padding:36px 24px; }
+  .final-cta .fc-visual{ min-height:220px; }
+  .final-cta .fc-badge{ bottom:16px; right:16px; padding:12px 14px; gap:10px; }
+  .final-cta .fc-badge i{ width:34px; height:34px; font-size:.86rem; }
+  .final-cta .fc-badge strong{ font-size:1rem; }
+}
+
+@media (max-width:480px){
+  .sec{ padding:48px 0; }
+  .wrap{ padding:0 16px; }
+
+  .hero-offset{ padding:24px 0 40px; }
+  .hero-copy h1{ font-size:1.7rem; }
+  .hero-copy > p{ font-size:.86rem; }
+  .hero-actions{ flex-direction:column; }
+  .hero-actions .btn{ width:100%; justify-content:center; }
+  .hero-img-main{ aspect-ratio:1/1; border-radius:16px; }
+  .hero-service-list{ gap:8px; }
+  .hero-service-item{
+    padding:12px 14px;
+    gap:10px;
+    border-radius:11px;
+  }
+  .hero-service-item > i:first-child{ width:32px; height:32px; font-size:.74rem; }
+  .hero-service-item .hsi-title{ font-size:.76rem; }
+  .hero-service-item .hsi-meta{ font-size:.62rem; }
+  .hero-service-item .hsi-arrow{ width:30px; height:30px; font-size:.68rem; }
+
+  .bento-head h2{ font-size:1.45rem; }
+  .bento-card{ min-height:200px; }
+  .bento-card .bc-body{ padding:18px 18px 20px; }
+  .bento-card .bc-title{ font-size:1rem; }
+  .bento-card .bc-desc{ font-size:.72rem; }
+  .bento-card .bc-link{ font-size:.66rem; }
+  .bento-card.large{ min-height:240px; }
+  .bento-card.large .bc-body{ padding:22px 18px; }
+  .bento-card.large .bc-title{ font-size:1.15rem; }
+
+  .process-head h2{ font-size:1.45rem; }
+  .proc-circle{ width:56px; height:56px; font-size:1rem; }
+  .proc-num{ width:24px; height:24px; font-size:.58rem; }
+  .proc-title{ font-size:.88rem; }
+  .proc-desc{ font-size:.72rem; }
+
+  .price-card{ padding:28px 20px 24px; border-radius:20px; }
+  .price-card.featured::before{ font-size:.52rem; padding:5px 12px; }
+  .price-card .pc-price .amount{ font-size:2.2rem; }
+  .price-card .pc-features li{ font-size:.8rem; }
+
+  .whyus-visual{ aspect-ratio:4/3; border-radius:18px; }
+  .whyus-badge{ padding:12px 14px; gap:10px; }
+  .whyus-badge i{ width:36px; height:36px; font-size:.88rem; }
+  .whyus-badge strong{ font-size:.76rem; }
+  .whyus-badge small{ font-size:.62rem; }
+
+  .whyus-copy h2{ font-size:1.45rem; }
+  .whyus-copy > p{ font-size:.86rem; }
+  .whyus-list li{ padding:16px 0; gap:14px; }
+  .whyus-list .wl-num{ font-size:.9rem; width:24px; }
+  .whyus-list .wl-body h4{ font-size:.86rem; }
+  .whyus-list .wl-body p{ font-size:.76rem; }
+  .whyus-cta{ flex-direction:column; }
+  .whyus-cta .btn{ width:100%; justify-content:center; }
+
+  .stats-band{ padding:36px 18px; border-radius:20px; }
+  .stats-head h2{ font-size:1.4rem; }
+  .stats-head p{ font-size:.86rem; }
+  .stats-grid{ grid-template-columns:1fr 1fr; gap:14px; row-gap:24px; }
+  .stat-tile .st-num{ font-size:1.85rem; }
+  .stat-tile .st-label{ font-size:.62rem; letter-spacing:.6px; }
+  .stat-tile .st-sub{ font-size:.6rem; }
+
+  .action-head h2{ font-size:1.45rem; }
+  .action-card{ padding:26px 18px 22px; border-radius:18px; }
+  .action-card .ac-num{ font-size:2.2rem; top:16px; right:16px; }
+  .action-card .ac-icon{ width:52px; height:52px; font-size:1.15rem; margin-bottom:18px; }
+  .action-card h3{ font-size:1rem; }
+  .action-card p{ font-size:.78rem; }
+
+  .action-bottom{ padding:18px; }
+  .action-bottom p{ font-size:.8rem; }
+  .action-bottom .ab-actions{ flex-direction:column; }
+  .action-bottom .ab-actions .btn{ width:100%; justify-content:center; }
+
+  .final-cta .fc-copy{ padding:28px 20px; }
+  .final-cta .fc-copy h2{ font-size:1.45rem; }
+  .final-cta .fc-copy p{ font-size:.86rem; }
+  .final-cta .fc-actions{ flex-direction:column; }
+  .final-cta .fc-actions .btn{ width:100%; justify-content:center; }
+  .final-cta .fc-visual{ min-height:200px; }
+  .final-cta .fc-badge{ padding:10px 12px; gap:8px; }
+  .final-cta .fc-badge i{ width:32px; height:32px; font-size:.78rem; }
+  .final-cta .fc-badge strong{ font-size:.92rem; }
+  .final-cta .fc-badge small{ font-size:.58rem; }
+}
+
+@media (max-width:380px){
+  .wrap{ padding:0 14px; }
+  .hero-copy h1{ font-size:1.55rem; }
+  .bento-head h2{ font-size:1.3rem; }
+  .process-head h2{ font-size:1.3rem; }
+  .whyus-copy h2{ font-size:1.3rem; }
+  .action-head h2{ font-size:1.3rem; }
+  .final-cta .fc-copy h2{ font-size:1.3rem; }
+  .price-card .pc-price .amount{ font-size:2rem; }
+  .stat-tile .st-num{ font-size:1.65rem; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+  html{ scroll-behavior:auto; }
+}
+</style>
+</head>
+<body>
+
+<div id="header-placeholder"></div>
+
+<main>
+
+  <!-- ==========================================================
+       SECTION 1 — HERO
+       ========================================================== -->
+  <section class="hero-offset">
+    <div class="wrap">
+      <div class="hero-grid">
+
+        <div class="hero-left">
+          <div class="hero-vert-badge" aria-hidden="true">
+            <i class="fas fa-bolt"></i>
+            <span>Professional Services</span>
+          </div>
+
+          <div class="hero-copy">
+            <span class="mini-eyebrow" data-aos="fade-down">
+              <i class="fas fa-screwdriver-wrench"></i> Automotive Services
+            </span>
+            <h1 data-aos="fade-up" data-aos-delay="100">
+              Expert care.<br><em>Every drive.</em>
+            </h1>
+            <p data-aos="fade-up" data-aos-delay="180">
+              From routine oil changes to full performance builds — our ASE-certified
+              technicians deliver factory-grade service at transparent prices.
+              Same-day slots, mobile pickup, 12-month guarantee.
+            </p>
+            <div class="hero-actions" data-aos="fade-up" data-aos-delay="240">
+              <a href="404.html" class="btn btn-red">
+                <i class="fas fa-calendar-check"></i> Book Service
+              </a>
+              <a href="404.html" class="btn btn-ghost">
+                <i class="fas fa-phone"></i> Call Now
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-right" data-aos="fade-left" data-aos-delay="150">
+          <div class="hero-img-main">
+            <img
+              src="cp10.webp"
+              alt="Workshop technician"
+              loading="eager"
+              onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #1a0000, #0B0E13)';">
+          </div>
+
+          <div class="hero-service-list">
+            <!-- DIV — only the arrow is clickable -->
+            <div class="hero-service-item">
+              <i class="fas fa-oil-can"></i>
+              <div class="hsi-body">
+                <div class="hsi-title">Oil &amp; Filter Change</div>
+                <div class="hsi-meta">30 min · From $49</div>
+              </div>
+              <a href="404.html" class="hsi-arrow" aria-label="View Oil and Filter Change">
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+
+            <div class="hero-service-item">
+              <i class="fas fa-circle-dot"></i>
+              <div class="hsi-body">
+                <div class="hsi-title">Brake Inspection</div>
+                <div class="hsi-meta">45 min · Free with service</div>
+              </div>
+              <a href="404.html" class="hsi-arrow" aria-label="View Brake Inspection">
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+
+            <div class="hero-service-item">
+              <i class="fas fa-gauge-high"></i>
+              <div class="hsi-body">
+                <div class="hsi-title">Full Diagnostics</div>
+                <div class="hsi-meta">60 min · From $89</div>
+              </div>
+              <a href="404.html" class="hsi-arrow" aria-label="View Full Diagnostics">
+                <i class="fas fa-arrow-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       SECTION 2 — BENTO SERVICES
+       ========================================================== -->
+  <section class="sec bento-section">
+    <div class="wrap">
+
+      <div class="bento-head" data-aos="fade-up">
+        <span class="mini-eyebrow"><i class="fas fa-th-large"></i> Our Services</span>
+        <h2>Complete care, <em>under one roof</em></h2>
+        <p>Every aspect of vehicle maintenance and performance — handled by the same trusted team.</p>
+      </div>
+
+      <div class="bento-grid">
+
+        <article class="bento-card large" data-aos="fade-up">
+          <img class="bc-img"
+               src="cp9.webp"
+               alt="Full service"
+               loading="lazy"
+               onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          <div class="bc-body">
+            <span class="bc-tag"><i class="fas fa-star"></i> Most Popular</span>
+            <h3 class="bc-title">Full Service &amp; MOT</h3>
+            <p class="bc-desc">Comprehensive 40-point inspection, oil change, brake check, fluid top-up, and government MOT certificate — all in a single visit.</p>
+            <a href="404.html" class="bc-link">Learn More <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+        <article class="bento-card" data-aos="fade-up" data-aos-delay="80">
+          <img class="bc-img"
+               src="cp8.webp"
+               alt="Brake service"
+               loading="lazy"
+               onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          <div class="bc-body">
+            <span class="bc-tag amber">Safety</span>
+            <h3 class="bc-title">Brake &amp; Suspension</h3>
+            <p class="bc-desc">Pads, rotors, calipers, shocks — restored to factory spec.</p>
+            <a href="404.html" class="bc-link">Learn More <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+        <article class="bento-card" data-aos="fade-up" data-aos-delay="160">
+          <img class="bc-img"
+               src="cp7.webp"
+               alt="Diagnostics"
+               loading="lazy"
+               onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          <div class="bc-body">
+            <span class="bc-tag green">Fast</span>
+            <h3 class="bc-title">Diagnostics</h3>
+            <p class="bc-desc">Computer-based fault tracing for every system.</p>
+            <a href="404.html" class="bc-link">Learn More <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+        <article class="bento-card" data-aos="fade-up" data-aos-delay="240">
+          <img class="bc-img"
+               src="cp6.webp"
+               alt="Performance tuning"
+               loading="lazy"
+               onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          <div class="bc-body">
+            <span class="bc-tag"><i class="fas fa-fire"></i> Performance</span>
+            <h3 class="bc-title">Performance Tuning</h3>
+            <p class="bc-desc">ECU remaps, exhausts, suspension — unlock true potential.</p>
+            <a href="404.html" class="bc-link">Learn More <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+        <article class="bento-card" data-aos="fade-up" data-aos-delay="300">
+          <img class="bc-img"
+               src="cp5.webp"
+               alt="AC service"
+               loading="lazy"
+               onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #2a0505, #0B0E13)';">
+          <div class="bc-body">
+            <span class="bc-tag green">Seasonal</span>
+            <h3 class="bc-title">AC &amp; Heating</h3>
+            <p class="bc-desc">Recharge, leak detection, and full system check.</p>
+            <a href="404.html" class="bc-link">Learn More <i class="fas fa-arrow-right"></i></a>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="bento-cta" data-aos="fade-up">
+        <a href="404.html" class="btn btn-ghost">
+          <i class="fas fa-th-list"></i> View All Services <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       SECTION 3 — PROCESS
+       ========================================================== -->
+  <section class="sec process-section">
+    <div class="wrap">
+
+      <div class="process-head" data-aos="fade-up">
+        <span class="mini-eyebrow"><i class="fas fa-route"></i> How It Works</span>
+        <h2>Book in <em>four simple steps</em></h2>
+        <p>Same-day availability, transparent pricing, and no hidden fees — from booking to delivery.</p>
+      </div>
+
+      <div class="process-track">
+
+        <div class="proc-step" data-aos="fade-up">
+          <div class="proc-circle">
+            <i class="fas fa-calendar-plus"></i>
+            <span class="proc-num">01</span>
+          </div>
+          <div>
+            <h4 class="proc-title">Book Online</h4>
+            <p class="proc-desc">Pick a date, choose your service, confirm in 60 seconds.</p>
+          </div>
+        </div>
+
+        <div class="proc-connector" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+
+        <div class="proc-step" data-aos="fade-up" data-aos-delay="100">
+          <div class="proc-circle">
+            <i class="fas fa-truck-pickup"></i>
+            <span class="proc-num">02</span>
+          </div>
+          <div>
+            <h4 class="proc-title">We Collect</h4>
+            <p class="proc-desc">Free pickup &amp; drop-off within 15 km — or drop off yourself.</p>
+          </div>
+        </div>
+
+        <div class="proc-connector" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+
+        <div class="proc-step" data-aos="fade-up" data-aos-delay="200">
+          <div class="proc-circle">
+            <i class="fas fa-wrench"></i>
+            <span class="proc-num">03</span>
+          </div>
+          <div>
+            <h4 class="proc-title">Expert Service</h4>
+            <p class="proc-desc">ASE-certified technicians and a full quality-check on every job.</p>
+          </div>
+        </div>
+
+        <div class="proc-connector" aria-hidden="true"><i class="fas fa-chevron-right"></i></div>
+
+        <div class="proc-step" data-aos="fade-up" data-aos-delay="300">
+          <div class="proc-circle">
+            <i class="fas fa-circle-check"></i>
+            <span class="proc-num">04</span>
+          </div>
+          <div>
+            <h4 class="proc-title">Back on Road</h4>
+            <p class="proc-desc">Delivered back with a full report and 12-month guarantee.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="process-cta" data-aos="fade-up">
+        <a href="404.html" class="btn btn-red">
+          <i class="fas fa-calendar-check"></i> Start Booking Now
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       SECTION 4 — PRICING
+       ========================================================== -->
+  <section class="sec pricing-section">
+    <div class="wrap">
+
+      <div class="pricing-head" data-aos="fade-up">
+        <span class="mini-eyebrow"><i class="fas fa-tags"></i> Simple Pricing</span>
+        <h2>Transparent packages, <em>no surprises</em></h2>
+        <p>Choose a plan that fits your driving habits — cancel or upgrade any time.</p>
+      </div>
+
+      <div class="pricing-grid">
+
+        <div class="price-card" data-aos="fade-up">
+          <div class="pc-tag">Essential</div>
+          <h3>Basic Care</h3>
+          <p class="pc-sub">Perfect for low-mileage city drivers who need the essentials covered.</p>
+          <div class="pc-price">
+            <span class="currency">$</span>
+            <span class="amount">49</span>
+            <span class="period">/ visit</span>
+          </div>
+          <ul class="pc-features">
+            <li><i class="fas fa-check"></i> Oil &amp; filter change</li>
+            <li><i class="fas fa-check"></i> 20-point safety inspection</li>
+            <li><i class="fas fa-check"></i> Fluid top-up</li>
+            <li><i class="fas fa-check"></i> Tyre pressure &amp; tread check</li>
+            <li class="muted"><i class="fas fa-xmark"></i> Full diagnostics</li>
+            <li class="muted"><i class="fas fa-xmark"></i> Free pickup &amp; drop-off</li>
+          </ul>
+          <a href="404.html" class="btn btn-ghost pc-btn">Choose Basic</a>
+        </div>
+
+        <div class="price-card featured" data-aos="fade-up" data-aos-delay="100">
+          <div class="pc-tag">Most Chosen</div>
+          <h3>Full Service</h3>
+          <p class="pc-sub">The complete annual service that keeps your warranty intact and your car at peak.</p>
+          <div class="pc-price">
+            <span class="currency">$</span>
+            <span class="amount">189</span>
+            <span class="period">/ visit</span>
+          </div>
+          <ul class="pc-features">
+            <li><i class="fas fa-check"></i> Oil &amp; filter + air filter</li>
+            <li><i class="fas fa-check"></i> 40-point inspection</li>
+            <li><i class="fas fa-check"></i> Brake &amp; suspension check</li>
+            <li><i class="fas fa-check"></i> Full computer diagnostics</li>
+            <li><i class="fas fa-check"></i> Free pickup &amp; drop-off</li>
+            <li><i class="fas fa-check"></i> 12-month written guarantee</li>
+          </ul>
+          <a href="404.html" class="btn btn-red pc-btn">Choose Full Service</a>
+        </div>
+
+        <div class="price-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="pc-tag">Performance</div>
+          <h3>Elite Care</h3>
+          <p class="pc-sub">For enthusiasts and performance cars that demand the very best from every visit.</p>
+          <div class="pc-price">
+            <span class="currency">$</span>
+            <span class="amount">399</span>
+            <span class="period">/ visit</span>
+          </div>
+          <ul class="pc-features">
+            <li><i class="fas fa-check"></i> Everything in Full Service</li>
+            <li><i class="fas fa-check"></i> Performance diagnostic scan</li>
+            <li><i class="fas fa-check"></i> ECU performance check</li>
+            <li><i class="fas fa-check"></i> Track-ready pre-inspection</li>
+            <li><i class="fas fa-check"></i> Priority booking (same day)</li>
+            <li><i class="fas fa-check"></i> 24-month written guarantee</li>
+          </ul>
+          <a href="404.html" class="btn btn-ghost pc-btn">Choose Elite</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       SECTION 5 — WHY US
+       ========================================================== -->
+  <section class="sec whyus-section">
+    <div class="wrap">
+      <div class="whyus-grid">
+
+        <div class="whyus-visual" data-aos="fade-right">
+          <img
+            src="car1.webp"
+            alt="Certified technicians at work"
+            loading="lazy"
+            onerror="this.style.display='none'; this.parentElement.style.background='linear-gradient(135deg, #1a0000, #0B0E13)';">
+          <div class="whyus-badge">
+            <i class="fas fa-award"></i>
+            <div>
+              <strong>ASE-Certified Team</strong>
+              <small>Every technician, every job</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="whyus-copy" data-aos="fade-left">
+          <span class="mini-eyebrow"><i class="fas fa-shield-halved"></i> Why Choose Us</span>
+          <h2>Four reasons <em>drivers trust us</em></h2>
+          <p>We've been servicing Detroit's finest for over 15 years. Here's what keeps our customers coming back.</p>
+
+          <ul class="whyus-list">
+            <li>
+              <span class="wl-num">01</span>
+              <div class="wl-body">
+                <h4>Factory-Grade Tools &amp; Parts</h4>
+                <p>We use manufacturer-approved diagnostic equipment and only genuine OEM or premium-grade components.</p>
+              </div>
+            </li>
+            <li>
+              <span class="wl-num">02</span>
+              <div class="wl-body">
+                <h4>Fixed-Price, No Surprises</h4>
+                <p>Every job is quoted upfront and priced fixed — the number you're given is the number you pay.</p>
+              </div>
+            </li>
+            <li>
+              <span class="wl-num">03</span>
+              <div class="wl-body">
+                <h4>Same-Day Turnaround</h4>
+                <p>Most jobs done by close of business. Emergency repairs handled within 2 hours of arrival.</p>
+              </div>
+            </li>
+            <li>
+              <span class="wl-num">04</span>
+              <div class="wl-body">
+                <h4>12-Month Written Guarantee</h4>
+                <p>If anything we've serviced fails within a year — we fix it free, no paperwork, no argument.</p>
+              </div>
+            </li>
+          </ul>
+
+          <div class="whyus-cta">
+            <a href="404.html" class="btn btn-red">
+              <i class="fas fa-star"></i> Read Customer Stories
+            </a>
+            <a href="404.html" class="btn btn-ghost">
+              <i class="fas fa-images"></i> See Our Work
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       SECTION 6 — STATS
+       ========================================================== -->
+  <section class="sec stats-section">
+    <div class="wrap">
+      <div class="stats-band" data-aos="fade-up">
+        <span class="stats-dots" aria-hidden="true"></span>
+
+        <div class="stats-head">
+          <span class="mini-eyebrow"><i class="fas fa-trophy"></i> By The Numbers</span>
+          <h2>Fifteen years of <em>trusted service</em></h2>
+          <p>Our team has serviced thousands of vehicles — here's what that looks like in numbers.</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-tile" data-aos="fade-up">
+            <div class="st-num" data-count="15000">15,000<span>+</span></div>
+            <div class="st-label">Vehicles Serviced</div>
+            <div class="st-sub">Since 2010</div>
+          </div>
+          <div class="stat-tile" data-aos="fade-up" data-aos-delay="80">
+            <div class="st-num" data-count="98" data-suffix="%">98<span>%</span></div>
+            <div class="st-label">On-Time Delivery</div>
+            <div class="st-sub">Last 12 months</div>
+          </div>
+          <div class="stat-tile" data-aos="fade-up" data-aos-delay="160">
+            <div class="st-num" data-count="32">32</div>
+            <div class="st-label">Certified Technicians</div>
+            <div class="st-sub">ASE-accredited team</div>
+          </div>
+          <div class="stat-tile" data-aos="fade-up" data-aos-delay="240">
+            <div class="st-num" data-count="4.9" data-suffix="★">4.9<span>★</span></div>
+            <div class="st-label">Average Rating</div>
+            <div class="st-sub">12,480 reviews</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       SECTION 7 — ACTION CARDS (no form)
+       ========================================================== -->
+  <section class="sec action-section">
+    <div class="wrap">
+
+      <div class="action-head" data-aos="fade-up">
+        <span class="mini-eyebrow"><i class="fas fa-rocket"></i> Get Started</span>
+        <h2>Ready to <em>get started?</em></h2>
+        <p>Three ways to begin — pick the option that fits your schedule best. All lead to the same expert service.</p>
+      </div>
+
+      <div class="action-grid">
+
+        <div class="action-card" data-aos="fade-up">
+          <span class="ac-num">01</span>
+          <div class="ac-icon"><i class="fas fa-calendar-check"></i></div>
+          <h3>Book Online</h3>
+          <p>Pick a date, choose your service, and confirm in under 60 seconds. Same-day slots available every day.</p>
+          <div class="ac-meta"><i class="fas fa-circle-check"></i> Instant confirmation</div>
+          <a href="404.html" class="btn btn-red ac-btn">
+            <i class="fas fa-calendar-plus"></i> Book Service
+          </a>
+        </div>
+
+        <div class="action-card" data-aos="fade-up" data-aos-delay="100">
+          <span class="ac-num">02</span>
+          <div class="ac-icon"><i class="fas fa-phone"></i></div>
+          <h3>Call Us</h3>
+          <p>Prefer to talk to a real person? Our team answers every call within 30 seconds — no phone trees, no hold music.</p>
+          <div class="ac-meta"><i class="fas fa-circle-check"></i> Mon–Sat · 8 AM – 7 PM</div>
+          <a href="404.html" class="btn btn-red ac-btn">
+            <i class="fas fa-phone"></i> Call +1 (800) 555-0199
+          </a>
+        </div>
+
+        <div class="action-card" data-aos="fade-up" data-aos-delay="200">
+          <span class="ac-num">03</span>
+          <div class="ac-icon"><i class="fas fa-comment-dots"></i></div>
+          <h3>Chat with Expert</h3>
+          <p>Need a quick answer or a fitment check? Chat with a technician right now — average response time 2 minutes.</p>
+          <div class="ac-meta"><i class="fas fa-circle-check"></i> 7 days a week · Live now</div>
+          <a href="404.html" class="btn btn-red ac-btn">
+            <i class="fas fa-comment"></i> Start Live Chat
+          </a>
+        </div>
+
+      </div>
+
+      <div class="action-bottom" data-aos="fade-up">
+        <p>Not sure which service is right for you? We'll help you decide — no pressure, no obligation.</p>
+        <div class="ab-actions">
+          <a href="404.html" class="btn btn-ghost">
+            <i class="fas fa-file-invoice"></i> Get a Free Quote
+          </a>
+          <a href="404.html" class="btn btn-ghost">
+            <i class="fas fa-question-circle"></i> Compare Services
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       SECTION 8 — FINAL CTA
+       ========================================================== -->
+  <section class="sec final-cta-section">
+    <div class="wrap">
+      <div class="final-cta" data-aos="zoom-in">
+
+        <div class="fc-copy">
+          <span class="mini-eyebrow"><i class="fas fa-bolt"></i> Need Help Now?</span>
+          <h2>Talk to a technician <em>right now</em></h2>
+          <p>Urgent repair, roadside emergency, or just want a quick quote? Skip the form and reach a real expert in seconds.</p>
+          <div class="fc-actions">
+            <a href="404.html" class="btn btn-red">
+              <i class="fas fa-phone"></i> Call +1 (800) 555-0199
+            </a>
+            <a href="404.html" class="btn btn-ghost">
+              <i class="fas fa-comment-dots"></i> Live Chat
+            </a>
+          </div>
+        </div>
+
+        <div class="fc-visual">
+          <img
+            src="car2.webp"
+            alt="Performance car"
+            loading="lazy"
+            onerror="this.style.display='none';">
+          <div class="fc-badge">
+            <i class="fas fa-headset"></i>
+            <div>
+              <strong>24/7 Support</strong>
+              <small>Roadside &amp; emergency</small>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div id="footer-placeholder"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+AOS.init({
+  duration: 850,
+  easing: 'ease-out-cubic',
+  once: true,
+  offset: 60,
+  mirror: false,
+  disable: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+});
+
+/* ---------- header + footer loader ---------- */
+document.addEventListener('DOMContentLoaded', function () {
+  fetch('header.html')
+    .then(r => r.ok ? r.text() : Promise.reject('Header not found'))
+    .then(d => { document.getElementById('header-placeholder').innerHTML = d; initHeader(); })
+    .catch(err => console.warn('Header not loaded:', err));
+  fetch('footer.html')
+    .then(r => r.ok ? r.text() : Promise.reject('Footer not found'))
+    .then(d => { document.getElementById('footer-placeholder').innerHTML = d; initFooter(); })
+    .catch(err => console.warn('Footer not loaded:', err));
+});
+
+function initHeader(){
+  const hamburger = document.getElementById('hamburgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (!hamburger || !mobileMenu) return;
+  function toggleMenu(){
+    const isOpen = !mobileMenu.classList.contains('active');
+    hamburger.classList.toggle('active', isOpen);
+    mobileMenu.classList.toggle('active', isOpen);
+    document.documentElement.classList.toggle('menu-open', isOpen);
+    document.body.classList.toggle('menu-open', isOpen);
+    document.documentElement.style.overflow = isOpen ? 'hidden' : '';
+    document.body.style.overflow            = isOpen ? 'hidden' : '';
+    hamburger.setAttribute('aria-expanded', isOpen);
+  }
+  function closeMenu(){
+    if (!mobileMenu.classList.contains('active')) return;
+    hamburger.classList.remove('active');
+    mobileMenu.classList.remove('active');
+    document.documentElement.classList.remove('menu-open');
+    document.body.classList.remove('menu-open');
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    hamburger.setAttribute('aria-expanded', 'false');
+  }
+  hamburger.addEventListener('click', toggleMenu);
+  document.addEventListener('click', e => {
+    if (mobileMenu.classList.contains('active') &&
+        !hamburger.contains(e.target) && !mobileMenu.contains(e.target)) closeMenu();
+  });
+  window.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
+  document.querySelectorAll('.mobile-nav-link, .mobile-action-link').forEach(l =>
+    l.addEventListener('click', closeMenu));
+}
+
+function initFooter(){
+  function validEmail(email){ return /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(email); }
+  (function(){
+    var btn = document.getElementById('footerSubscribeBtn');
+    var input = document.getElementById('footerEmail');
+    var err = document.getElementById('footerEmailError');
+    if (!btn || !input || !err) return;
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var email = input.value.trim();
+      if (!email){ err.textContent = 'Please enter your email address'; err.classList.add('show'); input.classList.add('error'); }
+      else if (!validEmail(email)){ err.textContent = 'Please enter a valid email address'; err.classList.add('show'); input.classList.add('error'); }
+      else { err.classList.remove('show'); input.classList.remove('error'); window.location.href = '404.html'; }
+    });
+    input.addEventListener('input', function(){ if (this.value.trim()){ err.classList.remove('show'); this.classList.remove('error'); } });
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') btn.click(); });
+  })();
+  (function(){
+    var btn = document.getElementById('mobileFooterSubscribeBtn');
+    var input = document.getElementById('mobileFooterEmail');
+    var err = document.getElementById('mobileFooterEmailError');
+    if (!btn || !input || !err) return;
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var email = input.value.trim();
+      if (!email){ err.textContent = 'Please enter your email address'; err.classList.add('show'); input.classList.add('error'); }
+      else if (!validEmail(email)){ err.textContent = 'Please enter a valid email address'; err.classList.add('show'); input.classList.add('error'); }
+      else { err.classList.remove('show'); input.classList.remove('error'); window.location.href = '404.html'; }
+    });
+    input.addEventListener('input', function(){ if (this.value.trim()){ err.classList.remove('show'); this.classList.remove('error'); } });
+    input.addEventListener('keydown', function(e){ if (e.key === 'Enter') btn.click(); });
+  })();
+}
+
+/* ---------- STATS COUNT-UP ---------- */
+(function initCounters(){
+  const nums = document.querySelectorAll('.st-num[data-count]');
+  if (!nums.length) return;
+
+  function formatNum(val){
+    if (val % 1 === 0) return val.toLocaleString();
+    return val.toFixed(1);
+  }
+
+  function animate(el){
+    const target = parseFloat(el.dataset.count);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1600;
+    const start = performance.now();
+    function tick(now){
+      const p = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const val = target * eased;
+      el.innerHTML = formatNum(Math.round(val * 10) / 10) +
+        (suffix ? '<span>' + suffix + '</span>' : '');
+      if (p < 1) requestAnimationFrame(tick);
+      else el.innerHTML = formatNum(target) +
+        (suffix ? '<span>' + suffix + '</span>' : '');
+    }
+    requestAnimationFrame(tick);
+  }
+
+  if (!('IntersectionObserver' in window)){
+    nums.forEach(animate);
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      io.unobserve(entry.target);
+      animate(entry.target);
+    });
+  }, { threshold: 0.4 });
+  nums.forEach(el => io.observe(el));
+})();
+
+console.log('%c🔧 Services page ready — 8 sections, arrow-only click on hero cards', 'color:#E10600;font-size:14px;font-weight:bold;');
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Automotive — Login</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================
+   AUTOMOTIVE COLOR SYSTEM — matches navbar + footer + signup
+   ========================================================== */
+:root{
+  --carbon:      #0B0E13;
+  --graphite:    #141922;
+  --steel:       #232A36;
+
+  --red:         #E10600;
+  --red-bright:  #FF2A1F;
+  --red-deep:    #A80400;
+
+  --amber:       #FFB020;
+  --amber-d:     #E08A00;
+
+  --silver:      #C9D1DC;
+  --text:        #EEF2F8;
+  --text-soft:   #A9B3C0;
+  --text-mute:   #8B96A6;
+
+  --line:        rgba(201,209,220,.12);
+  --line-2:      rgba(201,209,220,.22);
+
+  --input-bg:    rgba(11,14,19,.55);
+  --input-bd:    rgba(201,209,220,.18);
+
+  --ease:        cubic-bezier(.22,.61,.36,1);
+}
+
+*{
+  margin:0; padding:0; box-sizing:border-box;
+  font-family:'Inter','Segoe UI',Roboto,system-ui,sans-serif;
+}
+
+html, body{ overflow-x:hidden; }
+
+body{
+  background:
+    radial-gradient(1100px 600px at 78% -10%, rgba(225,6,0,.16), transparent 62%),
+    radial-gradient(900px 520px at 4% 6%, rgba(255,176,32,.07), transparent 60%),
+    var(--carbon);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  width:100%;
+  position:relative;
+  z-index:0;
+}
+
+/* floating blobs */
+body::before,
+body::after{
+  content:'';
+  position:fixed;
+  border-radius:50%;
+  filter:blur(90px);
+  z-index:-1;
+  pointer-events:none;
+}
+body::before{
+  width:520px; height:520px;
+  background:#E10600;
+  opacity:.22;
+  top:-180px; left:-160px;
+  animation:blobDrift 16s ease-in-out infinite;
+}
+body::after{
+  width:460px; height:460px;
+  background:#FFB020;
+  opacity:.12;
+  bottom:-200px; right:-180px;
+  animation:blobDrift 20s ease-in-out infinite reverse;
+}
+@keyframes blobDrift{
+  0%,100%{ transform:translate(0,0) scale(1); }
+  50%{ transform:translate(40px,-30px) scale(1.1); }
+}
+
+#header-placeholder,
+#footer-placeholder{ width:100%; flex-shrink:0; }
+
+.main-wrapper{
+  max-width:1140px;
+  width:100%;
+  margin:0 auto;
+  padding:0 16px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+.login-form-wrapper{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:2.5rem 0;
+  width:100%;
+  flex:1;
+}
+
+/* ==========================================================
+   CARD
+   ========================================================== */
+.login-form-card{
+  display:flex;
+  flex-direction:column;
+  max-width:860px;
+  width:100%;
+  background:linear-gradient(160deg, rgba(20,25,34,.96), rgba(11,14,19,.99));
+  border-radius:24px;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.7),
+    inset 0 1px 0 rgba(255,255,255,.05);
+  border:1px solid var(--line-2);
+  overflow:hidden;
+  position:relative;
+}
+.login-form-card::after{
+  content:'';
+  position:absolute;
+  left:0; right:0; bottom:0;
+  height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+  pointer-events:none;
+}
+
+/* ==========================================================
+   VISUAL PANEL
+   ========================================================== */
+.login-form-visual{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg, #1a0000 0%, #2a0505 45%, #0B0E13 100%);
+  padding:1.5rem;
+  min-height:240px;
+  overflow:hidden;
+}
+.login-form-visual::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 20% 25%, rgba(225,6,0,.35), transparent 55%),
+    radial-gradient(circle at 85% 80%, rgba(255,176,32,.18), transparent 55%);
+  pointer-events:none;
+}
+.login-form-visual::after{
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:3px;
+  background:linear-gradient(90deg, var(--red), var(--amber), transparent);
+}
+
+.login-form-visual img{
+  width:100%;
+  max-width:220px;
+  height:auto;
+  object-fit:contain;
+  display:block;
+  position:relative;
+  z-index:2;
+  filter:drop-shadow(0 14px 28px rgba(0,0,0,.6));
+  animation:floatImage 4s ease-in-out infinite;
+}
+@keyframes floatImage{
+  0%,100%{ transform:translateY(0) scale(1); }
+  50%{ transform:translateY(-10px) scale(1.02); }
+}
+
+.login-svg-fallback{
+  width:100%;
+  max-width:220px;
+  display:none;
+  position:relative;
+  z-index:2;
+}
+.login-svg-fallback svg{ width:100%; height:auto; display:block; }
+
+/* ==========================================================
+   FORM PANEL
+   ========================================================== */
+.login-form-content{
+  flex:1;
+  padding:2rem 1.5rem;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  text-align:center;
+  position:relative;
+  z-index:1;
+}
+
+.login-form-heading{
+  font-family:'Outfit',sans-serif;
+  font-size:1.6rem;
+  font-weight:800;
+  color:#fff;
+  margin-bottom:6px;
+  letter-spacing:-.02em;
+}
+.login-form-subhead{
+  font-size:.86rem;
+  color:var(--text-soft);
+  margin-bottom:22px;
+  line-height:1.65;
+}
+.login-form-subhead strong{
+  color:var(--amber);
+  font-weight:700;
+}
+
+/* ---------- Global alerts ---------- */
+.login-global-error,
+.login-global-success{
+  display:none;
+  padding:11px 15px;
+  border-radius:10px;
+  font-size:.8rem;
+  font-weight:600;
+  line-height:1.5;
+  margin-bottom:16px;
+  text-align:left;
+}
+.login-global-error{
+  background:rgba(225,6,0,.10);
+  color:#FF8A85;
+  border:1px solid rgba(225,6,0,.35);
+  border-left:4px solid var(--red);
+}
+.login-global-success{
+  background:rgba(67,160,71,.10);
+  color:#8FE39B;
+  border:1px solid rgba(67,160,71,.35);
+  border-left:4px solid #43A047;
+}
+.login-global-error.show,
+.login-global-success.show{ display:block; }
+.login-global-error i,
+.login-global-success i{ margin-right:6px; }
+
+/* ---------- Demo hint ---------- */
+.login-demo-hint{
+  background:rgba(255,176,32,.06);
+  border:1px dashed rgba(255,176,32,.28);
+  border-radius:10px;
+  padding:11px 14px;
+  margin-bottom:16px;
+  font-size:.75rem;
+  color:var(--text-soft);
+  line-height:1.75;
+  text-align:left;
+}
+.login-demo-hint strong{ color:var(--amber); font-weight:700; }
+.login-demo-hint code{
+  background:rgba(11,14,19,.7);
+  padding:2px 7px;
+  border-radius:4px;
+  color:#fff;
+  font-weight:600;
+  font-size:.72rem;
+  border:1px solid var(--line-2);
+}
+
+/* ---------- Google button ---------- */
+.login-google-row{
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  margin-bottom:16px;
+  cursor:pointer;
+  font-weight:600;
+  color:#fff;
+  font-size:.86rem;
+  transition:all .25s var(--ease);
+  border-radius:10px;
+  padding:11px 16px;
+  background:var(--input-bg);
+  border:1.5px solid var(--input-bd);
+  justify-content:center;
+  text-decoration:none;
+}
+.login-google-row:hover{
+  background:rgba(20,25,34,.95);
+  border-color:rgba(225,6,0,.4);
+  box-shadow:0 4px 14px rgba(225,6,0,.18);
+  transform:translateY(-1px);
+}
+.login-google-icon{
+  display:inline-flex;
+  width:1.4rem;
+  height:1.4rem;
+  flex-shrink:0;
+  background:#fff;
+  border-radius:50%;
+  padding:2px;
+}
+.login-google-icon svg{ width:100%; height:100%; display:block; }
+
+.login-divider{
+  display:flex;
+  align-items:center;
+  gap:.7rem;
+  margin:4px 0 18px;
+  justify-content:center;
+}
+.login-divider hr{
+  flex:1;
+  border:none;
+  height:1px;
+  background:var(--line);
+}
+.login-divider span{
+  color:var(--text-mute);
+  font-size:.72rem;
+  font-weight:700;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+}
+
+/* ---------- Inputs ---------- */
+.login-input-group{
+  position:relative;
+  margin-bottom:14px;
+  width:100%;
+}
+.login-input-group i{
+  position:absolute;
+  left:15px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--red-bright);
+  font-size:.9rem;
+  width:1.1rem;
+  text-align:center;
+  pointer-events:none;
+  z-index:2;
+}
+.login-input-group input,
+.login-input-group select{
+  width:100%;
+  padding:.78rem .9rem .78rem 2.6rem;
+  border:1.5px solid var(--input-bd);
+  border-radius:10px;
+  font-size:.9rem;
+  background:var(--input-bg);
+  transition:all .2s ease;
+  outline:none;
+  color:#fff;
+  font-family:inherit;
+  cursor:pointer;
+}
+.login-input-group input::placeholder{ color:#7a8593; }
+.login-input-group select{ color:var(--text-soft); }
+.login-input-group select:valid{ color:#fff; }
+
+.login-input-group select{
+  appearance:none;
+  -webkit-appearance:none;
+  padding-right:2.6rem;
+  background-image:url("cp8.webp");
+  background-repeat:no-repeat;
+  background-position:right 1rem center;
+  background-size:12px;
+}
+
+.login-input-group input:focus,
+.login-input-group select:focus{
+  border-color:var(--red);
+  box-shadow:0 0 0 4px rgba(225,6,0,.15);
+  background:rgba(11,14,19,.85);
+}
+
+.login-error-msg{
+  color:var(--red-bright);
+  font-size:.75rem;
+  font-weight:600;
+  margin-top:4px;
+  margin-bottom:12px;
+  display:none;
+  padding-left:.5rem;
+  text-align:left;
+  line-height:1.4;
+}
+.login-error-msg.show{ display:block; }
+.login-input-group.has-error{ margin-bottom:0; }
+.login-row-options.has-error{ margin-bottom:0; }
+
+/* ---------- Remember + Forgot ---------- */
+.login-row-options{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:6px 0 20px;
+  flex-wrap:wrap;
+  gap:.4rem;
+}
+.login-remember{
+  display:flex;
+  align-items:center;
+  gap:.5rem;
+  font-size:.82rem;
+  color:var(--text-soft);
+  cursor:pointer;
+  font-weight:500;
+}
+.login-remember input[type="checkbox"]{
+  width:16px;
+  height:16px;
+  accent-color:var(--red);
+  cursor:pointer;
+  flex-shrink:0;
+}
+.login-forgot-link{
+  color:var(--amber);
+  font-size:.82rem;
+  text-decoration:none;
+  font-weight:700;
+  transition:color .25s ease;
+}
+.login-forgot-link:hover{ color:#fff; text-decoration:underline; }
+
+/* ---------- Submit ---------- */
+.login-btn-wrapper{ display:flex; margin-bottom:18px; width:100%; }
+.login-submit-btn{
+  width:100%;
+  padding:.88rem .9rem;
+  background:linear-gradient(135deg, var(--red), var(--red-deep));
+  border:none;
+  border-radius:10px;
+  font-weight:800;
+  font-size:.9rem;
+  color:#fff;
+  cursor:pointer;
+  transition:all .35s var(--ease);
+  letter-spacing:.6px;
+  box-shadow:0 10px 26px rgba(225,6,0,.4);
+  text-transform:uppercase;
+  font-family:inherit;
+  position:relative;
+  overflow:hidden;
+}
+.login-submit-btn::before{
+  content:'';
+  position:absolute;
+  top:0; left:-100%;
+  width:100%; height:100%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+  transition:left .5s ease;
+}
+.login-submit-btn:hover::before{ left:100%; }
+.login-submit-btn:hover{
+  background:linear-gradient(135deg, var(--red-bright), var(--red));
+  transform:translateY(-2px);
+  box-shadow:0 16px 36px rgba(225,6,0,.6);
+}
+.login-submit-btn:disabled{ opacity:.95; cursor:wait; transform:none; }
+
+.login-signup-text{
+  text-align:center;
+  font-size:.85rem;
+  color:var(--text-soft);
+}
+.login-signup-text a{
+  color:var(--amber);
+  font-weight:700;
+  text-decoration:none;
+}
+.login-signup-text a:hover{ color:#fff; text-decoration:underline; }
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+@media (min-width:768px){
+  .login-form-card{
+    flex-direction:row;
+    min-height:560px;
+    border-radius:24px;
+  }
+  .login-form-visual{
+    flex:.9;
+    min-height:280px;
+    padding:2rem;
+    border-right:1px solid var(--line-2);
+  }
+  .login-form-visual img{ max-width:240px; }
+  .login-form-content{
+    padding:2.5rem 2.5rem 2.5rem 2rem;
+    flex:1.1;
+    text-align:left;
+  }
+  .login-form-heading{ font-size:1.8rem; }
+  .login-form-subhead{ font-size:.9rem; margin-bottom:24px; }
+  .login-divider{ justify-content:flex-start; }
+  .login-google-row{ justify-content:flex-start; }
+}
+
+@media (max-width:767px){
+  .login-form-wrapper{ padding:1.5rem 0; }
+  .login-form-card{ max-width:460px; margin:0 auto; border-radius:18px; }
+  .login-form-content{ padding:2rem 1.5rem; text-align:center; }
+  .login-form-visual{ border-bottom:1px solid var(--line-2); }
+}
+
+@media (max-width:420px){
+  .login-form-content{ padding:1.5rem 1rem; }
+  .login-form-heading{ font-size:1.4rem; }
+  .login-form-subhead{ font-size:.8rem; margin-bottom:18px; }
+  .login-input-group input,
+  .login-input-group select{ padding:.68rem .7rem .68rem 2.4rem; font-size:.84rem; }
+  .login-submit-btn{ padding:.78rem .6rem; font-size:.82rem; }
+  .login-form-visual{ min-height:200px; padding:1rem; }
+  .login-form-visual img{ max-width:170px; }
+  .login-error-msg{ font-size:.72rem; padding-left:.4rem; }
+  .login-demo-hint{ font-size:.7rem; padding:8px 10px; }
+}
+
+::-webkit-scrollbar{ width:8px; }
+::-webkit-scrollbar-track{ background:var(--carbon); }
+::-webkit-scrollbar-thumb{ background:var(--steel); border-radius:4px; border:2px solid var(--carbon); }
+::-webkit-scrollbar-thumb:hover{ background:var(--red); }
+
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{
+    animation-duration:.001ms !important;
+    transition-duration:.001ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+  <div id="header-placeholder"></div>
+
+  <div class="main-wrapper">
+    <div class="login-form-wrapper">
+      <div class="login-form-card">
+
+        <!-- ============ VISUAL PANEL ============ -->
+        <div class="login-form-visual">
+          <img src="cp6.webp" alt="Automotive" loading="lazy"
+               onerror="this.style.display='none'; document.getElementById('loginSvgFallback').style.display='block';" />
+
+          <div id="loginSvgFallback" class="login-svg-fallback" style="display:none;">
+            <svg viewBox="0 0 300 340" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="carGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#FF2A1F"/>
+                  <stop offset="100%" stop-color="#A80400"/>
+                </linearGradient>
+              </defs>
+              <rect width="300" height="340" rx="16" fill="#0B0E13"/>
+              <circle cx="150" cy="150" r="105" fill="#E10600" opacity="0.15"/>
+              <circle cx="150" cy="150" r="72" fill="none" stroke="#FFB020" stroke-width="2" stroke-dasharray="6 6" opacity="0.55"/>
+
+              <!-- Car body -->
+              <path d="M70 175 L95 135 Q100 128 108 128 L192 128 Q200 128 205 135 L230 175 L245 178 Q255 180 255 190 L255 210 Q255 218 247 218 L235 218 Q230 205 218 205 Q206 205 201 218 L99 218 Q94 205 82 205 Q70 205 65 218 L53 218 Q45 218 45 210 L45 190 Q45 180 55 178 Z"
+                    fill="url(#carGrad)" stroke="#FFB020" stroke-width="2" stroke-linejoin="round"/>
+              <!-- Windows -->
+              <path d="M105 138 L125 138 L125 165 L96 165 Z" fill="#0B0E13" opacity="0.6"/>
+              <path d="M133 138 L167 138 L167 165 L133 165 Z" fill="#0B0E13" opacity="0.6"/>
+              <path d="M175 138 L195 138 L204 165 L175 165 Z" fill="#0B0E13" opacity="0.6"/>
+              <!-- Headlight -->
+              <ellipse cx="240" cy="188" rx="6" ry="5" fill="#FFB020"/>
+              <!-- Wheels -->
+              <circle cx="82" cy="218" r="17" fill="#232A36" stroke="#FFB020" stroke-width="2"/>
+              <circle cx="82" cy="218" r="6" fill="#FFB020"/>
+              <circle cx="218" cy="218" r="17" fill="#232A36" stroke="#FFB020" stroke-width="2"/>
+              <circle cx="218" cy="218" r="6" fill="#FFB020"/>
+
+              <text x="150" y="272" text-anchor="middle" font-family="Outfit, Inter, sans-serif" font-size="16" font-weight="800" fill="#ffffff" letter-spacing="1">AUTOMOTIVE</text>
+              <text x="150" y="292" text-anchor="middle" font-family="Inter, sans-serif" font-size="11" fill="#FFB020" letter-spacing="1">Certified · Precision · Performance</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- ============ FORM PANEL ============ -->
+        <div class="login-form-content">
+          <h1 class="login-form-heading">Welcome Back</h1>
+          <p class="login-form-subhead">
+            Sign in to <strong>Automotive</strong> — manage your vehicles, book services, and access genuine parts.
+          </p>
+
+          <div class="login-global-success" id="loginGlobalSuccess" role="status" aria-live="polite"></div>
+          <div class="login-global-error" id="loginGlobalError" role="alert" aria-live="polite"></div>
+
+          <div class="login-demo-hint">
+            <strong>Demo Accounts:</strong><br>
+            🚗 Customer: <code>customer@automotive.com</code> / <code>Customer@123</code><br>
+            🏢 Business: <code>business@automotive.com</code> / <code>Business@123</code>
+          </div>
+
+          <!-- Google Login -->
+          <a href="404.html" class="login-google-row" id="googleLoginBtn">
+            <span class="login-google-icon">
+              <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
+              </svg>
+            </span>
+            <span>Continue with Google</span>
+          </a>
+
+          <div class="login-divider"><hr /><span>Or</span><hr /></div>
+
+          <!-- Role select -->
+          <div class="login-input-group">
+            <i class="fas fa-user-tag"></i>
+            <select id="loginRoleSelect">
+              <option value="">Select your account type</option>
+              <option value="customer">Customer · Personal Vehicle</option>
+              <option value="business">Business · Fleet / Wholesale</option>
+            </select>
+          </div>
+          <div class="login-error-msg" id="loginRoleError">Please select your account type.</div>
+
+          <!-- Email -->
+          <div class="login-input-group">
+            <i class="fas fa-envelope"></i>
+            <input type="email" id="loginEmail" placeholder="Enter your email address" required />
+          </div>
+          <div class="login-error-msg" id="loginEmailError">Please enter a valid email address.</div>
+
+          <!-- Password -->
+          <div class="login-input-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="loginPassword" placeholder="Enter your password" required />
+          </div>
+          <div class="login-error-msg" id="loginPasswordError">Please enter your password.</div>
+
+          <!-- Remember + Forgot -->
+          <div class="login-row-options">
+            <label class="login-remember">
+              <input type="checkbox" id="loginRememberMe" /> Remember Me
+            </label>
+            <a href="404.html" class="login-forgot-link">Forgot Password?</a>
+          </div>
+          <div class="login-error-msg" id="loginCheckboxError">Please check "Remember Me" to continue.</div>
+
+          <!-- Submit -->
+          <div class="login-btn-wrapper">
+            <button class="login-submit-btn" id="loginSubmitBtn">Log In</button>
+          </div>
+
+          <div class="login-signup-text">
+            Not a member yet? <a href="signin.html" id="loginSignupLink">Create an account</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+<script>
+/* ============================
+   LOAD HEADER + FOOTER
+   ============================ */
+document.addEventListener('DOMContentLoaded', function () {
+  fetch('header.html')
+    .then(r => r.ok ? r.text() : Promise.reject('Header not found'))
+    .then(d => {
+      document.getElementById('header-placeholder').innerHTML = d;
+      initHeader();
+    })
+    .catch(err => console.warn('Header not loaded:', err));
+
+  fetch('footer.html')
+    .then(r => r.ok ? r.text() : Promise.reject('Footer not found'))
+    .then(d => {
+      document.getElementById('footer-placeholder').innerHTML = d;
+      initFooter();
+    })
+    .catch(err => console.warn('Footer not loaded:', err));
+});
+
+/* ============================
+   HEADER INIT
+   ============================ */
+function initHeader(){
+  const hamburger = document.getElementById('hamburgerBtn');
+  const mobileMenu = document.getElementById('mobileMenu');
+  if (!hamburger || !mobileMenu) return;
+
+  function toggleMenu(){
+    const isOpen = !mobileMenu.classList.contains('active');
+    hamburger.classList.toggle('active', isOpen);
+    mobileMenu.classList.toggle('active', isOpen);
+    document.documentElement.classList.toggle('menu-open', isOpen);
+    document.body.classList.toggle('menu-open', isOpen);
+    document.documentElement.style.overflow = isOpen ? 'hidden' : '';
+    document.body.style.overflow            = isOpen ? 'hidden' : '';
+    hamburger.setAttribute('aria-expanded', isOpen);
+  }
+  function closeMenu(){
+    if (!mobileMenu.classList.contains('active')) return;
+    hamburger.classList.remove('active');
+    mobileMenu.classList.remove('active');
+    document.documentElement.classList.remove('menu-open');
+    document.body.classList.remove('menu-open');
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+    hamburger.setAttribute('aria-expanded', 'false');
+  }
+
+  hamburger.addEventListener('click', toggleMenu);
+  document.addEventListener('click', function (e) {
+    if (mobileMenu.classList.contains('active')) {
+      if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) closeMenu();
+    }
+  });
+  window.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  window.addEventListener('resize', () => { if (window.innerWidth > 768) closeMenu(); });
+  document.querySelectorAll('.mobile-nav-link, .mobile-action-link').forEach(l =>
+    l.addEventListener('click', closeMenu));
+}
+
+/* ============================
+   FOOTER INIT — newsletter validation
+   ============================ */
+function initFooter(){
+  function validateEmail(email){
+    return /^[^\s@]+@([^\s@]+\.)+[^\s@]+$/.test(email);
+  }
+
+  /* DESKTOP */
+  (function(){
+    var btn = document.getElementById('footerSubscribeBtn');
+    var input = document.getElementById('footerEmail');
+    var err = document.getElementById('footerEmailError');
+    if (!btn || !input || !err) return;
+
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var email = input.value.trim();
+      if (!email){
+        err.textContent = 'Please enter your email address';
+        err.classList.add('show');
+        input.classList.add('error');
+      } else if (!validateEmail(email)){
+        err.textContent = 'Please enter a valid email address';
+        err.classList.add('show');
+        input.classList.add('error');
+      } else {
+        err.classList.remove('show');
+        input.classList.remove('error');
+        window.location.href = '404.html';
+      }
+    });
+
+    input.addEventListener('input', function(){
+      if (this.value.trim()){ err.classList.remove('show'); this.classList.remove('error'); }
+    });
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') btn.click();
+    });
+  })();
+
+  /* MOBILE */
+  (function(){
+    var btn = document.getElementById('mobileFooterSubscribeBtn');
+    var input = document.getElementById('mobileFooterEmail');
+    var err = document.getElementById('mobileFooterEmailError');
+    if (!btn || !input || !err) return;
+
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      var email = input.value.trim();
+      if (!email){
+        err.textContent = 'Please enter your email address';
+        err.classList.add('show');
+        input.classList.add('error');
+      } else if (!validateEmail(email)){
+        err.textContent = 'Please enter a valid email address';
+        err.classList.add('show');
+        input.classList.add('error');
+      } else {
+        err.classList.remove('show');
+        input.classList.remove('error');
+        window.location.href = '404.html';
+      }
+    });
+
+    input.addEventListener('input', function(){
+      if (this.value.trim()){ err.classList.remove('show'); this.classList.remove('error'); }
+    });
+    input.addEventListener('keydown', function(e){
+      if (e.key === 'Enter') btn.click();
+    });
+  })();
+}
+
+/* ============================
+   LOGIN LOGIC — customer / business
+   ============================ */
+(function login(){
+  const roleSelect = document.getElementById('loginRoleSelect');
+  const emailInput = document.getElementById('loginEmail');
+  const passwordInput = document.getElementById('loginPassword');
+  const rememberCheck = document.getElementById('loginRememberMe');
+
+  const roleError = document.getElementById('loginRoleError');
+  const emailError = document.getElementById('loginEmailError');
+  const passwordError = document.getElementById('loginPasswordError');
+  const checkboxError = document.getElementById('loginCheckboxError');
+  const globalError = document.getElementById('loginGlobalError');
+  const globalSuccess = document.getElementById('loginGlobalSuccess');
+
+  const loginBtn = document.getElementById('loginSubmitBtn');
+
+  const USERS_KEY     = 'automotive_users';
+  const SESSION_KEY   = 'automotive_session';
+  const SESSION_TTL_MS = 1000 * 60 * 60 * 2;   /* 2 hours */
+
+  const DEMO_USERS = {
+    'customer@automotive.com': {
+      password: 'Customer@123',
+      name: 'Customer User',
+      userId: 'AU-C001',
+      role: 'customer'
+    },
+    'business@automotive.com': {
+      password: 'Business@123',
+      name: 'Business Account',
+      userId: 'AU-B001',
+      role: 'business'
+    }
+  };
+
+  function loadRegisteredUsers(){
+    try {
+      const raw = localStorage.getItem(USERS_KEY);
+      const list = raw ? JSON.parse(raw) : [];
+      const map = {};
+      list.forEach(u => {
+        if (!u || !u.email) return;
+        map[u.email.toLowerCase()] = {
+          password: u.password,
+          name: u.name,
+          userId: u.userId,
+          role: u.role || 'customer'
+        };
+      });
+      return map;
+    } catch (e) { return {}; }
+  }
+
+  function setError(errEl, group, show){
+    if (show){ errEl.classList.add('show'); if (group) group.classList.add('has-error'); }
+    else { errEl.classList.remove('show'); if (group) group.classList.remove('has-error'); }
+  }
+  function clearGlobal(){
+    globalError.classList.remove('show');
+    globalError.innerHTML = '';
+    if (globalSuccess){
+      globalSuccess.classList.remove('show');
+      globalSuccess.innerHTML = '';
+    }
+  }
+  function showGlobal(msg){
+    globalError.innerHTML = '<i class="fas fa-exclamation-circle"></i>' + msg;
+    globalError.classList.add('show');
+  }
+  function showGlobalSuccess(msg){
+    if (!globalSuccess) return;
+    globalSuccess.innerHTML = '<i class="fas fa-check-circle"></i>' + msg;
+    globalSuccess.classList.add('show');
+  }
+
+  /* Show signup success message if redirected from signup page */
+  (function showSignupSuccess(){
+    try {
+      const msg = sessionStorage.getItem('automotive_signup_success');
+      if (msg){
+        showGlobalSuccess(msg);
+        sessionStorage.removeItem('automotive_signup_success');
+      }
+    } catch (e) {}
+  })();
+
+  /* Live input listeners */
+  roleSelect.addEventListener('change', () => {
+    if (roleSelect.value) setError(roleError, roleSelect.closest('.login-input-group'), false);
+    clearGlobal();
+  });
+  emailInput.addEventListener('input', () => {
+    if (emailInput.value.trim()) setError(emailError, emailInput.closest('.login-input-group'), false);
+    clearGlobal();
+  });
+  passwordInput.addEventListener('input', () => {
+    if (passwordInput.value.trim()) setError(passwordError, passwordInput.closest('.login-input-group'), false);
+    clearGlobal();
+  });
+  rememberCheck.addEventListener('change', () => {
+    if (rememberCheck.checked) setError(checkboxError, rememberCheck.closest('.login-row-options'), false);
+    clearGlobal();
+  });
+
+  const emailOk = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+  /* Submit */
+  loginBtn.addEventListener('click', function (e){
+    e.preventDefault();
+    clearGlobal();
+    let valid = true;
+
+    if (!roleSelect.value){
+      roleError.textContent = 'Please select your account type.';
+      setError(roleError, roleSelect.closest('.login-input-group'), true);
+      valid = false;
+    } else setError(roleError, roleSelect.closest('.login-input-group'), false);
+
+    const email = emailInput.value.trim().toLowerCase();
+    if (!email || !emailOk(email)){
+      emailError.textContent = 'Please enter a valid email address.';
+      setError(emailError, emailInput.closest('.login-input-group'), true);
+      valid = false;
+    } else setError(emailError, emailInput.closest('.login-input-group'), false);
+
+    const pwd = passwordInput.value;
+    if (!pwd){
+      passwordError.textContent = 'Please enter your password.';
+      setError(passwordError, passwordInput.closest('.login-input-group'), true);
+      valid = false;
+    } else setError(passwordError, passwordInput.closest('.login-input-group'), false);
+
+    if (!rememberCheck.checked){
+      checkboxError.textContent = 'Please check "Remember Me".';
+      setError(checkboxError, rememberCheck.closest('.login-row-options'), true);
+      valid = false;
+    } else setError(checkboxError, rememberCheck.closest('.login-row-options'), false);
+
+    if (!valid) return;
+
+    const freshUsers = Object.assign({}, DEMO_USERS, loadRegisteredUsers());
+    const record = freshUsers[email];
+
+    if (!record){
+      showGlobal('No account found with <strong>' + email + '</strong>. Please check your email or create an account.');
+      return;
+    }
+    if (record.password !== pwd){
+      showGlobal('Incorrect password. Please try again.');
+      return;
+    }
+    if (record.role !== roleSelect.value){
+      const roleNames = {
+        'customer': 'Customer · Personal Vehicle',
+        'business': 'Business · Fleet / Wholesale'
+      };
+      showGlobal('This account is registered as <strong>' + (roleNames[record.role] || record.role) + '</strong>. Please select the correct account type.');
+      return;
+    }
+
+    const session = {
+      authenticated: true,
+      userId: record.userId,
+      name: record.name,
+      email,
+      role: record.role,
+      issuedAt: Date.now(),
+      expiresAt: Date.now() + SESSION_TTL_MS
+    };
+
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Logging in…';
+
+    try {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      if (rememberCheck.checked) localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      else localStorage.removeItem(SESSION_KEY);
+    } catch (err){
+      showGlobal('Could not save your session.');
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Log In';
+      return;
+    }
+
+    setTimeout(function (){
+      if (record.role === 'customer')      window.location.href = 'customer-dashboard.html';
+      else if (record.role === 'business') window.location.href = 'business-dashboard.html';
+    }, 300);
+  });
+
+  /* Enter submits */
+  document.querySelectorAll('.login-input-group input, .login-input-group select').forEach(el => {
+    el.addEventListener('keydown', e => { if (e.key === 'Enter') loginBtn.click(); });
+  });
+
+  console.log('🚗 Login page ready — Automotive (2 roles: customer / business)');
+})();
+</script>
+
+</body>
+</html>
